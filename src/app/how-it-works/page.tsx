@@ -118,7 +118,7 @@ export default async function HowItWorksPage() {
                   <div className={`relative w-full aspect-[4/3] md:aspect-video rounded-[2rem] p-8 ${step.bg} border ${step.border} overflow-hidden group hover:shadow-2xl hover:shadow-blue-900/10 transition-all duration-500`}>
                     <div className={`absolute inset-0 bg-gradient-to-br ${step.color} opacity-0 group-hover:opacity-5 transition-opacity duration-500`} />
                     <div className={`absolute inset-0 flex items-center justify-center opacity-20 transform group-hover:scale-110 transition-transform duration-700 ${step.textColor}`}>
-                      {React.cloneElement(step.icon as React.ReactElement, { className: "w-64 h-64" })}
+                      {React.cloneElement(step.icon as React.ReactElement<any>, { className: "w-64 h-64" })}
                     </div>
                     <div className="relative z-10 h-full flex flex-col justify-end items-start">
                       <div className="bg-white/90 backdrop-blur-md p-6 rounded-2xl border border-white/50 shadow-sm transform translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-500">

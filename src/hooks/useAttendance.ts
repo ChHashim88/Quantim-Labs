@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { createClient } from '@/lib/supabase/client';
 
-export function useAttendance(programId?: string) {
+export function useAttendance(programId?: string | null) {
   useEffect(() => {
     async function logAttendance() {
       if (!programId || typeof window === "undefined") return;
