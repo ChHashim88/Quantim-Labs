@@ -68,7 +68,7 @@ export function OfferLetterClient({ studentName, programName, fallbackDate, prog
                 <div className="relative">
                   <Image 
                     src="/logo.png" 
-                    alt="Quantim Labs Logo" 
+                    alt="Quantim Labz Logo" 
                     width={160} 
                     height={40} 
                     className="relative object-contain h-10 w-auto z-10" 
@@ -98,11 +98,11 @@ export function OfferLetterClient({ studentName, programName, fallbackDate, prog
               <p className="font-bold text-lg text-slate-900">Dear {studentName},</p>
               
               <p>
-                Congratulations! We are thrilled to officially offer you a position in the <span className="font-bold text-blue-700" style={{ color: '#1d4ed8' }}>{programName}</span> Internship Program at <strong className="font-heading text-slate-900">QUANTIM LABS</strong>. 
+                Congratulations! We are thrilled to officially offer you a position in the <span className="font-bold text-blue-700" style={{ color: '#1d4ed8' }}>{programName}</span> Internship Program at <strong className="font-heading text-slate-900">QUANTIM LABZ</strong>. 
               </p>
 
               <p>
-                Your selection is a testament to your potential, dedication, and passion for technology. At Quantim Labs, we are committed to bridging the gap between theoretical knowledge and real-world execution. During this program, you will undergo rigorous, structured training, participate in practical hands-on modules, and build enterprise-grade projects under the guidance of our world-class mentors.
+                Your selection is a testament to your potential, dedication, and passion for technology. At Quantim Labz, we are committed to bridging the gap between theoretical knowledge and real-world execution. During this program, you will undergo rigorous, structured training, participate in practical hands-on modules, and build enterprise-grade projects under the guidance of our world-class mentors.
               </p>
 
               <div className="bg-slate-50 border border-slate-100 p-5 rounded-xl my-6" style={{ backgroundColor: '#f8fafc', borderColor: '#f1f5f9', WebkitPrintColorAdjust: 'exact', printColorAdjust: 'exact' }}>
@@ -136,7 +136,7 @@ export function OfferLetterClient({ studentName, programName, fallbackDate, prog
                 <div className="w-48 h-px bg-slate-300 mb-2" />
                 <p className="font-bold text-slate-900">Dr. Hashim</p>
                 <p className="text-sm text-slate-500">Director of Programs</p>
-                <p className="text-sm font-heading font-black tracking-tight text-slate-900 mt-1">QUANTIM LABS</p>
+                <p className="text-sm font-heading font-black tracking-tight text-slate-900 mt-1">QUANTIM LABZ</p>
               </div>
 
               {/* Verified Badge / Stamp */}

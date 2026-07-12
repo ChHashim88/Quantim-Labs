@@ -324,7 +324,7 @@ export default function CoreTerminal() {
             <span className="text-sm font-semibold text-primary">Core Command Center</span>
           </div>
           <h2 className="text-4xl md:text-5xl font-heading font-bold mb-6">
-            Quantim Labs <span className="bg-gradient-to-r from-primary to-blue-400 bg-clip-text text-transparent">Core Controller</span>
+            Quantim Labz <span className="bg-gradient-to-r from-primary to-blue-400 bg-clip-text text-transparent">Core Controller</span>
           </h2>
           <p className="text-muted-foreground text-lg">
             Interact with the core systems below. Sweep your mouse across the grid to play sounds, rotate the hologram, or run diagnostics.

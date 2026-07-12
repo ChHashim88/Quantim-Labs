@@ -178,7 +178,7 @@ export default function InteractiveConstellation() {
             <span className="text-sm font-semibold text-primary">Live Stack Velocity Index</span>
           </div>
           <h2 className="text-4xl md:text-5xl font-heading font-bold mb-6">
-            Quantim Labs <span className="bg-gradient-to-r from-primary to-blue-400 bg-clip-text text-transparent">Trending Index</span>
+            Quantim Labz <span className="bg-gradient-to-r from-primary to-blue-400 bg-clip-text text-transparent">Trending Index</span>
           </h2>
           <p className="text-muted-foreground text-lg mb-8 leading-relaxed">
             Interactive metrics of global stack momentum. Hover over the waves to see current indices, and toggle components to customize your dashboard.

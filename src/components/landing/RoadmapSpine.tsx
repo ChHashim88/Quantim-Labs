@@ -188,26 +188,25 @@ export function RoadmapSpine() {
     <section
       ref={sectionRef}
       id="features"
-      className="relative w-full bg-white overflow-hidden flex flex-col items-center py-0 md:pt-[5px] md:pb-[100px] pt-[50px] border-t border-slate-100"
+      className="relative w-full bg-[#F2F2F2] overflow-hidden flex flex-col items-center py-0 md:pt-[5px] md:pb-[100px] pt-[50px] border-t border-[#DCDCDC]"
     >
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[800px] bg-[radial-gradient(circle,rgba(59,130,246,0.08)_0%,transparent_70%)] pointer-events-none transform-gpu"></div>
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1200px] h-[1000px] bg-[radial-gradient(circle,rgba(37,99,235,0.05)_0%,transparent_70%)] pointer-events-none transform-gpu"></div>
+
 
       <div
         className={`w-full max-w-[1200px] mx-auto px-6 relative z-10 transition-all duration-1000 transform ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}`}
       >
         <div className="flex flex-col items-center text-center mb-[10px] md:mb-10">
           <div className="flex items-center gap-4 mb-6 mt-16">
-            <span className="text-blue-600 text-xs md:text-sm font-semibold tracking-widest uppercase bg-blue-50 px-4 py-2 rounded-full border border-blue-100">
+            <span className="text-[#111] text-xs md:text-sm font-semibold tracking-widest uppercase bg-[#E8E8E8] px-4 py-2 rounded-full border border-[#DCDCDC]">
               YOUR CAREER PATHWAY
             </span>
           </div>
 
-          <h2 className="text-[25px] md:text-5xl lg:text-6xl font-normal md:font-bold tracking-normal md:tracking-tight text-slate-900 mb-6 w-full max-w-[339px] md:max-w-4xl mx-auto leading-[32px] md:leading-tight font-['Roboto_Condensed'] md:font-sans">
-            The <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-blue-400">Quantim Labs Path</span>
+          <h2 className="text-[25px] md:text-5xl lg:text-6xl font-normal md:font-bold tracking-normal md:tracking-tight text-[#111] mb-6 w-full max-w-[339px] md:max-w-4xl mx-auto leading-[32px] md:leading-tight font-['Roboto_Condensed'] md:font-sans">
+            The <span className="text-[#111]">Quantim Labz Path</span>
           </h2>
 
-          <p className="text-slate-600 text-[13px] md:text-lg leading-[19px] md:leading-relaxed font-normal text-center w-full max-w-[342px] md:max-w-3xl mx-auto tracking-normal font-sans">
+          <p className="text-[#666] text-[13px] md:text-lg leading-[19px] md:leading-relaxed font-normal text-center w-full max-w-[342px] md:max-w-3xl mx-auto tracking-normal font-sans">
             Our optimized learning methodology designed to bridge the gap between classroom theory and real-world execution.
           </p>
         </div>
@@ -272,7 +271,7 @@ export function RoadmapSpine() {
                 className="hidden md:block"
                 d="M 500 0 L 500 190 A 50 50 0 0 1 450 240 L 200 240 A 50 50 0 0 0 150 290 L 150 430 A 50 50 0 0 0 200 480 L 450 480 A 50 50 0 0 1 500 530 L 500 1070 A 50 50 0 0 0 550 1120 L 800 1120 A 50 50 0 0 1 850 1170 L 850 1310 A 50 50 0 0 1 800 1360 L 550 1360 A 50 50 0 0 0 500 1410 L 500 1920"
                 fill="none"
-                stroke="#2563EB"
+                stroke="#111111"
                 strokeWidth="4"
                 strokeLinejoin="round"
                 strokeLinecap="round"
@@ -283,23 +282,23 @@ export function RoadmapSpine() {
           <div className="absolute left-[30px] top-[10px] bottom-[45px] w-[2px] block md:hidden pointer-events-none z-0">
             <div className="absolute inset-0 bg-slate-200 rounded-full" />
             <motion.div
-              className="absolute top-0 bottom-0 left-0 w-full bg-blue-600 origin-top rounded-full shadow-[0_0_8px_#3B82F6]"
+              className="absolute top-0 bottom-0 left-0 w-full bg-[#111] origin-top rounded-full"
               style={{ scaleY: smoothProgress }}
             />
           </div>
           <div className="hidden md:block absolute left-1/2 -translate-x-1/2 -translate-y-1/2 z-20 w-[48px] h-[48px] top-[6.15%]">
-            <div className={`w-full h-full flex items-center justify-center rounded-[7px] bg-white border transition-all duration-500 shadow-sm ${image1Src.includes('Animation') ? 'border-blue-500 shadow-[0_0_15px_rgba(59,130,246,0.3)]' : 'border-slate-200'}`}>
-              <Blocks className={`w-6 h-6 ${image1Src.includes('Animation') ? 'text-blue-600' : 'text-slate-400'}`} />
+            <div className={`w-full h-full flex items-center justify-center rounded-[7px] bg-white border transition-all duration-500 shadow-sm ${image1Src.includes('Animation') ? 'border-[#111] shadow-[0_0_15px_rgba(0,0,0,0.15)]' : 'border-[#DCDCDC]'}`}>
+              <Blocks className={`w-6 h-6 ${image1Src.includes('Animation') ? 'text-[#111]' : 'text-[#AAAAAA]'}`} />
             </div>
           </div>
           <div className="hidden md:block absolute left-1/2 -translate-x-1/2 -translate-y-1/2 z-20 w-[48px] h-[48px] top-[40.00%]">
-            <div className={`w-full h-full flex items-center justify-center rounded-[7px] bg-white border transition-all duration-500 shadow-sm ${image2Src.includes('Animation') ? 'border-blue-500 shadow-[0_0_15px_rgba(59,130,246,0.3)]' : 'border-slate-200'}`}>
-              <Code className={`w-6 h-6 ${image2Src.includes('Animation') ? 'text-blue-600' : 'text-slate-400'}`} />
+            <div className={`w-full h-full flex items-center justify-center rounded-[7px] bg-white border transition-all duration-500 shadow-sm ${image2Src.includes('Animation') ? 'border-[#111] shadow-[0_0_15px_rgba(0,0,0,0.15)]' : 'border-[#DCDCDC]'}`}>
+              <Code className={`w-6 h-6 ${image2Src.includes('Animation') ? 'text-[#111]' : 'text-[#AAAAAA]'}`} />
             </div>
           </div>
           <div className="hidden md:block absolute left-1/2 -translate-x-1/2 -translate-y-1/2 z-20 w-[48px] h-[48px] top-[73.84%]">
-            <div className={`w-full h-full flex items-center justify-center rounded-[7px] bg-white border transition-all duration-500 shadow-sm ${image3Src.includes('Animation') ? 'border-blue-500 shadow-[0_0_15px_rgba(59,130,246,0.3)]' : 'border-slate-200'}`}>
-              <Trophy className={`w-6 h-6 ${image3Src.includes('Animation') ? 'text-blue-600' : 'text-slate-400'}`} />
+            <div className={`w-full h-full flex items-center justify-center rounded-[7px] bg-white border transition-all duration-500 shadow-sm ${image3Src.includes('Animation') ? 'border-[#111] shadow-[0_0_15px_rgba(0,0,0,0.15)]' : 'border-[#DCDCDC]'}`}>
+              <Trophy className={`w-6 h-6 ${image3Src.includes('Animation') ? 'text-[#111]' : 'text-[#AAAAAA]'}`} />
             </div>
           </div>
           {timelineData.map((node) => {
@@ -320,8 +319,8 @@ export function RoadmapSpine() {
                   className={`relative md:absolute left-[65px] md:left-1/2 translate-x-0 md:-translate-x-1/2 md:-translate-y-1/2 w-[calc(100%-80px)] md:w-full max-w-2xl px-0 md:px-6 text-left md:text-center z-10 ${node.topClass}`}
                 >
                   <div ref={nodeRef} className="absolute left-[-35px] top-[4px] -translate-x-1/2 z-20 w-[36px] h-[36px] block md:hidden">
-                    <div className={`w-full h-full flex items-center justify-center rounded-[7px] bg-white border transition-all duration-500 shadow-sm ${iconSrc.includes('Animation') ? 'border-blue-500 shadow-[0_0_15px_rgba(59,130,246,0.3)]' : 'border-slate-200'}`}>
-                      <IconComponent className={`w-4 h-4 ${iconSrc.includes('Animation') ? 'text-blue-600' : 'text-slate-400'}`} />
+                    <div className={`w-full h-full flex items-center justify-center rounded-[7px] bg-white border transition-all duration-500 shadow-sm ${iconSrc.includes('Animation') ? 'border-[#111] shadow-[0_0_15px_rgba(0,0,0,0.15)]' : 'border-[#DCDCDC]'}`}>
+                      <IconComponent className={`w-4 h-4 ${iconSrc.includes('Animation') ? 'text-[#111]' : 'text-[#AAAAAA]'}`} />
                     </div>
                   </div>
                   <h3 className="text-2xl md:text-4xl font-bold text-slate-900 mb-[10px] md:mb-6">
@@ -345,20 +344,20 @@ export function RoadmapSpine() {
 
                     <div className={`relative flex ${node.visualAlignClass} ${node.visualOrderClass}`}>
                       {isStructuredLearning && (
-                        <div className="bg-white border border-slate-200 p-6 md:p-8 rounded-3xl shadow-xl shadow-blue-900/5 w-full max-w-[450px]">
+                        <div className="bg-white border border-[#DCDCDC] p-6 md:p-8 rounded-2xl shadow-md w-full max-w-[450px]">
                           <div className="space-y-4">
-                            <div className="flex items-center justify-between border-b border-slate-100 pb-4">
-                              <span className="font-bold text-slate-900">Module 1: NextJS Core</span>
-                              <span className="text-xs px-2.5 py-1 rounded-full bg-blue-50 text-blue-600 border border-blue-100">Unlocked</span>
+                            <div className="flex items-center justify-between border-b border-[#EBEBEB] pb-4">
+                              <span className="font-bold text-[#111]">Module 1: NextJS Core</span>
+                              <span className="text-xs px-2.5 py-1 rounded-full bg-[#111] text-white">Unlocked</span>
                             </div>
                             <div className="space-y-2">
-                              <div className="flex items-center justify-between text-sm p-3 rounded-xl bg-slate-50 border border-slate-100">
-                                <span className="text-slate-600 font-medium">1.1 App Router</span>
-                                <span className="text-blue-600 text-xs font-semibold">100% Watched</span>
+                              <div className="flex items-center justify-between text-sm p-3 rounded-xl bg-[#F2F2F2] border border-[#DCDCDC]">
+                                <span className="text-[#555] font-medium">1.1 App Router</span>
+                                <span className="text-[#111] text-xs font-semibold">100% Watched</span>
                               </div>
-                              <div className="flex items-center justify-between text-sm p-3 rounded-xl bg-slate-50 border border-slate-100">
-                                <span className="text-slate-600 font-medium">1.2 Server Components</span>
-                                <span className="text-blue-500 text-xs font-semibold animate-pulse">Watching Now</span>
+                              <div className="flex items-center justify-between text-sm p-3 rounded-xl bg-[#F2F2F2] border border-[#DCDCDC]">
+                                <span className="text-[#555] font-medium">1.2 Server Components</span>
+                                <span className="text-[#111] text-xs font-semibold animate-pulse">Watching Now</span>
                               </div>
                             </div>
                           </div>
@@ -366,13 +365,13 @@ export function RoadmapSpine() {
                       )}
 
                       {isPracticalDevelopment && (
-                        <div className="bg-white border border-slate-200 p-6 md:p-8 rounded-3xl shadow-xl shadow-blue-900/5 w-full max-w-[450px]">
+                        <div className="bg-white border border-[#DCDCDC] p-6 md:p-8 rounded-2xl shadow-md w-full max-w-[450px]">
                           <div className="space-y-4">
-                            <div className="flex items-center justify-between border-b border-slate-100 pb-4">
-                              <span className="font-bold text-slate-900">Interactive Sandbox</span>
-                              <span className="text-xs px-2.5 py-1 rounded-full bg-blue-50 text-blue-600 border border-blue-100">Live Sync</span>
+                            <div className="flex items-center justify-between border-b border-[#EBEBEB] pb-4">
+                              <span className="font-bold text-[#111]">Interactive Sandbox</span>
+                              <span className="text-xs px-2.5 py-1 rounded-full bg-[#111] text-white">Live Sync</span>
                             </div>
-                            <pre className="text-[10px] md:text-xs bg-slate-900 p-4 rounded-xl text-slate-300 font-mono overflow-x-auto border border-slate-800 shadow-inner">
+                            <pre className="text-[10px] md:text-xs bg-[#111] p-4 rounded-xl text-[#AAAAAA] font-mono overflow-x-auto border border-[#2A2A2A] shadow-inner">
                               <code>{`// Submit Task 3 for Review\nconst res = await fetch("/api/submit", {\n  method: "POST",\n  body: JSON.stringify({ code })\n});\nif (res.ok) console.log("Passed!");`}</code>
                             </pre>
                           </div>
@@ -380,13 +379,13 @@ export function RoadmapSpine() {
                       )}
 
                       {isVerifiableCertification && (
-                        <div className="bg-white border border-slate-200 p-6 md:p-8 rounded-3xl shadow-xl shadow-blue-900/5 w-full max-w-[450px] flex flex-col items-center text-center justify-center min-h-[220px] mx-auto md:mx-0">
-                          <div className="w-16 h-16 rounded-full bg-blue-50 border-2 border-blue-100 flex items-center justify-center mb-4 text-blue-600 shadow-[0_0_15px_rgba(59,130,246,0.15)]">
+                        <div className="bg-white border border-[#DCDCDC] p-6 md:p-8 rounded-2xl shadow-md w-full max-w-[450px] flex flex-col items-center text-center justify-center min-h-[220px] mx-auto md:mx-0">
+                          <div className="w-16 h-16 rounded-full bg-[#F2F2F2] border-2 border-[#DCDCDC] flex items-center justify-center mb-4 text-[#111]">
                             <Trophy className="w-8 h-8" />
                           </div>
-                          <h4 className="font-bold text-slate-900 mb-1">Internship Certified</h4>
-                          <p className="text-xs text-slate-500 mb-4 font-mono">ID: INX-2026-9042A</p>
-                          <div className="px-6 py-2 bg-slate-900 rounded-xl border border-slate-800 shadow-md">
+                          <h4 className="font-bold text-[#111] mb-1">Internship Certified</h4>
+                          <p className="text-xs text-[#666] mb-4 font-mono">ID: INX-2026-9042A</p>
+                          <div className="px-6 py-2 bg-[#111] rounded-xl shadow-md">
                             <span className="text-[10px] text-white font-mono font-bold tracking-wider">VERIFIED</span>
                           </div>
                         </div>

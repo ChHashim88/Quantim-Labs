@@ -25,7 +25,7 @@ const sidebarStructure = [
     icon: Users,
     items: [
       { name: "Students", href: "/admin/students", icon: GraduationCap },
-      { name: "Mentors", href: "/admin/mentors", icon: UserCheck },
+      // { name: "Mentors", href: "/admin/mentors", icon: UserCheck },
       { name: "Admins", href: "/admin/users", icon: UserCog },
       { name: "Roles & Permissions", href: "/admin/roles", icon: Key },
     ]
@@ -162,7 +162,7 @@ export function AdminSidebar({ profile }: { profile: any }) {
           <div className="relative">
             <Image 
               src="/logo.png" 
-              alt="Quantim Labs Logo" 
+              alt="Quantim Labz Logo" 
               width={120} 
               height={32} 
               className="relative object-contain h-8 w-auto z-10 transition-transform duration-500 group-hover:scale-105" 

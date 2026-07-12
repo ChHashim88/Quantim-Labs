@@ -81,7 +81,7 @@ export default async function ProgramDetailsPage({ params }: { params: Promise<{
       </div>
       <footer className="py-8 border-t border-border mt-auto bg-card">
         <div className="container mx-auto px-4 text-center text-muted-foreground text-sm">
-          &copy; {new Date().getFullYear()} Quantim Labs. All rights reserved.
+          &copy; {new Date().getFullYear()} Quantim Labz. All rights reserved.
         </div>
       </footer>
     </main>

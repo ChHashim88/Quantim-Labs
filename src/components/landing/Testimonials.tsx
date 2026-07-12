@@ -21,9 +21,9 @@ const TESTIMONIALS_DATA: Testimonial[] = [
     role: "Full Stack Engineer",
     company: "Vercel",
     avatarInitials: "NA",
-    avatarBg: "from-blue-600 to-blue-400",
+    avatarBg: "from-[#333] to-[#111]",
     rating: 5,
-    text: "Quantim Labs completely changed my trajectory. The structured daily lessons and lock system kept me disciplined, and the AI agent feedback felt like having a personal mentor 24/7."
+    text: "Quantim Labz completely changed my trajectory. The structured daily lessons and lock system kept me disciplined, and the AI agent feedback felt like having a personal mentor 24/7."
   },
   {
     id: 2,
@@ -31,7 +31,7 @@ const TESTIMONIALS_DATA: Testimonial[] = [
     role: "Cloud Architect",
     company: "AWS",
     avatarInitials: "SR",
-    avatarBg: "from-blue-700 to-blue-500",
+    avatarBg: "from-[#444] to-[#222]",
     rating: 5,
     text: "Building real-world projects in the browser sandbox and deploying them prepared me for the enterprise stack. I was interview-ready from day one and landed my dream role."
   },
@@ -41,7 +41,7 @@ const TESTIMONIALS_DATA: Testimonial[] = [
     role: "AI Engineer",
     company: "OpenAI",
     avatarInitials: "AR",
-    avatarBg: "from-slate-700 to-blue-600",
+    avatarBg: "from-[#555] to-[#333]",
     rating: 5,
     text: "The AI agent curriculum and database integration challenges were cutting-edge. It is rare to find an internship program that mirrors actual high-scale production systems so closely."
   }
@@ -49,23 +49,22 @@ const TESTIMONIALS_DATA: Testimonial[] = [
 
 export function Testimonials() {
   return (
-    <section id="testimonials" className="py-28 relative overflow-hidden bg-background border-t border-border">
-      {/* Decorative Background Glows */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[550px] h-[550px] bg-primary/5 rounded-full blur-[130px] pointer-events-none" />
+    <section id="testimonials" className="py-28 relative overflow-hidden bg-[#F2F2F2] border-t border-[#DCDCDC]">
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[550px] h-[550px] bg-[#111]/3 rounded-full blur-[130px] pointer-events-none" />
 
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+      <div className="max-w-[1400px] mx-auto px-8 md:px-16 relative z-10">
 
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto mb-20">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-6">
-            <Quote className="w-4 h-4 text-primary" />
-            <span className="text-sm font-semibold text-primary">Student Success</span>
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#E8E8E8] border border-[#DCDCDC] mb-6">
+            <Quote className="w-4 h-4 text-[#111]" />
+            <span className="text-sm font-semibold text-[#111]">Student Success</span>
           </div>
           <h2 className="text-4xl md:text-5xl font-heading font-bold mb-6">
-            What Our <span className="bg-gradient-to-r from-primary to-blue-400 bg-clip-text text-transparent">Graduates Say</span>
+            What Our <span className="text-[#111]">Graduates Say</span>
           </h2>
           <p className="text-muted-foreground text-lg leading-relaxed">
-            See how Quantim Labs graduates bridged the gap between theory and industry execution to land top-tier tech roles.
+            See how Quantim Labz graduates bridged the gap between theory and industry execution to land top-tier tech roles.
           </p>
         </div>
 
@@ -78,7 +77,7 @@ export function Testimonials() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-80px" }}
               transition={{ duration: 0.5, delay: idx * 0.15 }}
-              className="group relative rounded-3xl p-8 bg-card/45 border border-border/50 hover:border-primary/30 transition-all duration-300 shadow-xl backdrop-blur-sm hover:shadow-2xl hover:shadow-primary/5 flex flex-col justify-between"
+              className="group relative rounded-2xl p-8 bg-white border border-[#DCDCDC] hover:border-[#AAAAAA] hover:shadow-xl transition-all duration-300 shadow-sm flex flex-col justify-between"
             >
               {/* Card Hover Ambient Light Effect */}
               <div className="absolute inset-0 bg-gradient-to-br from-white/[0.015] to-transparent rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />

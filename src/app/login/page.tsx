@@ -53,7 +53,7 @@ export default function LoginPage() {
           <Link href="/" className="inline-flex items-center gap-1 group mb-16 hover:opacity-80 transition-opacity">
             <Image 
               src="/logo.png" 
-              alt="Quantim Labs Logo" 
+              alt="Quantim Labz Logo" 
               width={160} 
               height={44} 
               className="relative object-contain h-10 w-auto z-10 filter brightness-0 invert" 

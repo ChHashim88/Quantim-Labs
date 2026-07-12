@@ -19,7 +19,7 @@ export default async function HowItWorksPage() {
     {
       id: "01",
       title: "Enroll & Onboard",
-      description: "Join Quantim Labs and get immediate access to your personalized dashboard. Choose your preferred tech stack and internship track.",
+      description: "Join Quantim Labz and get immediate access to your personalized dashboard. Choose your preferred tech stack and internship track.",
       icon: <Rocket className="w-8 h-8" />,
       color: "from-blue-400 to-blue-600",
       bg: "bg-blue-50",
@@ -59,17 +59,41 @@ export default async function HowItWorksPage() {
   ];
 
   return (
-    <main className="min-h-screen bg-background pt-32">
+    <main className="min-h-screen bg-background">
       <Navbar user={user} userRole={userRole} />
+      
+      {/* Internship Programs Sub-Navigation (Pill Menu) */}
+      <div className="pt-28 pb-4 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-center md:justify-start overflow-hidden">
+        <div className="grid grid-cols-2 md:inline-flex bg-white border border-border p-1.5 rounded-3xl md:rounded-full shadow-sm gap-1 md:gap-0 w-full md:w-auto items-stretch md:items-center">
+          <Link href="/internship-programs" className="flex items-center justify-center px-2 sm:px-4 md:px-6 py-2.5 rounded-full text-[13px] md:text-sm font-bold text-muted-foreground hover:text-foreground hover:bg-black/5 transition-all text-center leading-tight">
+            Internship Programs
+          </Link>
+          <Link href="/how-it-works" className="flex items-center justify-center px-2 sm:px-4 md:px-6 py-2.5 rounded-full text-[13px] md:text-sm font-bold bg-[#111] text-white shadow-md transition-all text-center leading-tight">
+            How it Works
+          </Link>
+          <Link href="/internships-about" className="flex items-center justify-center px-2 sm:px-4 md:px-6 py-2.5 rounded-full text-[13px] md:text-sm font-bold text-muted-foreground hover:text-foreground hover:bg-black/5 transition-all text-center leading-tight">
+            About Us
+          </Link>
+          {user ? (
+            <Link href={userRole === 'SUPER_ADMIN' || userRole === 'ADMIN' ? '/admin' : '/student'} className="flex items-center justify-center px-2 sm:px-4 md:px-6 py-2.5 rounded-full text-[13px] md:text-sm font-bold text-muted-foreground hover:text-foreground hover:bg-black/5 transition-all text-center leading-tight">
+              {userRole === 'SUPER_ADMIN' || userRole === 'ADMIN' ? 'Admin Portal' : 'Dashboard'}
+            </Link>
+          ) : (
+            <Link href="/login" className="flex items-center justify-center px-2 sm:px-4 md:px-6 py-2.5 rounded-full text-[13px] md:text-sm font-bold text-muted-foreground hover:text-foreground hover:bg-black/5 transition-all text-center leading-tight">
+              Login
+            </Link>
+          )}
+        </div>
+      </div>
       
       {/* Hero */}
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 mb-24">
         <div className="max-w-4xl mx-auto text-center relative z-10">
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[400px] bg-blue-100/50 rounded-full blur-[100px] -z-10 pointer-events-none" />
+
           
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 border border-blue-100 mb-6">
-            <span className="w-2 h-2 rounded-full bg-blue-600 animate-pulse" />
-            <span className="text-sm font-semibold text-blue-600 uppercase tracking-widest">The Process</span>
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#E8E8E8] border border-[#DCDCDC] mb-6">
+            <span className="w-2 h-2 rounded-full bg-[#111] animate-pulse" />
+            <span className="text-sm font-semibold text-[#111] uppercase tracking-widest">The Process</span>
           </div>
           
           <h1 className="text-5xl md:text-7xl font-heading font-extrabold text-slate-900 tracking-tight mb-8">
@@ -154,7 +178,7 @@ export default async function HowItWorksPage() {
 
       <footer className="py-8 border-t border-slate-200 mt-auto bg-white">
         <div className="container mx-auto px-4 text-center text-slate-500 text-sm">
-          &copy; {new Date().getFullYear()} Quantim Labs. All rights reserved.
+          &copy; {new Date().getFullYear()} Quantim Labz. All rights reserved.
         </div>
       </footer>
     </main>

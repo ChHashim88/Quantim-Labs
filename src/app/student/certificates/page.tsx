@@ -272,7 +272,7 @@ export default function CertificatesPage() {
               </div>
               
               <h2 className="text-xs font-bold text-primary uppercase tracking-[0.3em] font-mono">
-                QUANTIM LABS CERTIFICATE OF ACCREDITATION
+                QUANTIM LABZ CERTIFICATE OF ACCREDITATION
               </h2>
               
               <div className="space-y-1">

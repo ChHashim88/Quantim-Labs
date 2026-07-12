@@ -1,8 +1,10 @@
 "use client";
 
 import { motion } from "framer-motion";
+import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 
 const programs = [
   {
@@ -27,11 +29,11 @@ const programs = [
 
 export function Programs() {
   return (
-    <section id="programs" className="py-24 relative bg-card/50 border-y border-border">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+    <section id="programs" className="py-24 relative bg-[#F2F2F2] border-y border-[#DCDCDC]">
+      <div className="max-w-[1400px] mx-auto px-8 md:px-16">
         <div className="text-center max-w-3xl mx-auto mb-16">
           <h2 className="text-3xl md:text-5xl font-heading font-bold mb-6">
-            Featured <span className="text-primary">Programs</span>
+            Internship <span className="text-primary">Programs</span>
           </h2>
           <p className="text-muted-foreground text-lg">
             Choose from our industry-vetted internship programs designed to accelerate your tech career.
@@ -46,7 +48,7 @@ export function Programs() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: idx * 0.1 }}
-              className="group rounded-3xl bg-background border border-border hover:border-primary/50 transition-all hover:shadow-xl hover:shadow-primary/5 relative overflow-hidden flex flex-col h-full"
+              className="group rounded-2xl bg-white border border-[#DCDCDC] hover:border-[#AAAAAA] hover:shadow-xl transition-all duration-300 relative overflow-hidden flex flex-col h-full"
             >
               {/* AI Image Banner without heavy fade */}
               <div className="h-48 w-full relative overflow-hidden border-b border-border shadow-inner">
@@ -64,7 +66,11 @@ export function Programs() {
                   {program.description}
                 </p>
 
-                <Button variant="outline" className="w-full group-hover:bg-primary group-hover:text-primary-foreground group-hover:border-primary transition-all">
+                <Button 
+                  variant="outline" 
+                  className="w-full border-[#DCDCDC] text-[#111] hover:bg-[#111] hover:text-white hover:border-[#111] transition-all rounded-xl"
+                  onClick={() => toast("Slots are full for these courses, see Active courses.")}
+                >
                   View Details <ArrowRight className="ml-2 w-4 h-4" />
                 </Button>
               </div>
@@ -73,9 +79,9 @@ export function Programs() {
         </div>
 
         <div className="mt-16 text-center">
-          <Button size="lg" className="rounded-full px-8">
+          <Link href="/programs" className="inline-block mt-16 px-8 py-3 rounded-full bg-[#111] text-white text-sm font-medium hover:bg-black transition-colors">
             View All Programs
-          </Button>
+          </Link>
         </div>
       </div>
     </section>

@@ -50,14 +50,14 @@ const features = [
 
 export function Features() {
   return (
-    <section id="features" className="py-24 relative overflow-hidden bg-background">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+    <section id="features" className="py-24 relative overflow-hidden bg-[#EBEBEB]">
+      <div className="max-w-[1400px] mx-auto px-8 md:px-16">
         <div className="text-center max-w-3xl mx-auto mb-16">
           <h2 className="text-3xl md:text-5xl font-heading font-bold mb-6">
             Everything you need to <span className="text-primary">succeed</span>
           </h2>
           <p className="text-muted-foreground text-lg">
-            Quantim Labs isn't just an LMS. It's a comprehensive ecosystem designed to guarantee learning outcomes and prepare you for the industry.
+            Quantim Labz isn't just an LMS. It's a comprehensive ecosystem designed to guarantee learning outcomes and prepare you for the industry.
           </p>
         </div>
 
@@ -69,16 +69,16 @@ export function Features() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: idx * 0.1 }}
-              className="relative group rounded-3xl p-8 bg-card border border-border/50 hover:border-border transition-colors"
+              className="relative group rounded-2xl p-8 bg-white border border-[#DCDCDC] hover:border-[#AAAAAA] hover:shadow-lg transition-all duration-300"
             >
               <div className="absolute inset-0 bg-gradient-to-b from-white/[0.02] to-transparent rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity" />
               
-              <div className={`w-14 h-14 rounded-2xl ${feature.bgColor} flex items-center justify-center mb-6`}>
-                <feature.icon className={`w-7 h-7 ${feature.color}`} />
+              <div className={`w-14 h-14 rounded-xl bg-[#F2F2F2] border border-[#DCDCDC] flex items-center justify-center mb-6`}>
+                <feature.icon className="w-7 h-7 text-[#111]" />
               </div>
               
-              <h3 className="text-xl font-bold text-foreground mb-3">{feature.title}</h3>
-              <p className="text-muted-foreground leading-relaxed">
+              <h3 className="text-lg font-bold text-[#111] mb-3">{feature.title}</h3>
+              <p className="text-[#666] leading-relaxed text-sm">
                 {feature.description}
               </p>
             </motion.div>

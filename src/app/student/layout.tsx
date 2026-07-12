@@ -124,7 +124,7 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
             <div className="relative">
               <Image 
                 src="/logo.png" 
-                alt="Quantim Labs Logo" 
+                alt="Quantim Labz Logo" 
                 width={120} 
                 height={32} 
                 className="relative object-contain h-9 w-auto z-10 transition-transform duration-500 group-hover:scale-105" 

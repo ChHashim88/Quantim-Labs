@@ -270,7 +270,7 @@ export function EditInternshipClient({ internship }: { internship: any }) {
               <div className="space-y-4">
                 <div className="space-y-2">
                   <Label>Meta Title</Label>
-                  <Input name="meta_title" defaultValue={internship.meta_title} placeholder="Best AI Internship 2026 | Quantim Labs" />
+                  <Input name="meta_title" defaultValue={internship.meta_title} placeholder="Best AI Internship 2026 | Quantim Labz" />
                 </div>
                 <div className="space-y-2">
                   <Label>Meta Description</Label>
