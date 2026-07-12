@@ -2,121 +2,117 @@
 
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
-import { ArrowRight, ChevronRight, Triangle, Circle, Square, Hexagon } from "lucide-react";
+import { ArrowRight, Sparkles, GraduationCap } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { TerminalBanner } from "./TerminalBanner";
 
 export function Hero() {
   return (
-    <section className="relative pt-32 pb-20 bg-[#0A0A0A] text-white min-h-[90vh] flex flex-col justify-center font-sans overflow-hidden">
-      
-      {/* Background Subtle Gradient Glows */}
-      <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-blue-900/10 rounded-full blur-[120px] pointer-events-none" />
-      <div className="absolute bottom-0 right-1/4 w-[400px] h-[400px] bg-purple-900/10 rounded-full blur-[100px] pointer-events-none" />
-      
-      <div className="container relative z-10 mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-8 items-center">
-          
-          {/* Left Column: Content */}
-          <div className="flex flex-col items-start text-left lg:pr-12">
-            
-            {/* Pill Badge */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-              className="inline-flex items-center px-4 py-1.5 rounded-full border border-blue-500/30 bg-blue-950/20 mb-8 backdrop-blur-sm"
-            >
-              <span className="text-xs font-medium text-blue-100 tracking-wide">
-                Announcing Quantim Labs Programs
-              </span>
-            </motion.div>
+    <section className="relative pt-32 pb-20 overflow-hidden">
+      {/* Left decorative image */}
+      <motion.div
+        initial={{ opacity: 0, x: -40 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.8, delay: 0.4 }}
+        style={{
+          position: "absolute",
+          left: 0,
+          top: "50%",
+          transform: "translateY(-50%) rotate(3.91deg)",
+          zIndex: 0,
+          pointerEvents: "none",
+        }}
+      >
+        <Image
+          src="/h2.png"
+          alt="Decorative"
+          width={316}
+          height={316}
+          style={{ width: "315.26px", height: "315.26px", opacity: 1 }}
+        />
+      </motion.div>
 
-            {/* Title */}
-            <motion.h1
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.1 }}
-              className="text-5xl md:text-6xl lg:text-7xl font-medium tracking-tight mb-6 leading-[1.1] text-white font-heading"
-            >
-              Empower your career <br />
-              with our versatile platform
-            </motion.h1>
+      {/* Right decorative image */}
+      <motion.div
+        initial={{ opacity: 0, x: 40 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.8, delay: 0.4 }}
+        style={{
+          position: "absolute",
+          right: 0,
+          top: "50%",
+          transform: "translateY(-50%) rotate(-14.52deg)",
+          zIndex: 0,
+          pointerEvents: "none",
+        }}
+      >
+        <Image
+          src="/h3.png"
+          alt="Decorative"
+          width={238}
+          height={238}
+          style={{ width: "237.56px", height: "237.56px", opacity: 1 }}
+        />
+      </motion.div>
+      <div className="container relative z-10 mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center text-center">
+        <TerminalBanner />
 
-            {/* Subtitle */}
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-              className="text-base md:text-lg text-neutral-400 max-w-xl mb-10 leading-relaxed font-light"
-            >
-              Seamlessly integrate advanced skills into your portfolio with our developer-friendly, 
-              scalable internship ecosystem. Save time, reduce complexity, and focus on building what matters.
-            </motion.p>
+        <motion.h1
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.1 }}
+          className="text-5xl md:text-7xl font-heading font-extrabold tracking-tight mb-6 max-w-4xl"
+        >
+          Master Real-World Skills with <br className="hidden md:block" />
+          <span className="bg-gradient-to-r from-primary to-blue-400 bg-clip-text text-transparent">
+            Quantim Labs Programs
+          </span>
+        </motion.h1>
 
-            {/* Buttons */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.3 }}
-              className="flex items-center gap-6"
-            >
-              <Button 
-                asChild
-                className="h-12 px-7 rounded-full bg-white text-black hover:bg-neutral-200 font-medium transition-colors"
-              >
-                <Link href="/login">
-                  Get Started <ArrowRight className="ml-2 w-4 h-4" />
-                </Link>
-              </Button>
-              <Link 
-                href="/programs" 
-                className="group flex items-center text-neutral-300 hover:text-white transition-colors text-sm font-medium"
-              >
-                Explore Programs <ChevronRight className="ml-1 w-4 h-4 group-hover:translate-x-1 transition-transform" />
-              </Link>
-            </motion.div>
-          </div>
+        <motion.p
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+          className="text-lg md:text-xl text-muted-foreground max-w-2xl mb-10 leading-relaxed"
+        >
+          Not just an LMS. A complete internship ecosystem where you learn, build, and grow under expert mentorship. Prepare for your career with a premium learning experience.
+        </motion.p>
 
-          {/* Right Column: 3D Graphic */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            className="relative flex justify-center lg:justify-end mt-12 lg:mt-0"
-          >
-            <div className="relative w-full max-w-[600px] aspect-square">
-              {/* Fallback glow if image is slow to load */}
-              <div className="absolute inset-0 bg-gradient-to-tr from-slate-900 to-slate-800 rounded-full blur-[100px] opacity-50" />
-              <Image
-                src="/assets/cubes.png"
-                alt="3D Metallic Cubes"
-                fill
-                className="object-contain relative z-10 mix-blend-screen"
-                priority
-                sizes="(max-width: 768px) 100vw, 600px"
-              />
-            </div>
-          </motion.div>
-        </div>
-
-        {/* Trusted By Section */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.6 }}
-          className="mt-32 pt-16 flex flex-col items-center border-t border-white/5"
+          transition={{ duration: 0.5, delay: 0.3 }}
+          className="flex flex-col sm:flex-row items-center gap-4 w-full justify-center"
         >
-          <p className="text-xs text-neutral-500 mb-10 font-medium tracking-wide">Trusted by the world&apos;s most innovative companies</p>
-          
-          <div className="flex flex-wrap justify-center items-center gap-x-12 gap-y-10 opacity-60 grayscale hover:grayscale-0 transition-all duration-700">
-             <div className="flex items-center gap-2 text-xl font-bold font-sans tracking-tight"><div className="w-6 h-6 rounded-full border-[3px] border-white/80" /> Linear</div>
-             <div className="flex items-center gap-2 text-2xl font-black font-sans tracking-tighter">HubSpot</div>
-             <div className="flex items-center gap-2 text-xl font-bold font-sans lowercase"><Triangle className="w-5 h-5 fill-current" /> adidas</div>
-             <div className="flex items-center gap-2 text-xl font-bold font-sans"><Square className="w-5 h-5 fill-current text-blue-500" /> Dropbox</div>
-             <div className="flex items-center gap-1 text-xl font-bold font-sans tracking-tight text-blue-400"><Circle className="w-5 h-5 fill-current" /> coinbase</div>
-             <div className="flex items-center gap-2 text-xl font-bold font-sans"><Hexagon className="w-6 h-6 text-green-500" /> grammarly</div>
-          </div>
+          <Button size="lg" className="h-14 px-8 text-base font-semibold bg-primary text-primary-foreground hover:bg-primary/90 rounded-full shadow-[0_0_20px_rgba(59,130,246,0.3)] w-full sm:w-auto">
+            Apply Internship <ArrowRight className="ml-2 w-5 h-5" />
+          </Button>
+          <Link href="/programs" className="w-full sm:w-auto">
+            <Button size="lg" variant="outline" className="h-14 px-8 text-base font-semibold rounded-full border-border hover:bg-muted w-full bg-transparent">
+              Explore Programs
+            </Button>
+          </Link>
+        </motion.div>
+
+        {/* Floating Badges */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 1, delay: 0.6 }}
+          className="mt-20 grid grid-cols-2 md:grid-cols-4 gap-6 w-full max-w-4xl opacity-80"
+        >
+          {[
+            { label: "50+ Mentors", icon: GraduationCap },
+            { label: "100% Completion Focus", icon: Sparkles },
+            { label: "Enterprise Stack", icon: ArrowRight },
+            { label: "Career Ready", icon: Sparkles },
+          ].map((item, idx) => (
+            <div key={idx} className="flex flex-col items-center gap-2 p-4 rounded-2xl bg-muted border border-border ">
+              <item.icon className="w-6 h-6 text-primary" />
+              <span className="text-sm font-medium text-foreground">{item.label}</span>
+            </div>
+          ))}
         </motion.div>
       </div>
     </section>
