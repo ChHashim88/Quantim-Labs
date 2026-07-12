@@ -17,7 +17,7 @@ export function Hero() {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="text-[11px] font-mono uppercase tracking-[0.25em] text-[#555] mb-5"
+          className="text-[9px] md:text-[11px] font-mono uppercase tracking-[0.15em] md:tracking-[0.25em] text-[#555] mb-5 whitespace-nowrap"
         >
           [ Imagine Anything, Build Everything ]
         </motion.p>
@@ -31,9 +31,8 @@ export function Hero() {
         >
           <span className="md:hidden">
             Introducing<br />
-            the future<br />
-            of tech<br />
-            careers
+            the future of<br />
+            tech careers
           </span>
           <span className="hidden md:inline">
             Introducing the future of tech careers
