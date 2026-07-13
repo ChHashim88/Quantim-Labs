@@ -3,6 +3,7 @@ import { Navbar } from "@/components/layout/Navbar";
 import { createClient } from "@/lib/supabase/server";
 import { Code, Smartphone, Globe, Search, Megaphone, PenTool, ArrowRight } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 
 const services = [
   {
@@ -55,17 +56,65 @@ export default async function ServicesPage() {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Header Section */}
-        <div className="max-w-4xl mx-auto text-center mb-20">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#E8E8E8] border border-[#DCDCDC] mb-6">
-            <span className="w-2 h-2 rounded-full bg-[#111] animate-pulse" />
-            <span className="text-sm font-semibold text-[#111] uppercase tracking-widest">Our Expertise</span>
+        <div className="flex flex-col lg:flex-row items-center justify-between gap-16 mb-24 max-w-7xl mx-auto">
+          {/* Text Content */}
+          <div className="flex-1 text-center lg:text-left relative z-10">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#E8E8E8] border border-[#DCDCDC] mb-6">
+              <span className="w-2 h-2 rounded-full bg-[#111] animate-pulse" />
+              <span className="text-sm font-semibold text-[#111] uppercase tracking-widest">Our Expertise</span>
+            </div>
+            <h1 className="text-5xl md:text-6xl lg:text-7xl font-heading font-extrabold text-foreground mb-6 leading-[1.1] tracking-tight">
+              Premium Digital <br className="hidden lg:block" />
+              <span className="text-[#111] relative inline-block">
+                Services
+                <svg className="absolute -bottom-1 left-0 w-full text-[#DCDCDC] -z-10" viewBox="0 0 100 10" preserveAspectRatio="none">
+                  <path d="M0 5 Q 50 10 100 5" stroke="currentColor" strokeWidth="4" fill="transparent"/>
+                </svg>
+              </span>
+            </h1>
+            <p className="text-xl text-muted-foreground leading-relaxed max-w-2xl mx-auto lg:mx-0">
+              From seamless web applications to high-impact digital marketing, we provide end-to-end solutions that elevate your brand and drive measurable results.
+            </p>
           </div>
-          <h1 className="text-4xl md:text-6xl font-heading font-bold text-foreground mb-6 leading-tight">
-            Premium Digital <span className="text-[#111]">Services</span>
-          </h1>
-          <p className="text-xl text-muted-foreground leading-relaxed max-w-2xl mx-auto">
-            From seamless web applications to high-impact digital marketing, we provide end-to-end solutions that elevate your brand and drive measurable results.
-          </p>
+
+          {/* Creative Image Display */}
+          <div className="flex-1 relative w-full max-w-lg lg:max-w-none">
+            {/* Background decorative blur */}
+            <div className="absolute inset-0 bg-gray-200 rounded-full blur-3xl opacity-50 -z-10 transform translate-y-10 scale-90" />
+            
+            <div className="relative aspect-square md:aspect-[4/3] rounded-[2.5rem] overflow-hidden border border-[#DCDCDC] shadow-2xl group bg-[#F2F2F2]">
+              <Image 
+                src="/ser1.png" 
+                alt="Premium Digital Services" 
+                fill 
+                className="object-cover transition-transform duration-700 group-hover:scale-105"
+                priority
+              />
+              {/* Overlay elements */}
+              <div className="absolute inset-0 bg-gradient-to-t from-[#111]/50 via-transparent to-transparent pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+              
+              <div className="absolute bottom-6 left-6 right-6 bg-white/90 backdrop-blur-md border border-white/50 p-4 rounded-2xl flex items-center justify-between opacity-0 group-hover:opacity-100 transition-all duration-500 translate-y-4 group-hover:translate-y-0 shadow-lg">
+                 <div>
+                   <p className="text-xs text-gray-500 font-bold uppercase tracking-wider mb-1">Impact</p>
+                   <p className="font-bold text-[#111] text-lg leading-none">Innovative Solutions</p>
+                 </div>
+                 <div className="w-10 h-10 rounded-full bg-[#111] flex items-center justify-center">
+                   <ArrowRight className="w-5 h-5 text-white" />
+                 </div>
+              </div>
+            </div>
+
+            {/* Floating Badge */}
+            <div className="absolute -left-8 top-12 bg-white border border-[#DCDCDC] shadow-xl rounded-2xl p-4 hidden md:flex items-center gap-4 animate-bounce hover:animate-none transition-transform hover:scale-105 cursor-pointer z-20">
+              <div className="w-12 h-12 rounded-xl bg-[#F2F2F2] flex items-center justify-center border border-[#DCDCDC]">
+                <Code className="w-6 h-6 text-[#111]" />
+              </div>
+              <div>
+                <p className="text-xs text-gray-500 font-bold uppercase tracking-wider mb-1">Engineering</p>
+                <p className="text-sm font-bold text-[#111]">100% Scalable</p>
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Services Grid */}

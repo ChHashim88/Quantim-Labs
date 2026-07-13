@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { Globe, ShieldCheck, Award, Building, Users, Code, Cpu, LineChart } from "lucide-react";
 import { Navbar } from "@/components/layout/Navbar";
 import Link from "next/link";
+import Image from "next/image";
 
 export default async function AboutPage() {
   const supabase = await createClient();
@@ -63,17 +64,42 @@ export default async function AboutPage() {
                 ))}
               </div>
             </div>
-            <div className="relative flex justify-center py-10">
-               <div className="absolute inset-0 bg-primary/5 rounded-full blur-3xl transform scale-75" />
-               <div className="grid grid-cols-2 gap-6 relative z-10 opacity-90">
-                  <div className="flex flex-col gap-6 -translate-y-6">
-                    <div className="w-32 h-32 rounded-[2rem] bg-[#F2F2F2] border border-[#DCDCDC] flex items-center justify-center shadow-sm hover:scale-105 transition-transform"><Building className="w-12 h-12 text-[#111]" strokeWidth={1.5} /></div>
-                    <div className="w-32 h-32 rounded-[2rem] bg-white border border-[#DCDCDC] flex items-center justify-center shadow-md hover:scale-105 transition-transform"><Code className="w-12 h-12 text-[#111]" strokeWidth={1.5} /></div>
-                  </div>
-                  <div className="flex flex-col gap-6 translate-y-6">
-                    <div className="w-32 h-32 rounded-[2rem] bg-[#111] text-white flex items-center justify-center shadow-xl hover:scale-105 transition-transform"><Cpu className="w-12 h-12" strokeWidth={1.5} /></div>
-                    <div className="w-32 h-32 rounded-[2rem] bg-[#F2F2F2] border border-[#DCDCDC] flex items-center justify-center shadow-sm hover:scale-105 transition-transform"><Globe className="w-12 h-12 text-[#111]" strokeWidth={1.5} /></div>
-                  </div>
+            <div className="relative flex justify-center py-10 lg:py-0 items-center">
+               <div className="absolute inset-0 bg-gradient-to-bl from-gray-200 to-transparent rounded-full blur-3xl opacity-50 transform scale-90 -z-10" />
+               
+               <div className="relative w-full aspect-[4/5] max-w-md rounded-[2.5rem] overflow-hidden border border-[#DCDCDC] shadow-2xl group bg-[#F2F2F2]">
+                 <Image 
+                   src="/Aboutus1.png" 
+                   alt="Quantim Labz Team" 
+                   fill 
+                   className="object-contain transition-transform duration-700 group-hover:scale-105"
+                   priority
+                 />
+                 
+                 {/* Inner Overlay */}
+                 <div className="absolute inset-0 bg-gradient-to-t from-[#111]/60 via-transparent to-transparent pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                 
+                 {/* Interactive bottom card */}
+                 <div className="absolute bottom-6 left-6 right-6 bg-white/95 backdrop-blur-md border border-white/50 p-5 rounded-2xl flex items-center justify-between opacity-0 group-hover:opacity-100 transition-all duration-500 translate-y-4 group-hover:translate-y-0 shadow-xl">
+                   <div>
+                     <p className="text-xs text-gray-500 font-bold uppercase tracking-wider mb-1">Our Mission</p>
+                     <p className="font-bold text-[#111] text-lg leading-none">Empowering Innovation</p>
+                   </div>
+                   <div className="w-12 h-12 rounded-full bg-[#111] flex items-center justify-center">
+                     <Users className="w-6 h-6 text-white" />
+                   </div>
+                 </div>
+               </div>
+
+               {/* Floating Badge */}
+               <div className="absolute -right-6 md:-right-12 top-20 bg-white border border-[#DCDCDC] shadow-xl rounded-2xl p-4 hidden md:flex items-center gap-4 animate-pulse hover:animate-none transition-transform hover:scale-105 cursor-pointer z-20">
+                 <div className="w-12 h-12 rounded-xl bg-[#F2F2F2] flex items-center justify-center border border-[#DCDCDC]">
+                   <Building className="w-6 h-6 text-[#111]" />
+                 </div>
+                 <div>
+                   <p className="text-xs text-gray-500 font-bold uppercase tracking-wider mb-1">Established</p>
+                   <p className="text-sm font-bold text-[#111]">Industry Leaders</p>
+                 </div>
                </div>
             </div>
           </div>

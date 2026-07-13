@@ -1,11 +1,15 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
 import { Eye, ArrowRight, MousePointer } from "lucide-react";
 
 export function Hero() {
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const images = ["/hh1.png", "/hh2.png", "/hh3.png", "/hh4.png", "/hh5.png"];
+
   return (
     <section className="relative min-h-screen bg-[#F2F2F2] text-[#111] overflow-hidden flex flex-col">
 
@@ -48,7 +52,9 @@ export function Hero() {
         >
           <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100">
             <span className="text-xs font-medium text-[#111]">View Services</span>
-            <Eye className="w-4 h-4 text-gray-500" />
+            <Link href="/services" aria-label="Go to Services">
+              <Eye className="w-4 h-4 text-[#111] animate-pulse hover:scale-110 transition-transform cursor-pointer" />
+            </Link>
           </div>
           <div className="px-4 py-3">
             <p className="text-[11px] text-gray-500 leading-relaxed">
@@ -71,7 +77,7 @@ export function Hero() {
             Get Started
           </Link>
           <Link
-            href="/programs"
+            href="/process"
             className="hidden md:flex text-sm text-[#333] hover:text-black transition-colors items-center gap-1 group"
           >
             Here&apos;s How It Works
@@ -91,25 +97,40 @@ export function Hero() {
             Quantim<br />Labs
           </div>
 
-          <Image
-            src="/hh1.png"
-            alt="AI Robot"
-            fill
-            className="object-contain object-right-bottom"
-            priority
-            sizes="55vw"
-          />
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={currentImageIndex}
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              transition={{ duration: 0.5 }}
+              className="absolute inset-0"
+            >
+              <Image
+                src={images[currentImageIndex]}
+                alt="AI Robot"
+                fill
+                className="object-contain object-right-bottom"
+                priority
+                sizes="55vw"
+              />
+            </motion.div>
+          </AnimatePresence>
 
         </motion.div>
 
         {/* ─── Right Side Scroll Dots ─── */}
-        <div className="absolute right-6 top-1/2 -translate-y-1/2 flex flex-col items-center gap-3">
-          <span className="text-[10px] font-mono text-gray-400 mb-2">01</span>
-          {[true, false, false, false].map((active, i) => (
-            <div
+        <div className="absolute right-6 top-1/2 -translate-y-1/2 flex flex-col items-center gap-3 z-20">
+          <span className="text-[10px] font-mono text-gray-400 mb-2">
+            0{currentImageIndex + 1}
+          </span>
+          {images.map((_, i) => (
+            <button
               key={i}
-              className={`rounded-full transition-all ${active ? "w-2.5 h-2.5 bg-[#111]" : "w-1.5 h-1.5 bg-gray-300"
+              onClick={() => setCurrentImageIndex(i)}
+              className={`rounded-full transition-all cursor-pointer hover:scale-125 hover:bg-gray-400 ${currentImageIndex === i ? "w-2.5 h-2.5 bg-[#111]" : "w-1.5 h-1.5 bg-gray-300"
                 }`}
+              aria-label={`View image ${i + 1}`}
             />
           ))}
           <span className="text-[10px] font-mono text-gray-400 mt-2">05</span>

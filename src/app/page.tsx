@@ -4,6 +4,7 @@ import { ServicesMarquee } from "@/components/landing/ServicesMarquee";
 import { WhyChooseUs } from "@/components/landing/WhyChooseUs";
 import { WhoWeServe } from "@/components/landing/WhoWeServe";
 import { TechnologyPartner } from "@/components/landing/TechnologyPartner";
+import { ProcessMini } from "@/components/landing/ProcessMini";
 import { ContactSection } from "@/components/landing/ContactSection";
 import { createClient } from "@/lib/supabase/server";
 
@@ -25,6 +26,7 @@ export default async function Home() {
       <WhyChooseUs />
       <WhoWeServe />
       <TechnologyPartner />
+      <ProcessMini />
       <ContactSection />
 
       {/* Footer Placeholder */}

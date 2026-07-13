@@ -13,10 +13,10 @@ const outfit = Outfit({
 });
 
 export const metadata: Metadata = {
-  title: "Quantim Labz | Modern Internship Platform",
-  description: "The premium, futuristic internship learning and management platform.",
+  title: "Quantim Labz | Enterprise Software Solutions",
+  description: "Premium digital services, scalable engineering, and AI-enabled software solutions.",
   icons: {
-    icon: '/logo.png',
+    icon: '/favicon.png',
   }
 };
 

@@ -66,7 +66,7 @@ export function ContactSection() {
                   </div>
                   <div>
                     <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-1">Email</p>
-                    <a href="mailto:hello@quantimlabz.com" className="text-lg font-bold text-[#111] hover:text-gray-600 transition-colors">hello@quantimlabz.com</a>
+                    <a href="mailto:hello@quantimlabz.com" className="text-lg font-medium text-[#111] hover:text-gray-600 transition-colors">hello@quantimlabz.com</a>
                   </div>
                 </div>
 
@@ -76,7 +76,7 @@ export function ContactSection() {
                   </div>
                   <div>
                     <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-1">Phone</p>
-                    <a href="tel:+1234567890" className="text-lg font-bold text-[#111] hover:text-gray-600 transition-colors">+1 (234) 567-890</a>
+                    <a href="tel:+1234567890" className="text-lg font-medium text-[#111] hover:text-gray-600 transition-colors">+1 (234) 567-890</a>
                   </div>
                 </div>
 
@@ -86,7 +86,7 @@ export function ContactSection() {
                   </div>
                   <div>
                     <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-1">Office</p>
-                    <p className="text-lg font-bold text-[#111] leading-snug">123 Innovation Drive<br/>Tech District, CA 90210</p>
+                    <p className="text-lg font-medium text-[#111] leading-snug">123 Innovation Drive<br/>Tech District, CA 90210</p>
                   </div>
                 </div>
               </div>
