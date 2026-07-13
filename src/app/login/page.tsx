@@ -43,10 +43,20 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen flex bg-white overflow-hidden">
       {/* Left side: Brand/Visuals (hidden on mobile) */}
-      <div className="hidden lg:flex lg:w-1/2 relative bg-slate-900 items-center justify-center p-12 overflow-hidden">
-        {/* Background glow effects */}
-        <div className="absolute top-[-20%] left-[-10%] w-[70%] h-[70%] bg-blue-600/30 blur-[120px] rounded-full pointer-events-none" />
-        <div className="absolute bottom-[-20%] right-[-10%] w-[60%] h-[60%] bg-indigo-600/30 blur-[120px] rounded-full pointer-events-none" />
+      <div className="hidden lg:flex lg:w-1/2 relative items-center justify-center p-12 overflow-hidden">
+        {/* Creative Background Image */}
+        <div className="absolute inset-0 z-0">
+          <Image 
+            src="/login.png" 
+            alt="Login Background" 
+            fill
+            className="object-cover animate-pulse-slow"
+            style={{ animationDuration: '15s', animationTimingFunction: 'ease-in-out', animationIterationCount: 'infinite', animationDirection: 'alternate' }}
+            priority
+          />
+          <div className="absolute inset-0 bg-slate-900/60 mix-blend-multiply" />
+          <div className="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/40 to-transparent" />
+        </div>
         
         {/* Content */}
         <div className="relative z-10 w-full max-w-lg">
@@ -67,11 +77,7 @@ export default function LoginPage() {
             </div>
           </Link>
 
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 backdrop-blur-md mb-8">
-            <span className="w-2 h-2 rounded-full bg-blue-400 animate-pulse" />
-            <span className="text-sm font-medium text-slate-300 uppercase tracking-widest">Platform Access</span>
-          </div>
-          
+
           <h1 className="text-5xl lg:text-6xl font-heading font-extrabold text-white mb-6 leading-[1.1] tracking-tight">
             Accelerate Your <br />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-400">Tech Career.</span>

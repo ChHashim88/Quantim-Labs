@@ -5,7 +5,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter }
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { PlayCircle, Clock, ChevronRight, HelpCircle, Award, Calendar, Layers, ArrowLeft, PlusCircleIcon, ListTodo, FileText } from "lucide-react";
+import { PlayCircle, Clock, ChevronRight, HelpCircle, Award, Calendar, Layers, ArrowLeft, PlusCircleIcon, ListTodo, FileText, AlertCircle, X } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import { createClient } from "@/lib/supabase/client";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
@@ -27,6 +28,7 @@ export default function CoursesPage() {
   const [availablePrograms, setAvailablePrograms] = useState<any[]>([]);
   const [enrolledIds, setEnrolledIds] = useState<string[]>([]);
   const [showEnrollmentCenter, setShowEnrollmentCenter] = useState(false);
+  const [showAlreadyEnrolledModal, setShowAlreadyEnrolledModal] = useState(false);
 
   const audioCtxRef = useRef<AudioContext | null>(null);
 
@@ -138,6 +140,11 @@ export default function CoursesPage() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
         toast.error("Please login first.");
+        return;
+      }
+
+      if (enrolledIds.length >= 1) {
+        setShowAlreadyEnrolledModal(true);
         return;
       }
 
@@ -318,6 +325,48 @@ export default function CoursesPage() {
           ))}
         </div>
       )}
+
+      {/* Already Enrolled Modal */}
+      <AnimatePresence>
+        {showAlreadyEnrolledModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-md">
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              className="relative w-full max-w-md overflow-hidden bg-card border border-border shadow-2xl rounded-3xl"
+            >
+              <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-amber-500 to-orange-500" />
+              <button 
+                onClick={() => setShowAlreadyEnrolledModal(false)}
+                className="absolute top-4 right-4 p-2 text-muted-foreground hover:text-foreground hover:bg-muted rounded-full transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+              <div className="p-8 pt-10 flex flex-col items-center text-center space-y-6">
+                <div className="w-16 h-16 bg-amber-500/10 rounded-full flex items-center justify-center border border-amber-500/20">
+                  <AlertCircle className="w-8 h-8 text-amber-500" />
+                </div>
+                <div className="space-y-2">
+                  <h3 className="text-2xl font-bold font-heading text-foreground">Active Enrollment Detected</h3>
+                  <p className="text-muted-foreground leading-relaxed">
+                    You are already enrolled in an internship program. To maintain quality and focus, you can only participate in one program at a time.
+                  </p>
+                </div>
+                <div className="flex flex-col w-full gap-3 pt-4">
+                  <Button 
+                    variant="outline"
+                    onClick={() => setShowAlreadyEnrolledModal(false)}
+                    className="w-full h-12 rounded-xl font-semibold"
+                  >
+                    Close
+                  </Button>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

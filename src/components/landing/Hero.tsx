@@ -8,6 +8,7 @@ import { Eye, ArrowRight, MousePointer } from "lucide-react";
 
 export function Hero() {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [isImageLoading, setIsImageLoading] = useState(false);
   const images = ["/hh1.png", "/hh2.png", "/hh3.png", "/hh4.png", "/hh5.png"];
 
   return (
@@ -71,7 +72,7 @@ export function Hero() {
           className="mt-8 flex items-center gap-6"
         >
           <Link
-            href="/login"
+            href="/contact"
             className="inline-flex items-center px-6 py-3 bg-[#111] text-white text-sm font-medium rounded-full hover:bg-black transition-colors"
           >
             Get Started
@@ -97,24 +98,38 @@ export function Hero() {
             Quantim<br />Labs
           </div>
 
-          <AnimatePresence mode="wait">
+          <AnimatePresence>
             <motion.div
               key={currentImageIndex}
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              transition={{ duration: 0.5 }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.8, ease: "easeInOut" }}
               className="absolute inset-0"
             >
               <Image
                 src={images[currentImageIndex]}
                 alt="AI Robot"
                 fill
-                className="object-contain object-right-bottom"
+                className={`object-contain object-right-bottom transition-all duration-[1200ms] ease-in-out ${
+                  isImageLoading ? 'blur-xl grayscale opacity-40 scale-[0.98]' : 'blur-0 grayscale-0 opacity-100 scale-100'
+                }`}
                 priority
                 sizes="55vw"
               />
             </motion.div>
+          </AnimatePresence>
+
+          <AnimatePresence>
+            {isImageLoading && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.8, ease: "easeInOut" }}
+                className="absolute inset-0 z-10 water-dots-bg animate-water-wave mix-blend-overlay pointer-events-none"
+              />
+            )}
           </AnimatePresence>
 
         </motion.div>
@@ -127,7 +142,15 @@ export function Hero() {
           {images.map((_, i) => (
             <button
               key={i}
-              onClick={() => setCurrentImageIndex(i)}
+              onClick={() => {
+                if (currentImageIndex !== i) {
+                  setIsImageLoading(true);
+                  setCurrentImageIndex(i);
+                  setTimeout(() => {
+                    setIsImageLoading(false);
+                  }, 1200);
+                }
+              }}
               className={`rounded-full transition-all cursor-pointer hover:scale-125 hover:bg-gray-400 ${currentImageIndex === i ? "w-2.5 h-2.5 bg-[#111]" : "w-1.5 h-1.5 bg-gray-300"
                 }`}
               aria-label={`View image ${i + 1}`}

@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { ArrowLeft, Calendar, PlaySquare, CheckCircle2, Trophy, Clock, Check } from "lucide-react";
+import { ArrowLeft, Calendar, PlaySquare, CheckCircle2, Trophy, Clock, Check, AlertCircle, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
@@ -17,8 +17,10 @@ interface ProgramDetailsClientProps {
 export function ProgramDetailsClient({ program }: ProgramDetailsClientProps) {
   const router = useRouter();
   const [isEnrolled, setIsEnrolled] = useState(false);
+  const [enrolledProgramId, setEnrolledProgramId] = useState<string | null>(null);
+  const [showAlreadyEnrolledModal, setShowAlreadyEnrolledModal] = useState(false);
 
-  // Check if student is already enrolled in this internship
+  // Check if student is already enrolled in this internship or any other
   useEffect(() => {
     async function checkEnrollment() {
       const supabase = createClient();
@@ -26,11 +28,17 @@ export function ProgramDetailsClient({ program }: ProgramDetailsClientProps) {
       if (!user) return;
       const { data } = await supabase
         .from("student_enrollments")
-        .select("id")
+        .select("internship_id")
         .eq("student_id", user.id)
-        .eq("internship_id", program.id)
+        .limit(1)
         .single();
-      if (data) setIsEnrolled(true);
+        
+      if (data) {
+        setEnrolledProgramId(data.internship_id);
+        if (data.internship_id === program.id) {
+          setIsEnrolled(true);
+        }
+      }
     }
     checkEnrollment();
   }, [program.id]);
@@ -38,6 +46,11 @@ export function ProgramDetailsClient({ program }: ProgramDetailsClientProps) {
   const handleEnroll = async () => {
     if (isEnrolled) {
       router.push("/student/courses");
+      return;
+    }
+
+    if (enrolledProgramId && enrolledProgramId !== program.id) {
+      setShowAlreadyEnrolledModal(true);
       return;
     }
 
@@ -256,6 +269,52 @@ export function ProgramDetailsClient({ program }: ProgramDetailsClientProps) {
 
         </div>
       </div>
+
+      {/* Already Enrolled Modal */}
+      {showAlreadyEnrolledModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-md">
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.95, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.95, y: 20 }}
+            className="relative w-full max-w-md overflow-hidden bg-card border border-border shadow-2xl rounded-3xl"
+          >
+            <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-amber-500 to-orange-500" />
+            <button 
+              onClick={() => setShowAlreadyEnrolledModal(false)}
+              className="absolute top-4 right-4 p-2 text-muted-foreground hover:text-foreground hover:bg-muted rounded-full transition-colors"
+            >
+              <X className="w-5 h-5" />
+            </button>
+            <div className="p-8 pt-10 flex flex-col items-center text-center space-y-6">
+              <div className="w-16 h-16 bg-amber-500/10 rounded-full flex items-center justify-center border border-amber-500/20">
+                <AlertCircle className="w-8 h-8 text-amber-500" />
+              </div>
+              <div className="space-y-2">
+                <h3 className="text-2xl font-bold font-heading text-foreground">Active Enrollment Detected</h3>
+                <p className="text-muted-foreground leading-relaxed">
+                  You are already enrolled in an internship program. To maintain quality and focus, you can only participate in one program at a time.
+                </p>
+              </div>
+              <div className="flex flex-col w-full gap-3 pt-4">
+                <Button 
+                  onClick={() => router.push('/student')}
+                  className="w-full bg-primary hover:bg-primary/90 text-primary-foreground h-12 rounded-xl font-semibold"
+                >
+                  Go to My Dashboard
+                </Button>
+                <Button 
+                  variant="outline"
+                  onClick={() => setShowAlreadyEnrolledModal(false)}
+                  className="w-full h-12 rounded-xl font-semibold"
+                >
+                  Close
+                </Button>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      )}
     </div>
   );
 }

@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Mail, Phone, MapPin, Send } from "lucide-react";
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
+import Image from "next/image";
 
 export function ContactSection() {
   const [loading, setLoading] = useState(false);
@@ -39,17 +40,43 @@ export function ContactSection() {
     <section id="contact" className="py-24 relative bg-[#F2F2F2] border-t border-[#DCDCDC]">
       <div className="max-w-[1400px] mx-auto px-8 md:px-16">
         
-        <div className="text-center max-w-3xl mx-auto mb-16">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#E8E8E8] border border-[#DCDCDC] mb-6">
-            <span className="w-2 h-2 rounded-full bg-[#111] animate-pulse" />
-            <span className="text-sm font-semibold text-[#111] uppercase tracking-widest">Get In Touch</span>
+        {/* Header with Creative Spinning Image */}
+        <div className="flex flex-col lg:flex-row items-center justify-between gap-12 max-w-6xl mx-auto mb-20 relative z-10">
+          <div className="flex-1 text-center lg:text-left">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#E8E8E8] border border-[#DCDCDC] mb-6">
+              <span className="w-2 h-2 rounded-full bg-[#111] animate-pulse" />
+              <span className="text-sm font-semibold text-[#111] uppercase tracking-widest">Get In Touch</span>
+            </div>
+            <h2 className="text-5xl md:text-6xl font-heading font-extrabold mb-6 text-foreground leading-[1.1] tracking-tight">
+              Let's build something <br className="hidden lg:block"/>
+              <span className="text-[#111] relative inline-block">
+                extraordinary.
+                <svg className="absolute -bottom-2 left-0 w-full text-[#DCDCDC] -z-10" viewBox="0 0 100 10" preserveAspectRatio="none">
+                  <path d="M0 5 Q 50 10 100 5" stroke="currentColor" strokeWidth="4" fill="transparent"/>
+                </svg>
+              </span>
+            </h2>
+            <p className="text-muted-foreground text-lg max-w-xl mx-auto lg:mx-0 leading-relaxed">
+              Partner with our elite engineering team. Whether you have a visionary project in mind or need robust enterprise solutions, we are ready to deliver.
+            </p>
           </div>
-          <h2 className="text-4xl md:text-5xl font-heading font-bold mb-6 text-foreground">
-            Let's build something <span className="text-primary">extraordinary.</span>
-          </h2>
-          <p className="text-muted-foreground text-lg">
-            Have a project in mind or want to learn more about our internship programs? We're here to help.
-          </p>
+
+          <div className="relative w-64 h-64 md:w-80 md:h-80 shrink-0">
+            {/* Background Glow */}
+            <div className="absolute inset-0 bg-gray-200 rounded-full blur-3xl transform scale-150 -z-10 opacity-60" />
+            
+            {/* Spinning Image */}
+            <Image 
+              src="/contactus1.png" 
+              alt="Contact Quantim Labz" 
+              fill 
+              className="object-contain"
+              style={{ animation: 'spin 20s linear infinite' }}
+              priority
+            />
+            
+
+          </div>
         </div>
 
         <div className="grid lg:grid-cols-5 gap-12 max-w-6xl mx-auto">
