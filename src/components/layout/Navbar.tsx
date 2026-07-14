@@ -20,24 +20,26 @@ export function Navbar({ user, userRole }: NavbarProps) {
         <div className="flex items-center justify-between h-16">
 
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-3 group cursor-pointer">
+          <Link href="/" className="flex items-center group cursor-pointer">
             <Image
               src="/logo.png"
               alt="Quantim Labz Logo"
-              width={120}
-              height={32}
-              className="object-contain h-8 w-auto transition-transform duration-300 group-hover:scale-105"
+              width={64}
+              height={64}
+              className="object-contain h-12 md:h-14 w-auto transition-transform duration-300 group-hover:scale-105"
               style={{ filter: "brightness(0)" }}
               priority
             />
-            <div className="hidden sm:block h-5 w-px bg-[#DCDCDC] transform rotate-12" />
-            <span className="hidden sm:block text-sm font-bold tracking-widest text-[#111] uppercase">
-              Quantim Labz
+            <span className="hidden sm:block text-xl md:text-xl font-extrabold tracking-tighter text-[#111] uppercase font-heading -ml-3">
+              Uantim Labz
             </span>
           </Link>
 
           {/* Desktop Nav */}
           <div className="hidden md:flex items-center gap-8">
+            <Link href="/" className="text-sm text-[#555] hover:text-[#111] transition-colors">
+              Home
+            </Link>
             <Link href="/services" className="text-sm text-[#555] hover:text-[#111] transition-colors">
               Services
             </Link>
@@ -68,6 +70,9 @@ export function Navbar({ user, userRole }: NavbarProps) {
           animate={{ opacity: 1, y: 0 }}
           className="md:hidden bg-[#F2F2F2] border-b border-[#DCDCDC] px-8 pt-2 pb-6 space-y-1"
         >
+          <Link href="/" className="block px-3 py-2 text-sm text-[#555] hover:text-[#111] rounded-lg hover:bg-[#E8E8E8]">
+            Home
+          </Link>
           <Link href="/services" className="block px-3 py-2 text-sm text-[#555] hover:text-[#111] rounded-lg hover:bg-[#E8E8E8]">
             Services
           </Link>

@@ -19,7 +19,31 @@ export default async function AboutPage() {
     <main className="min-h-screen bg-background flex flex-col selection:bg-primary/30">
       <Navbar user={user} userRole={userRole} />
       
-      <div className="flex-1 pt-28 pb-20">
+      {/* Internship Programs Sub-Navigation (Pill Menu) */}
+      <div className="pt-28 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-center md:justify-start relative z-20 w-full">
+        <div className="grid grid-cols-2 md:inline-flex bg-card/80 backdrop-blur-md border border-border p-1.5 rounded-3xl md:rounded-full shadow-sm gap-1 md:gap-0 w-full md:w-auto items-stretch md:items-center">
+          <Link href="/programs" className="flex items-center justify-center px-2 sm:px-4 md:px-6 py-2.5 rounded-full text-[13px] md:text-sm font-bold text-muted-foreground hover:text-foreground hover:bg-muted transition-all text-center leading-tight">
+            Internship Programs
+          </Link>
+          <Link href="/how-it-works" className="flex items-center justify-center px-2 sm:px-4 md:px-6 py-2.5 rounded-full text-[13px] md:text-sm font-bold text-muted-foreground hover:text-foreground hover:bg-muted transition-all text-center leading-tight">
+            How it Works
+          </Link>
+          <Link href="/about" className="flex items-center justify-center px-2 sm:px-4 md:px-6 py-2.5 rounded-full text-[13px] md:text-sm font-bold bg-primary text-primary-foreground shadow-md transition-all text-center leading-tight">
+            About Us
+          </Link>
+          {user ? (
+            <Link href={userRole === 'SUPER_ADMIN' || userRole === 'ADMIN' ? '/admin' : '/student'} className="flex items-center justify-center px-2 sm:px-4 md:px-6 py-2.5 rounded-full text-[13px] md:text-sm font-bold text-muted-foreground hover:text-foreground hover:bg-muted transition-all text-center leading-tight">
+              {userRole === 'SUPER_ADMIN' || userRole === 'ADMIN' ? 'Admin Portal' : 'Dashboard'}
+            </Link>
+          ) : (
+            <Link href="/login" className="flex items-center justify-center px-2 sm:px-4 md:px-6 py-2.5 rounded-full text-[13px] md:text-sm font-bold text-muted-foreground hover:text-foreground hover:bg-muted transition-all text-center leading-tight">
+              Login
+            </Link>
+          )}
+        </div>
+      </div>
+
+      <div className="flex-1 pt-12 pb-20">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Header Section */}

@@ -11,7 +11,7 @@ import { createClient } from "@/lib/supabase/client";
 
 const baseSidebarLinks = [
   { name: "Dashboard", href: "/student", icon: LayoutDashboard },
-  { name: "My Courses", href: "/student/courses", icon: BookOpen },
+  { name: "InternShip Program", href: "/student/courses", icon: BookOpen },
   { name: "Lectures", href: "/student/lectures", icon: PlaySquare, badgeKey: "lectures" },
   { name: "Tasks", href: "/student/tasks", icon: ListTodo, badgeKey: "tasks" },
   { name: "Documents", href: "/student/documents", icon: FileText, badgeKey: "documents" },
@@ -26,7 +26,7 @@ const baseSidebarLinks = [
 export default function StudentLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
-  
+
   const [pendingTasks, setPendingTasks] = useState(0);
   const [pendingAssignments, setPendingAssignments] = useState(0);
   const [pendingQuizzes, setPendingQuizzes] = useState(0);
@@ -36,7 +36,7 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
   useEffect(() => {
     async function loadBadges() {
       if (typeof window === "undefined") return;
-      
+
       try {
         const supabase = createClient();
         const { data: { user } } = await supabase.auth.getUser();
@@ -44,26 +44,63 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
 
         const { data: enrollments } = await supabase
           .from('student_enrollments')
-          .select('internship_id')
+          .select('internship_id, enrolled_at')
           .eq('student_id', user.id);
 
-        const enrolled = enrollments ? enrollments.map(e => e.internship_id) : [];
+        const enrolledMap = new Map<string, Date>();
+        if (enrollments) {
+          enrollments.forEach(e => {
+            enrolledMap.set(e.internship_id, new Date(e.enrolled_at || new Date()));
+          });
+        }
+        const enrolled = Array.from(enrolledMap.keys());
         if (enrolled.length === 0) return;
-        
-        // Fetch all days for enrolled internships
+
+        // Fetch all days with order_index for enrolled internships
         const { data: daysData } = await supabase
           .from('days')
-          .select('id')
-          .in('internship_id', enrolled);
+          .select('id, internship_id, order_index')
+          .in('internship_id', enrolled)
+          .order('order_index', { ascending: true });
 
         if (daysData && daysData.length > 0) {
-          const dayIds = daysData.map(d => d.id);
-          
-          // Fetch assignments, quizzes, and tasks
+          const now = new Date();
+          const unlockedDayIds = new Set<string>();
+
+          const daysByInternship: Record<string, any[]> = {};
+          daysData.forEach(d => {
+            if (!daysByInternship[d.internship_id]) daysByInternship[d.internship_id] = [];
+            daysByInternship[d.internship_id].push(d);
+          });
+
+          Object.keys(daysByInternship).forEach(internshipId => {
+            const enrolledAt = enrolledMap.get(internshipId)!;
+            const daysSinceEnrollment = Math.floor((now.getTime() - enrolledAt.getTime()) / (1000 * 60 * 60 * 24));
+
+            daysByInternship[internshipId].forEach((day, index) => {
+              const weekNumber = index + 1;
+              const daysNeeded = (weekNumber - 1) * 7;
+              if (daysSinceEnrollment >= daysNeeded) {
+                unlockedDayIds.add(day.id);
+              }
+            });
+          });
+
+          // Fetch assignments, quizzes, and tasks only from UNLOCKED days
+          const dayIdsArr = Array.from(unlockedDayIds);
+          if (dayIdsArr.length === 0) {
+            setPendingTasks(0);
+            setPendingAssignments(0);
+            setPendingQuizzes(0);
+            setPendingLectures(0);
+            setPendingDocuments(0);
+            return;
+          }
+
           const { data: lessons } = await supabase
             .from('lessons')
             .select('id, content_type')
-            .in('day_id', dayIds)
+            .in('day_id', dayIdsArr)
             .in('content_type', ['ASSIGNMENT', 'QUIZ', 'TASK', 'VIDEO', 'DOCUMENT']);
 
           // Fetch progress from backend
@@ -102,9 +139,9 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
         console.error("Failed to load badge counts", e);
       }
     }
-    
+
     loadBadges();
-    
+
     // We want to occasionally refresh badges if localStorage changes (very basic polling or listener)
     const interval = setInterval(loadBadges, 3000);
     return () => clearInterval(interval);
@@ -116,37 +153,26 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
   };
 
   return (
-    <div className="min-h-screen bg-background flex">
-      {/* Sidebar */}
-      <aside className="w-64 border-r border-border bg-card  flex-shrink-0 flex flex-col">
-        <div className="h-20 flex items-center px-6 border-b border-border">
-          <div className="flex items-center gap-1 group">
-            <div className="relative">
-              <Image 
-                src="/logo.png" 
-                alt="Quantim Labz Logo" 
-                width={120} 
-                height={32} 
-                className="relative object-contain h-9 w-auto z-10 transition-transform duration-500 group-hover:scale-105" 
-                style={{ filter: "brightness(0)" }}
-                priority 
-              />
-            </div>
-            
-            <div className="h-6 w-px bg-slate-200 mx-3 transform rotate-12" />
-            
-            <div className="flex flex-col">
-              <span className="text-xl font-heading font-black tracking-tighter text-slate-900 leading-none">
-                QUANTIM<span className="text-blue-600">LABS</span>
-              </span>
-            </div>
-          </div>
+    <div className="bg-background text-foreground min-h-screen overflow-hidden font-sans selection:bg-primary selection:text-primary-foreground">
+      {/* Sidebar: Command Strip */}
+      <aside className="fixed left-0 top-0 h-full w-[80px] lg:w-[240px] glass-panel border-r border-border z-50 flex flex-col items-center lg:items-stretch transition-all duration-500">
+
+        <div className="h-20 flex items-center justify-center lg:justify-start lg:px-6 mb-8 mt-4">
+          <Image
+            src="/logo.png"
+            alt="Logo"
+            width={56}
+            height={56}
+            className="w-14 h-14 object-contain shrink-0"
+            priority
+          />
+          <span className="hidden lg:block -ml-3 font-heading font-extrabold tracking-tighter text-lg uppercase ">Uantim Labz</span>
         </div>
 
-        <nav className="flex-1 py-6 px-4 space-y-2 overflow-y-auto">
+        <nav className="flex-1 px-4 space-y-2 overflow-y-auto custom-scrollbar w-full">
           {baseSidebarLinks.map((link) => {
             const isActive = pathname === link.href;
-            
+
             let badgeCount = 0;
             if (link.badgeKey === "tasks") badgeCount = pendingTasks;
             if (link.badgeKey === "assignments") badgeCount = pendingAssignments;
@@ -158,41 +184,43 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
               <Link
                 key={link.name}
                 href={link.href}
-                className={`flex items-center justify-between px-4 py-3 rounded-xl transition-all ${
-                  isActive
-                    ? "bg-primary/10 text-primary border border-primary/20"
-                    : "text-muted-foreground hover:bg-muted hover:text-foreground"
-                }`}
+                className={`group flex items-center justify-center lg:justify-start gap-4 p-3 rounded-lg transition-all relative ${isActive
+                  ? "bg-primary/10 text-primary active-glow"
+                  : "text-muted-foreground hover:text-foreground hover:bg-foreground/5"
+                  }`}
               >
-                <div className="flex items-center gap-3">
-                  <link.icon className={`w-5 h-5 ${isActive ? "text-primary" : ""}`} />
-                  <span className="font-medium">{link.name}</span>
-                </div>
+                <link.icon className="w-5 h-5 shrink-0" />
+                <span className="hidden lg:block text-xs font-mono tracking-wider truncate uppercase">
+                  {link.name}
+                </span>
+
                 {badgeCount > 0 && (
-                  <div className="flex items-center justify-center bg-red-500 text-white text-[10px] font-bold h-5 min-w-[20px] rounded-full px-1">
-                    {badgeCount > 99 ? "99+" : badgeCount}
-                  </div>
+                  <>
+                    <span className="absolute top-2 right-2 w-1.5 h-1.5 bg-primary rounded-full glow-primary lg:hidden" />
+                    <span className={`hidden lg:flex ml-auto text-[10px] font-bold ${isActive ? 'text-primary' : 'text-muted-foreground'}`}>
+                      {badgeCount > 99 ? "99+" : badgeCount}
+                    </span>
+                  </>
                 )}
               </Link>
             );
           })}
         </nav>
 
-        <div className="p-4 border-t border-border">
-          <Button 
+        <div className="p-4 mt-auto w-full">
+          <button
             onClick={handleSignOut}
-            variant="outline" 
-            className="w-full justify-start text-muted-foreground border-border hover:bg-destructive/10 hover:text-destructive"
+            className="w-full flex items-center justify-center lg:justify-start gap-4 p-3 rounded-lg text-muted-foreground hover:text-destructive transition-all group"
           >
-            <LogOut className="w-4 h-4 mr-2" />
-            Sign Out
-          </Button>
+            <LogOut className="w-5 h-5 shrink-0 group-hover:text-destructive" />
+            <span className="hidden lg:block text-xs font-mono tracking-wider uppercase">Sign Out</span>
+          </button>
         </div>
       </aside>
 
-      {/* Main Content Area */}
-      <main className="flex-1 overflow-y-auto bg-background relative">
-        <div className="relative z-10 p-8 max-w-7xl mx-auto">
+      {/* Main Container */}
+      <main className="ml-[80px] lg:ml-[240px] h-screen overflow-y-auto custom-scrollbar relative grid-bg">
+        <div className="relative z-10 p-6 lg:p-10 max-w-7xl mx-auto w-full">
           {children}
         </div>
       </main>

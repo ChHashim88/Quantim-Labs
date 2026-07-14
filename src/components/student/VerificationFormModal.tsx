@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { X, ShieldCheck, Mail, User, Phone, MapPin, Globe, GraduationCap, Heart, Calendar } from "lucide-react";
+import { X, ShieldCheck, Mail, User, Phone, MapPin, Globe, GraduationCap, Heart, Calendar, Camera, PlaySquare, Video, ExternalLink, CheckCircle2 } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -19,7 +19,39 @@ interface Props {
 
 export function VerificationFormModal({ email, onClose, onSuccess }: Props) {
   const [loading, setLoading] = useState(false);
+  const [fetchingLinks, setFetchingLinks] = useState(true);
   const supabase = createClient();
+
+  const [socialLinks, setSocialLinks] = useState<any[]>([]);
+  const [clickedLinks, setClickedLinks] = useState<Set<string>>(new Set());
+
+  useEffect(() => {
+    const fetchLinks = async () => {
+      try {
+        const { data, error } = await supabase.from('social_links').select('*').eq('is_active', true);
+        if (!error && data) {
+          // Filter out empty URLs
+          setSocialLinks(data.filter(link => link.url && link.url.trim() !== ""));
+        }
+      } catch (err) {
+        console.error("Failed to fetch social links", err);
+      } finally {
+        setFetchingLinks(false);
+      }
+    };
+    fetchLinks();
+  }, []);
+
+  const handleLinkClick = (platform: string, url: string) => {
+    setClickedLinks(prev => {
+      const next = new Set(prev);
+      next.add(platform);
+      return next;
+    });
+    window.open(url, '_blank');
+  };
+
+  const allLinksClicked = socialLinks.length === 0 || socialLinks.every(link => clickedLinks.has(link.platform));
 
   const [formData, setFormData] = useState({
     fullName: "",
@@ -188,14 +220,49 @@ export function VerificationFormModal({ email, onClose, onSuccess }: Props) {
                 </div>
               </div>
 
+              {socialLinks.length > 0 && (
+                <div className="pt-4 border-t border-border space-y-4">
+                  <div>
+                    <Label className="text-sm font-bold text-slate-800 dark:text-slate-200">Required Action: Follow our Socials</Label>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      You must follow our official channels to complete your verification and stay updated.
+                    </p>
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    {socialLinks.map((link) => {
+                      const isClicked = clickedLinks.has(link.platform);
+                      
+                      let Icon = Globe;
+                      if (link.platform === "Instagram") Icon = Camera;
+                      if (link.platform === "TikTok") Icon = Video;
+                      if (link.platform === "YouTube") Icon = PlaySquare;
+
+                      return (
+                        <Button
+                          key={link.id}
+                          type="button"
+                          variant={isClicked ? "outline" : "default"}
+                          onClick={() => handleLinkClick(link.platform, link.url)}
+                          className={`w-full justify-start gap-2 h-10 ${isClicked ? "border-green-500/50 bg-green-500/10 text-green-600 dark:text-green-400" : ""}`}
+                        >
+                          {isClicked ? <CheckCircle2 className="w-4 h-4" /> : <Icon className="w-4 h-4" />}
+                          <span className="truncate flex-1 text-left">{link.platform}</span>
+                          {!isClicked && <ExternalLink className="w-3 h-3 opacity-50" />}
+                        </Button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
               <div className="pt-4 border-t border-border">
                 <Button 
                   type="submit" 
-                  className="w-full h-12 text-lg font-bold rounded-xl flex items-center justify-center gap-2"
-                  disabled={loading}
+                  className="w-full h-12 text-lg font-bold rounded-xl flex items-center justify-center gap-2 transition-all"
+                  disabled={loading || fetchingLinks || !allLinksClicked}
                 >
-                  {loading ? "Verifying..." : "Submit Verification"}
-                  {!loading && <ShieldCheck className="w-5 h-5" />}
+                  {loading ? "Verifying..." : !allLinksClicked ? "Please Follow All Channels" : "Submit Verification"}
+                  {!loading && allLinksClicked && <ShieldCheck className="w-5 h-5" />}
                 </Button>
               </div>
             </form>

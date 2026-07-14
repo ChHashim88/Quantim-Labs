@@ -141,10 +141,19 @@ export default function AttendancePage() {
 
   if (enrolledPrograms.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] text-center">
-        <CalendarIcon className="w-16 h-16 text-muted-foreground/50 mb-4" />
-        <h2 className="text-2xl font-bold mb-2">No Active Courses</h2>
-        <p className="text-muted-foreground max-w-md">You are not enrolled in any programs yet. Visit the My Courses page to enroll and start tracking attendance.</p>
+      <div className="flex flex-col items-center justify-center min-h-[60vh] text-center max-w-4xl mx-auto px-4">
+        <div className="glass-panel border-border shadow-2xl flex flex-col items-center justify-center p-12 text-center relative overflow-hidden w-full">
+          <div className="absolute top-0 right-0 p-8 opacity-5 pointer-events-none">
+            <CalendarIcon className="w-64 h-64 text-primary" />
+          </div>
+          <div className="w-16 h-16 rounded-sm bg-primary/10 border border-primary/20 flex items-center justify-center text-primary mb-6 glow-primary">
+            <CalendarIcon className="w-8 h-8" />
+          </div>
+          <h2 className="font-heading text-2xl font-bold tracking-tight mb-2 uppercase">NO ACTIVE COURSES</h2>
+          <p className="max-w-md mx-auto mb-8 text-xs font-mono tracking-widest text-muted-foreground uppercase">
+            YOU ARE NOT ENROLLED IN ANY PROGRAMS YET. VISIT THE COURSE DIRECTORY TO INITIALIZE A SYLLABUS AND TRACK ATTENDANCE.
+          </p>
+        </div>
       </div>
     );
   }
@@ -198,33 +207,33 @@ export default function AttendancePage() {
     <div className="space-y-8 max-w-6xl mx-auto">
       <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <h1 className="text-4xl font-heading font-extrabold tracking-tight">Attendance Center</h1>
-          <p className="text-muted-foreground mt-2">
-            Track your daily activity, view streaks, and check in.
+          <h1 className="text-4xl lg:text-5xl font-heading font-extrabold tracking-tighter uppercase">SYSTEM SYNC</h1>
+          <p className="font-mono text-[10px] tracking-[0.2em] uppercase text-muted-foreground mt-2 flex items-center gap-2">
+            <span className="w-1 h-1 bg-primary"></span> TRACK CONTINUITY AND INITIATE DAILY CHECK-INS
           </p>
         </div>
         <Button 
           onClick={handleManualCheckIn} 
           disabled={hasCheckedInToday || checkingIn}
-          className={`rounded-full px-8 py-6 h-auto text-lg font-bold shadow-2xl transition-all duration-300 flex items-center gap-3 ${
+          className={`rounded-sm px-8 py-6 h-auto font-mono text-[10px] tracking-widest uppercase font-bold transition-all duration-300 flex items-center gap-3 ${
             hasCheckedInToday 
-              ? "bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500/20 border border-emerald-500/30 cursor-not-allowed" 
-              : "bg-gradient-to-r from-blue-600 to-indigo-600 text-white hover:scale-105 hover:shadow-[0_0_30px_rgba(37,99,235,0.4)]"
+              ? "bg-primary/10 text-primary border border-primary/30 cursor-not-allowed glow-primary" 
+              : "bg-primary text-primary-foreground hover:bg-primary/90 glow-primary shadow-[0_0_30px_rgba(var(--primary),0.4)]"
           }`}
         >
           {checkingIn ? (
-            <Loader2 className="w-6 h-6 animate-spin" />
+            <><Loader2 className="w-4 h-4 animate-spin" /> SYNCHRONIZING...</>
           ) : hasCheckedInToday ? (
-            <><CheckCircle2 className="w-6 h-6" /> Checked In for Today</>
+            <><CheckCircle2 className="w-4 h-4" /> SESSION SYNCED</>
           ) : (
-            <><CalendarCheck className="w-6 h-6" /> Check In Now</>
+            <><CalendarCheck className="w-4 h-4" /> SYNC SESSION NOW</>
           )}
         </Button>
       </header>
 
       {/* Program Selector Dock */}
       <div className="flex items-center justify-start w-full relative z-10 mb-8">
-        <div className="relative flex p-1.5 rounded-full bg-background/40 backdrop-blur-xl border border-white/10 shadow-[0_8px_30px_rgb(0,0,0,0.12)] overflow-x-auto no-scrollbar max-w-full">
+        <div className="relative flex p-1 rounded-sm bg-card border border-border overflow-x-auto no-scrollbar max-w-full">
           {enrolledPrograms.map((program) => {
             const isActive = program.id === activeProgramId;
             return (
@@ -235,14 +244,14 @@ export default function AttendancePage() {
                     setSwitchTargetId(program.id);
                   }
                 }}
-                className={`relative px-6 py-2.5 rounded-full text-sm font-semibold transition-colors flex items-center justify-center outline-none whitespace-nowrap min-w-fit z-20 ${
-                  isActive ? "text-white" : "text-muted-foreground hover:text-foreground hover:bg-muted/30"
+                className={`relative px-5 py-2 rounded-sm text-xs font-mono tracking-widest uppercase transition-colors flex items-center justify-center outline-none whitespace-nowrap min-w-fit z-20 ${
+                  isActive ? "text-primary-foreground" : "text-muted-foreground hover:text-foreground hover:bg-foreground/5"
                 }`}
               >
                 {isActive && (
                   <motion.div
                     layoutId="attendance-active-pill"
-                    className="absolute inset-0 bg-gradient-to-tr from-primary to-blue-500 rounded-full shadow-lg shadow-primary/25 z-0"
+                    className="absolute inset-0 bg-primary rounded-sm shadow-lg shadow-primary/20 z-0"
                     transition={{ type: "spring", bounce: 0.25, duration: 0.5 }}
                   />
                 )}
@@ -261,25 +270,25 @@ export default function AttendancePage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
           >
-            <Card className="bg-card border-border shadow-xl overflow-hidden relative border-orange-500/20">
-              <div className="absolute top-0 right-0 p-4 opacity-10 pointer-events-none">
+            <div className="glass-panel p-6 corner-accent overflow-hidden relative group">
+              <div className="absolute top-0 right-0 p-4 opacity-10 pointer-events-none transition-transform group-hover:scale-110">
                 <Flame className="w-32 h-32 text-orange-500" />
               </div>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-lg flex items-center gap-2 text-orange-500">
-                  <Flame className="w-5 h-5" /> Current Streak
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
+              <div className="pb-4 border-b border-border/20 mb-4">
+                <h3 className="font-mono text-[10px] tracking-[0.3em] uppercase text-orange-500 flex items-center gap-2">
+                  <Flame className="w-4 h-4" /> CONTINUITY_STREAK
+                </h3>
+              </div>
+              <div>
                 <div className="flex items-baseline gap-2">
-                  <span className="text-6xl font-black tracking-tighter text-foreground">{streak}</span>
-                  <span className="text-muted-foreground font-semibold">Days</span>
+                  <span className="text-6xl font-heading font-black tracking-tighter text-foreground">{streak}</span>
+                  <span className="text-[10px] font-mono tracking-widest text-muted-foreground uppercase">CYCLES</span>
                 </div>
-                <p className="text-xs text-muted-foreground mt-4 leading-relaxed max-w-[200px]">
-                  Log in and check your course material every day to keep your streak burning hot!
+                <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground mt-4 leading-relaxed max-w-[250px]">
+                  MAINTAIN DAILY SYSTEM ACCESS TO PRESERVE ACTIVE CONTINUITY STATUS.
                 </p>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           </motion.div>
 
           <motion.div
@@ -287,37 +296,37 @@ export default function AttendancePage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
           >
-            <Card className="bg-card border-border shadow-xl overflow-hidden relative">
-              <div className="absolute top-0 right-0 p-4 opacity-10 pointer-events-none">
-                <Trophy className="w-32 h-32 text-blue-500" />
+            <div className="glass-panel p-6 corner-accent overflow-hidden relative group">
+              <div className="absolute top-0 right-0 p-4 opacity-10 pointer-events-none transition-transform group-hover:scale-110">
+                <Trophy className="w-32 h-32 text-primary" />
               </div>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-lg flex items-center gap-2 text-blue-500">
-                  <Trophy className="w-5 h-5" /> Total Check-ins
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
+              <div className="pb-4 border-b border-border/20 mb-4">
+                <h3 className="font-mono text-[10px] tracking-[0.3em] uppercase text-primary flex items-center gap-2 glow-primary">
+                  <Trophy className="w-4 h-4" /> TOTAL_SYNCS
+                </h3>
+              </div>
+              <div>
                 <div className="flex items-baseline gap-2">
-                  <span className="text-6xl font-black tracking-tighter text-foreground">{attendanceRecords.length}</span>
-                  <span className="text-muted-foreground font-semibold">/ {totalDaysRequired}</span>
+                  <span className="text-6xl font-heading font-black tracking-tighter text-foreground">{attendanceRecords.length}</span>
+                  <span className="text-[10px] font-mono tracking-widest text-muted-foreground uppercase">/ {totalDaysRequired}</span>
                 </div>
                 
-                <div className="mt-6 space-y-2">
-                  <div className="flex justify-between text-xs font-mono text-muted-foreground">
-                    <span>Progress</span>
-                    <span>{progressPercentage}%</span>
+                <div className="mt-6 space-y-3">
+                  <div className="flex justify-between text-[10px] font-mono tracking-widest text-muted-foreground uppercase">
+                    <span>COMPLETION_RATE</span>
+                    <span className="text-primary glow-primary">{progressPercentage}%</span>
                   </div>
-                  <div className="w-full h-2 rounded-full bg-muted overflow-hidden">
+                  <div className="w-full h-1 bg-border rounded-sm overflow-hidden">
                     <motion.div 
                       initial={{ width: 0 }}
                       animate={{ width: `${progressPercentage}%` }}
                       transition={{ duration: 1, ease: "easeOut" }}
-                      className="h-full bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full"
+                      className="h-full bg-primary rounded-sm glow-primary"
                     />
                   </div>
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           </motion.div>
         </div>
 
@@ -329,22 +338,22 @@ export default function AttendancePage() {
             transition={{ delay: 0.3 }}
             className="h-full"
           >
-            <Card className="bg-card border-border shadow-2xl h-full flex flex-col">
-              <CardHeader className="border-b border-border/40 pb-4">
-                <CardTitle className="text-xl">30-Day Activity Graph</CardTitle>
-                <CardDescription>Your attendance heatmap for the last month.</CardDescription>
-              </CardHeader>
-              <CardContent className="flex-1 flex flex-col justify-center p-8">
+            <div className="glass-panel p-8 corner-accent h-full flex flex-col">
+              <div className="border-b border-border/40 pb-6 mb-8">
+                <h3 className="text-2xl font-heading font-bold uppercase tracking-tight text-foreground">30-CYCLE ACTIVITY MATRIX</h3>
+                <p className="font-mono text-[10px] tracking-widest text-muted-foreground uppercase mt-2">SYSTEM ACCESS FREQUENCY ANALYSIS</p>
+              </div>
+              <div className="flex-1 flex flex-col justify-center">
                 
                 <div className="grid grid-cols-7 gap-3 sm:gap-4 lg:gap-6">
                   {gridDays.map((day, idx) => (
                     <div 
                       key={day.date} 
                       title={day.date}
-                      className={`aspect-square rounded-xl flex items-center justify-center font-mono text-xs sm:text-sm shadow-sm transition-all duration-300 ${
+                      className={`aspect-square rounded-sm flex items-center justify-center font-mono text-[10px] sm:text-xs transition-all duration-300 ${
                         day.isPresent 
-                          ? "bg-gradient-to-br from-blue-500 to-indigo-600 text-white shadow-blue-500/20 font-bold transform hover:scale-110" 
-                          : "bg-slate-900/50 text-muted-foreground/40 border border-border/50 hover:bg-muted/40"
+                          ? "bg-primary/10 border border-primary/50 text-primary glow-primary font-bold active-glow hover:bg-primary/20" 
+                          : "grid-bg text-muted-foreground/30 border border-border/30 hover:border-border/60 hover:text-muted-foreground/60"
                       }`}
                     >
                       {day.label}
@@ -352,19 +361,19 @@ export default function AttendancePage() {
                   ))}
                 </div>
                 
-                <div className="mt-10 flex items-center justify-end gap-3 text-xs text-muted-foreground font-mono">
-                  <span>Less</span>
-                  <div className="flex gap-1.5">
-                    <div className="w-3.5 h-3.5 rounded-sm bg-slate-900/50 border border-border/50" />
-                    <div className="w-3.5 h-3.5 rounded-sm bg-blue-500/40" />
-                    <div className="w-3.5 h-3.5 rounded-sm bg-blue-500/70" />
-                    <div className="w-3.5 h-3.5 rounded-sm bg-indigo-600" />
+                <div className="mt-10 flex items-center justify-end gap-3 text-[9px] uppercase tracking-widest text-muted-foreground font-mono">
+                  <span>LOW_FREQ</span>
+                  <div className="flex gap-2">
+                    <div className="w-4 h-4 rounded-sm grid-bg border border-border/30" />
+                    <div className="w-4 h-4 rounded-sm bg-primary/10 border border-primary/30" />
+                    <div className="w-4 h-4 rounded-sm bg-primary/20 border border-primary/50" />
+                    <div className="w-4 h-4 rounded-sm bg-primary/40 border border-primary/80 glow-primary" />
                   </div>
-                  <span>More</span>
+                  <span>HIGH_FREQ</span>
                 </div>
 
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           </motion.div>
         </div>
       </div>

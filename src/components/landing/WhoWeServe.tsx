@@ -26,7 +26,7 @@ export function WhoWeServe() {
     <section className="py-24 bg-background relative border-b border-border">
       <div className="max-w-[1400px] mx-auto px-8 md:px-16">
         <div className="text-center max-w-3xl mx-auto mb-16">
-          <motion.h2 
+          <motion.h2
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -34,7 +34,7 @@ export function WhoWeServe() {
           >
             Who we serve
           </motion.h2>
-          <motion.p 
+          <motion.p
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -45,7 +45,7 @@ export function WhoWeServe() {
           </motion.p>
         </div>
 
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
@@ -53,11 +53,10 @@ export function WhoWeServe() {
           className="bg-white rounded-3xl border border-border shadow-sm overflow-hidden flex flex-col md:flex-row group"
         >
           {serveItems.map((item, idx) => (
-            <div 
-              key={idx} 
-              className={`flex-1 p-10 lg:p-14 flex flex-col items-center text-center hover:bg-[#fafafa] transition-colors duration-300 ${
-                idx !== serveItems.length - 1 ? "border-b md:border-b-0 md:border-r border-border" : ""
-              }`}
+            <div
+              key={idx}
+              className={`flex-1 p-10 lg:p-14 flex flex-col items-center text-center hover:bg-[#fafafa] transition-colors duration-300 ${idx !== serveItems.length - 1 ? "border-b md:border-b-0 md:border-r border-border" : ""
+                }`}
             >
               <div className="w-16 h-16 rounded-2xl bg-white flex items-center justify-center mb-8 border border-border shadow-sm">
                 <item.icon className="w-7 h-7 text-foreground" strokeWidth={1.5} />

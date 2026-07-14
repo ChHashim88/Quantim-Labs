@@ -1,311 +1,48 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Play, RotateCcw, AlertTriangle, FileCode, CheckCircle, Terminal, BookOpen, Code2, PlayCircle, Loader2, CheckCircle2, UploadCloud } from "lucide-react";
+import { FileText, CheckCircle2, ChevronRight, Upload, Link as LinkIcon } from "lucide-react";
 import Link from "next/link";
 import { toast } from "sonner";
-import { motion, AnimatePresence } from "framer-motion";
-import { createClient } from "@/lib/supabase/client";
+import { motion } from "framer-motion";
 import { FuturisticLoader } from "@/components/ui/futuristic-loader";
 import { SwitchProgramModal } from "@/components/student/SwitchProgramModal";
+import { WeeklySidebar } from "@/components/student/WeeklySidebar";
+import { useWeeklyData } from "@/hooks/useWeeklyData";
 import { useAttendance } from "@/hooks/useAttendance";
 
-interface Assignment {
-  id: string;
-  title: string;
-  dueDate: string;
-  status: "Pending" | "In_Review" | "Submitted" | "Failed";
-  starterCode: string;
-  requirements: string[];
-  tests: string[];
-}
-
-// TRACK_ASSIGNMENTS mock removed.
-
 export default function AssignmentsPage() {
-  const [hasEnrollments, setHasEnrollments] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const [enrolledPrograms, setEnrolledPrograms] = useState<any[]>([]);
-  const [activeTrackId, setActiveTrackId] = useState<string | null>(null);
+  const { programs, activeProgramId, setActiveProgramId, activeProgram, loading, hasEnrollments, markComplete } =
+    useWeeklyData({ contentType: "ASSIGNMENT", progressType: "ASSIGNMENT" });
 
-  const [assignments, setAssignments] = useState<Assignment[]>([]);
   const [activeId, setActiveId] = useState<string>("");
   const [switchTargetId, setSwitchTargetId] = useState<string | null>(null);
 
-  useAttendance(activeTrackId);
+  useAttendance(activeProgramId);
 
-  const [file, setFile] = useState<File | null>(null);
-  const [isUploading, setIsUploading] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const activeAssignment = activeProgram?.weeks.flatMap(w => w.lessons).find(l => l.id === activeId);
+  const activeWeek = activeProgram?.weeks.find(w => w.lessons.some(l => l.id === activeId));
 
-  useEffect(() => {
-    async function loadData() {
-      if (typeof window === "undefined") return;
-
-      try {
-        const { createClient } = await import('@/lib/supabase/client');
-        const supabase = createClient();
-
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) return;
-
-        const { data: enrollments } = await supabase
-          .from('student_enrollments')
-          .select('internship_id')
-          .eq('student_id', user.id);
-
-        const enrolled = enrollments ? enrollments.map(e => e.internship_id) : [];
-
-        if (enrolled.length === 0) {
-          setHasEnrollments(false);
-          setLoading(false);
-          return;
-        }
-
-        setHasEnrollments(true);
-
-        // Fetch all enrolled programs to build the tabs
-        const { data: programsData } = await supabase
-          .from('internships')
-          .select('*')
-          .in('id', enrolled);
-
-        if (programsData) {
-          setEnrolledPrograms(programsData);
-          if (!activeTrackId && programsData.length > 0) {
-            setActiveTrackId(programsData[0].id);
-          }
-        }
-
-        const currentProgram = activeTrackId || (programsData && programsData.length > 0 ? programsData[0].id : null);
-        if (!currentProgram) return;
-
-        // Read completed items
-        const { data: progressData } = await supabase
-          .from('student_progress')
-          .select('content_id')
-          .eq('student_id', user.id)
-          .eq('content_type', 'ASSIGNMENT');
-        const completed = progressData ? progressData.map(p => p.content_id) : [];
-
-        // Fetch all days for the active internship ONLY
-        const { data: daysData } = await supabase
-          .from('days')
-          .select('id')
-          .eq('internship_id', currentProgram);
-
-        if (daysData && daysData.length > 0) {
-          const dayIds = daysData.map(d => d.id);
-
-          // Fetch assignments
-          const { data: lessons } = await supabase
-            .from('lessons')
-            .select('*')
-            .in('day_id', dayIds)
-            .eq('content_type', 'ASSIGNMENT');
-
-          if (lessons) {
-            const mappedAssignments = lessons.map((l, index) => {
-              const isPassed = completed.includes(l.id);
-
-              // Fallback starter code using HTML notes
-              let fallbackStarterCode = `// Code Sandbox\n\n// TODO: Implement requirements.`;
-              if (l.html_notes) {
-                // very simple attempt to extract some text
-                fallbackStarterCode = `/*\n${l.html_notes.replace(/<[^>]*>?/gm, '')}\n*/\n\n// Write your solution here`;
-              }
-
-              return {
-                id: l.id,
-                title: l.title || `Task 1.${index + 1}`,
-                dueDate: "Flexible",
-                status: isPassed ? "Submitted" : "Pending",
-                starterCode: fallbackStarterCode,
-                requirements: [
-                  "Pass all sandbox diagnostic validations.",
-                  "Ensure syntax compiles without errors."
-                ],
-                tests: [
-                  "Compile code execution context",
-                  "Verify logic constraints",
-                  "Assert final output state"
-                ]
-              } as Assignment;
-            });
-
-            setAssignments(mappedAssignments);
-
-              if (mappedAssignments.length > 0) {
-                const defaultId = mappedAssignments[0].id;
-                setActiveId(defaultId);
-              } else {
-              setAssignments([]);
-            }
-          } else {
-            setAssignments([]);
-          }
-        } else {
-          setAssignments([]);
-        }
-      } catch (e) {
-        console.error("Failed to load assignments", e);
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    loadData();
-  }, [activeTrackId]);
-
-  const activeAssign = assignments.find((a) => a.id === activeId);
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files.length > 0) {
-      const selected = e.target.files[0];
-      if (selected.name.endsWith(".zip") || selected.name.endsWith(".rar")) {
-        setFile(selected);
-      } else {
-        toast.error("Please select a .zip or .rar file.");
-      }
-    }
-  };
-
-  const handleFileUpload = async () => {
-    if (!file || !activeAssign || !activeTrackId) return;
-    
-    setIsUploading(true);
-    try {
-      const { createClient } = await import('@/lib/supabase/client');
-      const supabase = createClient();
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("Not authenticated");
-
-      const filePath = `${user.id}/${activeId}.zip`;
-      
-      const { error: uploadError } = await supabase.storage
-        .from("submissions")
-        .upload(filePath, file, { upsert: true });
-
-      if (uploadError) throw uploadError;
-
-      // Optional: Insert into assignment_submissions tracking table
-      try {
-        await supabase.from("assignment_submissions").insert({
-          student_id: user.id,
-          internship_id: activeTrackId,
-          assignment_id: activeId,
-          file_url: filePath,
-          status: "In_Review"
-        });
-      } catch (e) {
-        // Ignore if table doesn't exist yet
-      }
-
-      toast.success("Project submitted successfully!");
-      setFile(null);
-      
-      // Save completed assignment state persistently in student_progress
-      await supabase.from('student_progress').upsert({
-        student_id: user.id,
-        content_type: 'ASSIGNMENT',
-        content_id: activeId
-      }, { onConflict: 'student_id, content_type, content_id' });
-
-      // Link dynamic status to Day 5 of the active curriculum syllabus!
-      if (activeTrackId) {
-        const uniqueDayId = `${activeTrackId}-day-5`; // Day 5 is the assignment day!
-        await supabase.from('student_progress').upsert({
-          student_id: user.id,
-          content_type: 'LESSON',
-          content_id: uniqueDayId
-        }, { onConflict: 'student_id, content_type, content_id' });
-      }
-
-      setAssignments((prev) =>
-        prev.map((a) => (a.id === activeId ? { ...a, status: "Submitted" } : a))
-      );
-      
-    } catch (e: any) {
-      console.error(e);
-      toast.error(e.message || "Failed to upload file. Did you create the storage bucket?");
-    } finally {
-      setIsUploading(false);
-    }
-  };
-
-  const handleRunTests = () => {
-    if (isCompiling || !activeAssign) return;
-    setIsCompiling(true);
-    setConsoleLogs(["[1/3] Initializing sandbox compiler..."]);
-    playSound(400, 0.08, "triangle");
-
-    setTimeout(() => {
-      setConsoleLogs((prev) => [...prev, "[2/3] Resolving workspace file systems and imports... OK"]);
-      playSound(523, 0.08, "triangle");
-    }, 600);
-
-    activeAssign.tests.forEach((test, idx) => {
-      setTimeout(() => {
-        setConsoleLogs((prev) => [...prev, `>> Running test ${idx + 1}: ${test}... PASSED ✔`]);
-        playSound(659, 0.05, "sine");
-      }, 1200 + idx * 500);
-    });
-
-    const completionTime = 1200 + activeAssign.tests.length * 500;
-
-    setTimeout(() => {
-      setConsoleLogs((prev) => [
-        ...prev,
-        "[3/3] Compiling test metrics... SUCCESS.",
-        ">> Result: Code executed successfully in playground.",
-      ]);
-
-      playSound(523, 0.15, "sine");
-      setTimeout(() => playSound(659, 0.15, "sine"), 100);
-      setTimeout(() => playSound(783, 0.25, "sine"), 200);
-
-      setIsCompiling(false);
-      toast.info("Sandbox execution completed.");
-    }, completionTime + 600);
-  };
-
-  const resetCode = () => {
-    if (!activeAssign) return;
-    setCode(activeAssign.starterCode);
-    if (activeTrackId) {
-      localStorage.removeItem(`code_${activeTrackId}_${activeId}`);
-    }
-    setConsoleLogs(["Terminal reset. Awaiting instructions..."]);
-  };
-
-  const selectAssignment = (id: string) => {
-    setActiveId(id);
-  };
-
-  if (loading) {
-    return <FuturisticLoader text="Initializing Cloud IDE..." />;
-  }
+  if (loading) return <FuturisticLoader text="Loading Assignment Data..." />;
 
   if (!hasEnrollments) {
     return (
       <div className="max-w-4xl mx-auto py-16 px-4">
-        <Card className="bg-card border-border shadow-2xl flex flex-col items-center justify-center p-12 text-center">
-          <div className="w-16 h-16 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center text-primary mb-6">
-            <FileCode className="w-8 h-8" />
+        <div className="glass-panel border-border shadow-2xl flex flex-col items-center justify-center p-12 text-center relative overflow-hidden">
+          <div className="w-16 h-16 rounded-sm bg-primary/10 border border-primary/20 flex items-center justify-center text-primary mb-6 glow-primary">
+            <FileText className="w-8 h-8" />
           </div>
-          <CardTitle className="text-2xl font-bold tracking-tight mb-2">No Active Assignments</CardTitle>
-          <CardDescription className="max-w-md mx-auto mb-8 text-sm">
-            You do not have any coding assignments active. Please enroll in an internship program first to load assignments.
-          </CardDescription>
+          <h2 className="font-heading text-2xl font-bold tracking-tight mb-2 uppercase">NO ACTIVE ASSIGNMENTS</h2>
+          <p className="max-w-md mx-auto mb-8 text-xs font-mono tracking-widest text-muted-foreground uppercase">
+            NO ASSIGNMENTS DETECTED. PLEASE INITIALIZE AN INTERNSHIP PROGRAM TO BEGIN.
+          </p>
           <Link href="/student/courses">
-            <Button className="rounded-xl px-8 bg-primary text-primary-foreground hover:bg-primary/95 font-bold shadow-lg">
-              Explore Programs
+            <Button className="rounded-sm px-8 py-6 h-auto text-xs font-mono font-bold uppercase tracking-widest bg-primary text-primary-foreground hover:bg-primary/90 glow-primary">
+              EXPLORE PROGRAMS
             </Button>
           </Link>
-        </Card>
+        </div>
       </div>
     );
   }
@@ -313,35 +50,25 @@ export default function AssignmentsPage() {
   return (
     <div className="space-y-8 max-w-6xl mx-auto">
       <header>
-        <h1 className="text-4xl font-heading font-extrabold tracking-tight">Coding Assignments</h1>
-        <p className="text-muted-foreground mt-2">
-          Apply what you've learned through hands-on project implementations.
+        <h1 className="text-4xl lg:text-5xl font-heading font-extrabold tracking-tighter uppercase">ASSIGNMENTS</h1>
+        <p className="font-mono text-[10px] tracking-[0.2em] uppercase text-muted-foreground mt-2 flex items-center gap-2">
+          <span className="w-1 h-1 bg-primary"></span> SUBMIT WEEKLY DELIVERABLES — UNLOCKS EVERY 7 DAYS
         </p>
       </header>
 
-      {/* Glassmorphic Animated Dock */}
-      {hasEnrollments && enrolledPrograms.length > 0 && (
-        <div className="flex items-center justify-start mb-10 w-full relative z-10">
-          <div className="relative flex p-1.5 rounded-full bg-background/40 backdrop-blur-xl border border-white/10 shadow-[0_8px_30px_rgb(0,0,0,0.12)] overflow-x-auto no-scrollbar max-w-full">
-            {enrolledPrograms.map((program) => {
-              const isActive = program.id === activeTrackId;
+      {programs.length > 0 && (
+        <div className="flex items-center justify-start w-full relative z-10">
+          <div className="relative flex p-1 rounded-sm bg-card border border-border overflow-x-auto no-scrollbar max-w-full">
+            {programs.map((program) => {
+              const isActive = program.id === activeProgramId;
               return (
                 <button
                   key={program.id}
-                  onClick={() => {
-                      if (program.id !== activeTrackId) {
-                        setSwitchTargetId(program.id);
-                      }
-                    }}
-                  className={`relative px-6 py-2.5 rounded-full text-sm font-semibold transition-colors flex items-center justify-center outline-none whitespace-nowrap min-w-fit z-20 ${isActive ? "text-white" : "text-muted-foreground hover:text-foreground hover:bg-muted/30"
-                    }`}
+                  onClick={() => { if (program.id !== activeProgramId) setSwitchTargetId(program.id); }}
+                  className={`relative px-5 py-2 rounded-sm text-xs font-mono tracking-widest uppercase transition-colors flex items-center justify-center outline-none whitespace-nowrap min-w-fit z-20 ${isActive ? "text-primary-foreground" : "text-muted-foreground hover:text-foreground hover:bg-foreground/5"}`}
                 >
                   {isActive && (
-                    <motion.div
-                      layoutId="assignments-active-program-pill"
-                      className="absolute inset-0 bg-gradient-to-tr from-primary to-blue-500 rounded-full shadow-lg shadow-primary/25 z-0"
-                      transition={{ type: "spring", bounce: 0.25, duration: 0.5 }}
-                    />
+                    <motion.div layoutId="assignments-active-pill" className="absolute inset-0 bg-primary rounded-sm shadow-lg shadow-primary/20 z-0" transition={{ type: "spring", bounce: 0.25, duration: 0.5 }} />
                   )}
                   <span className="relative z-10 flex items-center gap-2">
                     {isActive && <div className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />}
@@ -354,132 +81,105 @@ export default function AssignmentsPage() {
         </div>
       )}
 
-      {activeAssign ? (
-        <div className="grid lg:grid-cols-12 gap-8 items-stretch">
-          {/* Left Column: Tasks List */}
-          <div className="lg:col-span-4 space-y-6">
-            <Card className="bg-card border-border shadow-xl">
-              <CardHeader>
-                <CardTitle className="text-lg">Assignments</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                {assignments.map((item) => (
-                  <div
-                    key={item.id}
-                    onClick={() => selectAssignment(item.id)}
-                    className={`p-4 rounded-2xl border transition-all cursor-pointer flex flex-col justify-between ${item.id === activeId
-                        ? "border-primary bg-primary/5 shadow-md"
-                        : "border-border/60 hover:bg-muted/40"
-                      }`}
-                  >
-                    <div>
-                      <h3 className="font-bold text-sm text-foreground mb-1">{item.title}</h3>
-                      <p className="text-xs text-muted-foreground">Due: {item.dueDate}</p>
-                    </div>
-                    <div className="flex justify-between items-center mt-4">
-                      <Badge
-                        variant={item.status === "Submitted" ? "default" : "outline"}
-                        className={
-                          item.status === "Submitted"
-                            ? "bg-blue-500 text-white hover:bg-blue-600"
-                            : "border-border text-muted-foreground"
-                        }
-                      >
-                        {item.status.replace("_", " ")}
-                      </Badge>
-                      <FileCode className={`w-4 h-4 ${item.id === activeId ? "text-primary animate-pulse" : "text-muted-foreground"}`} />
-                    </div>
-                  </div>
-                ))}
-              </CardContent>
-            </Card>
+      <div className="grid lg:grid-cols-12 gap-8 items-start">
+        <div className="lg:col-span-4">
+          <WeeklySidebar weeks={activeProgram?.weeks || []} activeId={activeId} onSelect={setActiveId} />
+        </div>
 
-          </div>
-
-          {/* Right Column: Submission & Sandbox */}
-          <div className="lg:col-span-8 flex flex-col gap-6">
-
-            {/* File Upload Section */}
-            <Card className="bg-card border-border shadow-xl relative overflow-hidden">
-              <div className="absolute top-0 right-0 p-4 opacity-5 pointer-events-none">
-                <UploadCloud className="w-32 h-32 text-primary" />
+        <div className="lg:col-span-8 flex flex-col min-h-[500px]">
+          {activeAssignment ? (
+            <div className="flex-1 glass-panel corner-accent overflow-hidden flex flex-col relative">
+              <div className="absolute top-0 right-0 p-8 opacity-5 pointer-events-none">
+                <FileText className="w-64 h-64 text-primary" />
               </div>
-              <CardHeader className="pb-3 border-b border-border/40">
-                <div className="flex items-center gap-2">
-                  <UploadCloud className="w-5 h-5 text-primary" />
-                  <CardTitle className="text-lg">Project Submission</CardTitle>
-                </div>
-                <CardDescription>Upload your full project code (.zip or .rar) for review.</CardDescription>
-              </CardHeader>
-              <CardContent className="pt-6 relative z-10">
-                {activeAssign.status === "Submitted" ? (
-                  <div className="flex flex-col items-center justify-center p-8 border-2 border-border/60 rounded-2xl bg-blue-500/5">
-                    <div className="w-16 h-16 rounded-full bg-blue-500/10 flex items-center justify-center text-blue-500 mb-4 border border-blue-500/20 shadow-[0_0_15px_rgba(59,130,246,0.2)]">
-                      <CheckCircle2 className="w-8 h-8" />
-                    </div>
-                    <h4 className="font-semibold text-foreground mb-1">Project Submitted Successfully</h4>
-                    <p className="text-xs text-muted-foreground">You have already submitted a file for this assignment. It is currently under review.</p>
+
+              <div className="p-8 border-b border-border/20 relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+                <div className="flex items-center gap-6">
+                  <div className={`w-16 h-16 rounded-sm flex items-center justify-center border glow-primary ${activeAssignment.completed ? "bg-primary/20 border-primary/40 text-primary" : "bg-primary/10 border-primary/20 text-primary"}`}>
+                    <FileText className="w-8 h-8" />
                   </div>
-                ) : (
-                  <div className="flex flex-col items-center justify-center p-8 border-2 border-dashed border-border/60 rounded-2xl bg-muted/20 transition-all hover:bg-muted/40">
-                    <input 
-                      type="file" 
-                      ref={fileInputRef} 
-                      onChange={handleFileChange} 
-                      accept=".zip,.rar" 
-                      className="hidden" 
-                    />
-                    
-                    {file ? (
-                      <div className="flex flex-col items-center text-center">
-                        <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center text-primary mb-4 border border-primary/20 shadow-[0_0_15px_rgba(59,130,246,0.2)]">
-                          <CheckCircle2 className="w-8 h-8" />
-                        </div>
-                        <p className="font-semibold text-foreground mb-1">{file.name}</p>
-                        <p className="text-xs text-muted-foreground mb-6">{(file.size / 1024 / 1024).toFixed(2)} MB</p>
-                        <div className="flex gap-3">
-                          <Button variant="outline" onClick={() => setFile(null)} disabled={isUploading}>Cancel</Button>
-                          <Button 
-                            onClick={handleFileUpload} 
-                            disabled={isUploading}
-                            className="bg-primary text-primary-foreground font-bold shadow-md shadow-primary/20"
-                          >
-                            {isUploading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <UploadCloud className="w-4 h-4 mr-2" />}
-                            {isUploading ? "Uploading..." : "Submit Project"}
-                          </Button>
+                  <div>
+                    <h2 className="text-2xl font-bold font-heading tracking-tight uppercase text-foreground">{activeAssignment.title}</h2>
+                    <p className="text-[10px] font-mono tracking-widest uppercase text-muted-foreground mt-2">
+                      {activeWeek?.weekTitle} &bull; REQUIRED_SUBMISSION
+                    </p>
+                  </div>
+                </div>
+                <div className="text-[10px] font-mono tracking-widest uppercase px-3 py-1.5 rounded-sm border border-border/40 bg-background/50">
+                  STATUS: {activeAssignment.completed ? <span className="text-primary glow-primary">SUBMITTED</span> : <span className="text-muted-foreground">PENDING</span>}
+                </div>
+              </div>
+
+              <div className="flex-1 overflow-y-auto p-8 relative z-10">
+                <h3 className="font-mono text-[10px] tracking-[0.3em] uppercase mb-6 flex items-center gap-2 text-primary border-b border-border/20 pb-4">
+                  <span className="w-1 h-1 bg-primary glow-primary"></span> ASSIGNMENT_DETAILS
+                </h3>
+                <div
+                  className="prose prose-slate dark:prose-invert max-w-none text-muted-foreground prose-p:font-mono prose-p:text-xs prose-p:leading-relaxed prose-headings:font-heading prose-headings:uppercase prose-a:text-primary mb-12"
+                  dangerouslySetInnerHTML={{ __html: activeAssignment.htmlNotes || "<p>No detailed instructions provided.</p>" }}
+                />
+
+                {!activeAssignment.completed && (
+                  <div className="border border-border/40 rounded-sm p-6 grid-bg bg-background/50 relative overflow-hidden">
+                    <div className="absolute top-0 left-0 w-1 h-full bg-primary glow-primary"></div>
+                    <h4 className="font-mono text-[10px] tracking-[0.2em] uppercase text-foreground mb-4">SUBMISSION_PORTAL</h4>
+                    <div className="space-y-4">
+                      <div>
+                        <label className="text-[9px] font-mono uppercase tracking-widest text-muted-foreground block mb-2">PROJECT_URL (GITHUB/DRIVE/VERCEL)</label>
+                        <div className="flex border border-border/40 rounded-sm overflow-hidden focus-within:border-primary/50 transition-colors">
+                          <div className="bg-muted/20 px-4 flex items-center justify-center border-r border-border/40">
+                            <LinkIcon className="w-4 h-4 text-muted-foreground" />
+                          </div>
+                          <input type="text" placeholder="https://" className="flex-1 bg-transparent border-none text-xs font-mono p-3 focus:outline-none" />
                         </div>
                       </div>
-                    ) : (
-                      <div className="flex flex-col items-center text-center">
-                        <div className="w-16 h-16 rounded-full bg-slate-800 flex items-center justify-center text-slate-400 mb-4 cursor-pointer hover:bg-slate-700 hover:text-white transition-all shadow-inner border border-slate-700" onClick={() => fileInputRef.current?.click()}>
-                          <UploadCloud className="w-8 h-8" />
-                        </div>
-                        <h4 className="font-semibold text-foreground mb-1">Select Project File</h4>
-                        <p className="text-xs text-muted-foreground mb-4">Ensure your project is compressed into a .zip or .rar format</p>
-                        <Button onClick={() => fileInputRef.current?.click()} variant="outline" className="border-primary/50 text-primary hover:bg-primary/10">
-                          Browse Files
-                        </Button>
-                      </div>
-                    )}
+                      <Button
+                        onClick={() => {
+                          markComplete(activeAssignment.id, activeProgramId, true);
+                          toast.success("Assignment submitted successfully!");
+                        }}
+                        className="w-full rounded-sm font-mono text-[10px] font-bold uppercase tracking-widest bg-primary text-primary-foreground hover:bg-primary/90 glow-primary h-12"
+                      >
+                        <Upload className="w-4 h-4 mr-2" /> TRANSMIT_SUBMISSION
+                      </Button>
+                    </div>
                   </div>
                 )}
-              </CardContent>
-            </Card>
-          </div>
+              </div>
+
+              {activeAssignment.completed && (
+                <div className="p-8 border-t border-border/20 grid-bg relative z-10 flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <CheckCircle2 className="w-5 h-5 text-primary glow-primary" />
+                    <p className="text-[10px] font-mono uppercase tracking-widest text-primary">SUBMISSION_RECEIVED_AND_VERIFIED</p>
+                  </div>
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      markComplete(activeAssignment.id, activeProgramId, false);
+                      toast.success("Submission recalled.");
+                    }}
+                    className="rounded-sm font-mono text-[9px] uppercase tracking-widest hover:text-destructive hover:border-destructive/50 h-8"
+                  >
+                    RECALL_SUBMISSION
+                  </Button>
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="flex-1 flex flex-col items-center justify-center text-center glass-panel corner-accent p-12 min-h-[400px]">
+              <FileText className="w-16 h-16 text-muted-foreground/30 mb-6" />
+              <p className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">SELECT AN ASSIGNMENT FROM THE WEEKLY INDEX TO VIEW DETAILS.</p>
+            </div>
+          )}
         </div>
-      ) : (
-        <div className="text-center py-12 text-sm text-muted-foreground">
-          No assignments loaded for active curriculum.
-        </div>
-      )}
+      </div>
+
       <SwitchProgramModal
         isOpen={!!switchTargetId}
-        currentProgramName={enrolledPrograms.find(p => p.id === activeTrackId)?.title || ""}
-        targetProgramName={enrolledPrograms.find(p => p.id === switchTargetId)?.title || ""}
-        onConfirm={() => {
-          if (switchTargetId) setActiveTrackId(switchTargetId);
-          setSwitchTargetId(null);
-        }}
+        currentProgramName={programs.find(p => p.id === activeProgramId)?.title || ""}
+        targetProgramName={programs.find(p => p.id === switchTargetId)?.title || ""}
+        onConfirm={() => { if (switchTargetId) setActiveProgramId(switchTargetId); setSwitchTargetId(null); }}
         onCancel={() => setSwitchTargetId(null)}
       />
     </div>

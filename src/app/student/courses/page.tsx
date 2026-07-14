@@ -68,7 +68,7 @@ export default function CoursesPage() {
         .from('student_enrollments')
         .select('internship_id')
         .eq('student_id', user.id);
-      
+
       const enrolled = enrollments ? enrollments.map(e => e.internship_id) : [];
       setEnrolledIds(enrolled);
 
@@ -77,7 +77,7 @@ export default function CoursesPage() {
         .select('content_id')
         .eq('student_id', user.id)
         .eq('content_type', 'LESSON');
-      
+
       const completed = progressData ? progressData.map(p => p.content_id) : [];
       const { data: dbInternships } = await supabase.from('internships').select('*');
       setAvailablePrograms(dbInternships || []);
@@ -160,7 +160,7 @@ export default function CoursesPage() {
         student_id: user.id,
         internship_id: programId
       });
-      
+
       if (error && error.code !== '23505') throw error;
       playChime();
       toast.success(`Successfully enrolled in ${programTitle}!`);
@@ -180,28 +180,29 @@ export default function CoursesPage() {
     <div className="space-y-8 max-w-6xl mx-auto">
       <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-4xl font-heading font-extrabold tracking-tight">
-            {showEnrollmentCenter ? "Curriculum Enrollment Center" : "My Active Courses"}
+          <h1 className="text-4xl lg:text-5xl font-heading font-extrabold tracking-tighter uppercase">
+            {showEnrollmentCenter ? "CURRICULUM ENROLLMENT" : "ACTIVE PROGRAMS"}
           </h1>
-          <p className="text-muted-foreground mt-2">
+          <p className="font-mono text-[10px] tracking-[0.2em] uppercase text-muted-foreground mt-2 flex items-center gap-2">
+            <span className="w-1 h-1 bg-primary"></span>
             {showEnrollmentCenter
-              ? "Select an available internship program below to begin your path."
-              : "Track your active internship programs and overall progress."}
+              ? "SELECT A LEARNING PATH TO INITIALIZE SYSTEM PROTOCOLS."
+              : "TRACK YOUR ACTIVE INTERNSHIP PROGRAMS AND OVERALL PROGRESS."}
           </p>
         </div>
 
         {enrolledIds.length > 0 && (
           <Button
             onClick={() => setShowEnrollmentCenter(!showEnrollmentCenter)}
-            className="rounded-xl border border-primary/20 bg-primary/5 text-primary hover:bg-primary/10 px-5 flex items-center gap-2"
+            className="rounded-sm border-primary/40 bg-primary/10 text-primary hover:bg-primary/20 px-6 py-4 font-mono text-[10px] tracking-widest font-bold uppercase flex items-center gap-2 glow-primary transition-all duration-300"
           >
             {showEnrollmentCenter ? (
               <>
-                <ArrowLeft className="w-4 h-4" /> Back to My Courses
+                <ArrowLeft className="w-4 h-4" /> RETURN_TO_DASHBOARD
               </>
             ) : (
               <>
-                <PlusCircleIcon className="w-4 h-4" /> Enroll in New Program
+                <PlusCircleIcon className="w-4 h-4" /> INITIALIZE_NEW_PROGRAM
               </>
             )}
           </Button>
@@ -214,114 +215,113 @@ export default function CoursesPage() {
             {availablePrograms.map((prog) => {
               const isEnrolled = enrolledIds.includes(prog.id);
               return (
-                <Card key={prog.id} className="bg-card border-border shadow-xl flex flex-col justify-between overflow-hidden relative group hover:border-primary/40 transition-all duration-300">
-                  <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-primary to-blue-400 opacity-60" />
-                  <CardHeader>
-                    <div className="flex flex-wrap gap-2 mb-3">
-                      <Badge variant="secondary" className="bg-primary/10 text-primary border-primary/20 text-[10px]">
+                <div key={prog.id} className="glass-panel p-6 corner-accent flex flex-col justify-between group hover:border-primary/50 transition-colors">
+                  <div>
+                    <div className="flex flex-wrap gap-2 mb-4">
+                      <div className="text-[9px] font-mono tracking-widest uppercase bg-primary/10 text-primary border border-primary/30 px-2 py-1 rounded-sm glow-primary">
                         {prog.category || "Development"}
-                      </Badge>
-                      <Badge variant="outline" className="text-[10px]">
-                        {prog.duration_weeks || 12} Weeks
-                      </Badge>
-                    </div>
-                    <CardTitle className="text-xl font-bold tracking-tight">{prog.title}</CardTitle>
-                  </CardHeader>
-
-                  <CardContent className="text-xs text-muted-foreground leading-relaxed flex-1">
-                    {prog.short_description || "Immersive learning path utilizing Next.js, database structures, and mentorship guidance."}
-
-                    <div className="mt-6 space-y-3 pt-4 border-t border-border/20 font-mono text-[10px]">
-                      <div className="flex items-center gap-2">
-                        <Layers className="w-3.5 h-3.5 text-primary" />
-                        <span>Level: <span className="text-foreground font-semibold">{prog.level || "Intermediate"}</span></span>
                       </div>
-                      <div className="flex flex-wrap gap-2 text-xs text-muted-foreground bg-muted/30 p-2.5 rounded-lg border border-border/50">
-                        <span className="flex items-center gap-1 font-medium text-foreground"><PlayCircle className="w-3.5 h-3.5 text-primary"/> Lectures</span>
-                        <span className="flex items-center gap-1 font-medium text-foreground"><ListTodo className="w-3.5 h-3.5 text-primary"/> Tasks</span>
-                        <span className="flex items-center gap-1 font-medium text-foreground"><FileText className="w-3.5 h-3.5 text-primary"/> Assignments</span>
-                        <span className="flex items-center gap-1 font-medium text-foreground"><HelpCircle className="w-3.5 h-3.5 text-primary"/> Quizzes</span>
-                        <span className="flex items-center gap-1 font-medium text-foreground"><Award className="w-3.5 h-3.5 text-primary"/> Certificates</span>
+                      <div className="text-[9px] font-mono tracking-widest uppercase border border-border/50 text-muted-foreground px-2 py-1 rounded-sm">
+                        {prog.duration_weeks || 12} WEEKS
                       </div>
                     </div>
-                  </CardContent>
+                    <h3 className="text-xl font-heading font-bold uppercase tracking-tight mb-2 group-hover:text-primary transition-colors">{prog.title}</h3>
+                    <p className="text-[10px] font-mono tracking-widest text-muted-foreground uppercase leading-relaxed mb-6">
+                      {prog.short_description || "IMMERSIVE LEARNING PATH UTILIZING NEXT.JS, DATABASE STRUCTURES, AND MENTORSHIP GUIDANCE."}
+                    </p>
 
-                  <CardFooter className="border-t border-border/30 pt-4 bg-muted/5">
+                    <div className="space-y-3 pt-4 border-t border-border/20 font-mono text-[9px] tracking-widest uppercase mb-6">
+                      <div className="flex items-center gap-2 text-muted-foreground">
+                        <Layers className="w-3.5 h-3.5 text-primary glow-primary" />
+                        <span>COMPLEXITY_LEVEL: <span className="text-foreground">{prog.level || "Intermediate"}</span></span>
+                      </div>
+                      <div className="flex flex-wrap gap-2 text-[9px] text-muted-foreground grid-bg p-3 rounded-sm border border-border/40">
+                        <span className="flex items-center gap-1"><PlayCircle className="w-3 h-3 text-primary glow-primary" /> LECTURES</span>
+                        <span className="flex items-center gap-1"><ListTodo className="w-3 h-3 text-primary glow-primary" /> TASKS</span>
+                        <span className="flex items-center gap-1"><FileText className="w-3 h-3 text-primary glow-primary" /> ASSIGNMENTS</span>
+                        <span className="flex items-center gap-1"><HelpCircle className="w-3 h-3 text-primary glow-primary" /> QUIZZES</span>
+                        <span className="flex items-center gap-1"><Award className="w-3 h-3 text-primary glow-primary" /> CERTIFICATES</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="border-t border-border/30 pt-4 mt-auto">
                     {isEnrolled ? (
                       <Button
                         onClick={() => {
                           setShowEnrollmentCenter(false);
                         }}
-                        className="w-full rounded-xl bg-slate-800 text-slate-300 hover:bg-slate-700 flex items-center justify-center gap-2 border border-border"
+                        className="w-full rounded-sm font-mono text-[10px] uppercase tracking-widest flex items-center justify-center gap-2 border border-border/50 bg-transparent text-muted-foreground hover:text-foreground"
                       >
-                        <span>Currently Enrolled</span>
+                        <span>SYSTEM_INITIALIZED</span>
                         <ChevronRight className="w-4 h-4" />
                       </Button>
                     ) : (
                       <Button
                         onClick={() => enrollInProgram(prog.id, prog.title)}
-                        className="w-full rounded-xl bg-primary text-primary-foreground hover:bg-primary/95 font-bold shadow-md shadow-primary/15 transition-all duration-300 flex items-center justify-center gap-2"
+                        className="w-full rounded-sm bg-primary text-primary-foreground hover:bg-primary/90 font-mono text-[10px] uppercase font-bold tracking-widest glow-primary transition-all duration-300 flex items-center justify-center gap-2"
                       >
-                        <span>Enroll & Start Learning</span>
+                        <span>INITIALIZE_ENROLLMENT</span>
                         <ChevronRight className="w-4 h-4" />
                       </Button>
                     )}
-                  </CardFooter>
-                </Card>
+                  </div>
+                </div>
               );
             })}
           </div>
         ) : (
-          <Card className="bg-card border-border shadow-xl p-12 text-center flex flex-col items-center">
-            <HelpCircle className="w-12 h-12 text-muted-foreground/60 mb-4" />
-            <CardTitle className="text-xl font-bold mb-2">No Programs Available</CardTitle>
-            <CardDescription className="max-w-md">
-              There are currently no internship programs published in the database.
-            </CardDescription>
-          </Card>
+          <div className="glass-panel p-12 text-center flex flex-col items-center corner-accent max-w-2xl mx-auto">
+            <HelpCircle className="w-16 h-16 text-muted-foreground/30 mb-6" />
+            <h3 className="text-xl font-heading font-bold uppercase tracking-widest mb-2 text-foreground">NO_PROGRAMS_DETECTED</h3>
+            <p className="font-mono text-[10px] tracking-widest uppercase text-muted-foreground">
+              SYSTEM RECORDS INDICATE NO INTERNSHIP PROGRAMS ARE CURRENTLY PUBLISHED IN THE DATABASE.
+            </p>
+          </div>
         )
       ) : (
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
           {enrolledTracks.map((track) => (
-            <Card key={track.id} className="bg-card border-border shadow-xl flex flex-col justify-between overflow-hidden relative group hover:border-primary/40 transition-all duration-300">
-              <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-blue-500 to-indigo-500 opacity-60" />
-              <CardHeader>
-                <div className="flex justify-between items-start mb-2">
-                  <Badge variant="secondary" className="bg-primary/10 text-primary border-primary/20 text-[10px]">
+            <div key={track.id} className="glass-panel p-6 corner-accent flex flex-col justify-between group hover:border-primary/50 transition-colors">
+              <div>
+                <div className="flex justify-between items-start mb-4">
+                  <div className="text-[9px] font-mono tracking-widest uppercase bg-primary/10 text-primary border border-primary/30 px-2 py-1 rounded-sm glow-primary">
                     {track.category || "Development"}
-                  </Badge>
-                  <Badge variant="default" className="bg-blue-500 hover:bg-blue-600 text-white">
-                    Enrolled
-                  </Badge>
-                </div>
-                <CardTitle className="text-xl font-bold tracking-tight">{track.title}</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex flex-wrap gap-2 text-[10px] text-muted-foreground mb-3 bg-muted/30 p-2.5 rounded-lg border border-border/50">
-                  <span className="flex items-center gap-1 font-medium text-foreground"><PlayCircle className="w-3 h-3 text-primary"/> Lectures</span>
-                  <span className="flex items-center gap-1 font-medium text-foreground"><ListTodo className="w-3 h-3 text-primary"/> Tasks</span>
-                  <span className="flex items-center gap-1 font-medium text-foreground"><FileText className="w-3 h-3 text-primary"/> Assignments</span>
-                  <span className="flex items-center gap-1 font-medium text-foreground"><HelpCircle className="w-3 h-3 text-primary"/> Quizzes</span>
-                  <span className="flex items-center gap-1 font-medium text-foreground"><Award className="w-3 h-3 text-primary"/> Certificates</span>
-                </div>
-                <div className="space-y-1.5">
-                  <div className="flex justify-between text-xs text-muted-foreground font-mono">
-                    <span>Overall Progress</span>
-                    <span>{track.progress}%</span>
                   </div>
-                  <Progress value={track.progress} className="h-1.5 bg-muted" />
+                  <div className="text-[9px] font-mono tracking-widest uppercase bg-blue-500/10 text-blue-500 border border-blue-500/30 px-2 py-1 rounded-sm">
+                    ACTIVE_SYNC
+                  </div>
                 </div>
-              </CardContent>
-              <CardFooter className="border-t border-border/30 pt-4 bg-muted/5">
+                <h3 className="text-xl font-heading font-bold uppercase tracking-tight mb-4 group-hover:text-primary transition-colors">{track.title}</h3>
+                <div className="space-y-6 mb-6">
+                  <div className="flex flex-wrap gap-2 text-[9px] text-muted-foreground grid-bg p-3 rounded-sm border border-border/40 font-mono uppercase tracking-widest">
+                    <span className="flex items-center gap-1"><PlayCircle className="w-3 h-3 text-primary glow-primary" /> LECTURES</span>
+                    <span className="flex items-center gap-1"><ListTodo className="w-3 h-3 text-primary glow-primary" /> TASKS</span>
+                    <span className="flex items-center gap-1"><FileText className="w-3 h-3 text-primary glow-primary" /> ASSIGNMENTS</span>
+                    <span className="flex items-center gap-1"><HelpCircle className="w-3 h-3 text-primary glow-primary" /> QUIZZES</span>
+                    <span className="flex items-center gap-1"><Award className="w-3 h-3 text-primary glow-primary" /> CERTIFICATES</span>
+                  </div>
+                  <div className="space-y-2">
+                    <div className="flex justify-between text-[10px] text-muted-foreground font-mono uppercase tracking-widest">
+                      <span>COMPLETION_RATE</span>
+                      <span className="text-primary glow-primary">{track.progress}%</span>
+                    </div>
+                    <div className="w-full h-1 bg-border rounded-sm overflow-hidden">
+                      <div className="h-full bg-primary rounded-sm glow-primary" style={{ width: `${track.progress}%` }} />
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="border-t border-border/30 pt-4 mt-auto">
                 <Button
                   onClick={() => router.push("/student/lectures")}
-                  className="w-full rounded-xl bg-primary text-primary-foreground hover:bg-primary/95 font-bold shadow-md shadow-primary/15 transition-all duration-300 flex items-center justify-center gap-2"
+                  className="w-full rounded-sm bg-primary text-primary-foreground hover:bg-primary/90 font-mono text-[10px] font-bold uppercase tracking-widest shadow-md shadow-primary/15 glow-primary transition-all duration-300 flex items-center justify-center gap-2"
                 >
-                  <span>Go to Lectures</span>
+                  <span>ACCESS_LECTURES</span>
                   <ChevronRight className="w-4 h-4" />
                 </Button>
-              </CardFooter>
-            </Card>
+              </div>
+            </div>
           ))}
         </div>
       )}
@@ -330,36 +330,36 @@ export default function CoursesPage() {
       <AnimatePresence>
         {showAlreadyEnrolledModal && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-md">
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="relative w-full max-w-md overflow-hidden bg-card border border-border shadow-2xl rounded-3xl"
+              className="relative w-full max-w-md overflow-hidden glass-panel corner-accent border-amber-500/30"
             >
-              <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-amber-500 to-orange-500" />
-              <button 
+              <div className="absolute top-0 left-0 w-full h-1 bg-amber-500 glow-primary" />
+              <button
                 onClick={() => setShowAlreadyEnrolledModal(false)}
-                className="absolute top-4 right-4 p-2 text-muted-foreground hover:text-foreground hover:bg-muted rounded-full transition-colors"
+                className="absolute top-4 right-4 p-2 text-muted-foreground hover:text-foreground hover:bg-muted/30 rounded-sm transition-colors"
               >
-                <X className="w-5 h-5" />
+                <X className="w-4 h-4" />
               </button>
               <div className="p-8 pt-10 flex flex-col items-center text-center space-y-6">
-                <div className="w-16 h-16 bg-amber-500/10 rounded-full flex items-center justify-center border border-amber-500/20">
+                <div className="w-16 h-16 bg-amber-500/10 rounded-sm flex items-center justify-center border border-amber-500/30">
                   <AlertCircle className="w-8 h-8 text-amber-500" />
                 </div>
-                <div className="space-y-2">
-                  <h3 className="text-2xl font-bold font-heading text-foreground">Active Enrollment Detected</h3>
-                  <p className="text-muted-foreground leading-relaxed">
-                    You are already enrolled in an internship program. To maintain quality and focus, you can only participate in one program at a time.
+                <div className="space-y-3">
+                  <h3 className="text-xl font-bold font-heading uppercase tracking-tighter text-foreground">SYSTEM_CONFLICT_DETECTED</h3>
+                  <p className="text-[10px] font-mono tracking-widest uppercase text-muted-foreground leading-relaxed">
+                    ACTIVE ENROLLMENT ALREADY EXISTS IN DATABANKS. SIMULTANEOUS PROGRAM EXECUTION IS PROHIBITED TO MAINTAIN OPTIMAL PROCESSING EFFICIENCY.
                   </p>
                 </div>
-                <div className="flex flex-col w-full gap-3 pt-4">
-                  <Button 
+                <div className="flex flex-col w-full gap-3 pt-6 border-t border-border/20">
+                  <Button
                     variant="outline"
                     onClick={() => setShowAlreadyEnrolledModal(false)}
-                    className="w-full h-12 rounded-xl font-semibold"
+                    className="w-full rounded-sm font-mono text-[10px] uppercase tracking-widest border-border/50 hover:bg-muted/30"
                   >
-                    Close
+                    ACKNOWLEDGE_AND_CLOSE
                   </Button>
                 </div>
               </div>

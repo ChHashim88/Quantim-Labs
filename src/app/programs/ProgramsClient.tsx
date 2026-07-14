@@ -92,7 +92,7 @@ export function ProgramsClient({ initialPrograms }: ProgramsClientProps) {
                 {/* Card Image without fade */}
                 <div className="h-48 relative overflow-hidden bg-muted border-b border-border shadow-inner">
                   <img 
-                    src={program.cover_banner_url || fallbackImage} 
+                    src={program.thumbnail_url || program.cover_banner_url || fallbackImage} 
                     alt={program.title} 
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
                   />

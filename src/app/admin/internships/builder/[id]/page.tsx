@@ -2,8 +2,15 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { UnifiedBuilderClient } from "./UnifiedBuilderClient";
 
-export default async function InternshipBuilderPage({ params }: { params: Promise<{ id: string }> }) {
+export default async function InternshipBuilderPage({ 
+  params,
+  searchParams
+}: { 
+  params: Promise<{ id: string }>;
+  searchParams: Promise<{ setup_weeks?: string }>;
+}) {
   const { id } = await params;
+  const { setup_weeks } = await searchParams;
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
@@ -23,7 +30,23 @@ export default async function InternshipBuilderPage({ params }: { params: Promis
   }
 
   // Fetch the days associated with this internship
-  // NOTE: This requires the SQL migration to add internship_id to days
+  const { data: existingDays } = await supabase
+    .from("days")
+    .select("id")
+    .eq("internship_id", id);
+
+  // Auto-generate weeks if setup_weeks is provided and no days exist yet
+  const numWeeks = parseInt(setup_weeks || "0");
+  if (numWeeks > 0 && (!existingDays || existingDays.length === 0)) {
+    const weeksToInsert = Array.from({ length: numWeeks }, (_, i) => ({
+      internship_id: id,
+      title: `Week ${i + 1}`,
+      order_index: i + 1,
+    }));
+    await supabase.from("days").insert(weeksToInsert);
+  }
+
+  // Fetch days (after potential auto-generation)
   const { data: days } = await supabase
     .from("days")
     .select("*, lessons(*)")

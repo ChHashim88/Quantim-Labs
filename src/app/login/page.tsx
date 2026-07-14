@@ -60,19 +60,18 @@ export default function LoginPage() {
         
         {/* Content */}
         <div className="relative z-10 w-full max-w-lg">
-          <Link href="/" className="inline-flex items-center gap-1 group mb-16 hover:opacity-80 transition-opacity">
+          <Link href="/" className="inline-flex items-center group mb-16 hover:opacity-80 transition-opacity">
             <Image 
               src="/logo.png" 
               alt="Quantim Labz Logo" 
-              width={160} 
-              height={44} 
-              className="relative object-contain h-10 w-auto z-10 filter brightness-0 invert" 
+              width={80} 
+              height={80} 
+              className="relative object-contain h-14 w-auto z-10 filter brightness-0 invert" 
               priority 
             />
-            <div className="h-6 w-px bg-white/20 mx-3 transform rotate-12" />
             <div className="flex flex-col">
-              <span className="text-xl font-heading font-black tracking-tighter text-white leading-none">
-                QUANTIM<span className="text-blue-400">LABS</span>
+              <span className="text-2xl font-heading font-extrabold tracking-tighter text-white leading-none uppercase -ml-2">
+                UANTIM LABZ
               </span>
             </div>
           </Link>
@@ -104,11 +103,10 @@ export default function LoginPage() {
       <div className="w-full lg:w-1/2 flex flex-col justify-center px-6 sm:px-12 lg:px-24 relative bg-white">
         
         {/* Mobile Header */}
-        <div className="lg:hidden absolute top-8 left-6 sm:left-12 flex items-center gap-1 group">
-           <Image src="/logo.png" alt="Logo" width={120} height={32} className="h-8 w-auto object-contain" style={{ filter: "brightness(0)" }} priority />
-           <div className="h-5 w-px bg-slate-200 mx-2 transform rotate-12" />
-           <span className="text-lg font-heading font-black tracking-tighter text-slate-900 leading-none">
-             QUANTIM<span className="text-blue-600">LABS</span>
+        <div className="lg:hidden absolute top-8 left-6 sm:left-12 flex items-center group cursor-pointer">
+           <Image src="/logo.png" alt="Logo" width={64} height={64} className="h-10 w-auto object-contain" style={{ filter: "brightness(0)" }} priority />
+           <span className="text-lg font-heading font-extrabold tracking-tighter text-slate-900 leading-none uppercase -ml-2">
+             UANTIM LABZ
            </span>
         </div>
 

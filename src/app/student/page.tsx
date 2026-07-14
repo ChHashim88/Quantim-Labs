@@ -1,10 +1,9 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
-import { Badge } from "@/components/ui/badge";
-import { PlayCircle, Clock, BookOpen, Flame, Award, CalendarDays, ArrowRight, ShieldAlert, Loader2, CheckCircle2, CalendarCheck, FileText, CheckCircle } from "lucide-react";
+import Image from "next/image";
+import { motion } from "framer-motion";
+import { PlayCircle, Clock, BookOpen, Flame, Award, CalendarDays, ArrowRight, ShieldAlert, Loader2, CheckCircle2, CalendarCheck, FileText, CheckCircle, Terminal, FolderOpen, AlertCircle, Bolt, Shield, Activity, Monitor, X, Play } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import Link from "next/link";
 import { toast } from "sonner";
@@ -13,19 +12,16 @@ import { FuturisticLoader } from "@/components/ui/futuristic-loader";
 import { VerificationFormModal } from "@/components/student/VerificationFormModal";
 import { CelebrationModal } from "@/components/student/CelebrationModal";
 import { ShieldCheck } from "lucide-react";
-import { SwitchProgramModal } from "@/components/student/SwitchProgramModal";
 
 interface DashboardStats {
   internshipName: string;
-  hoursLearned?: string;
-  lessonsCompletedStr?: string;
-  avgQuizScore?: string;
   progressPercentage: number;
   streakCount: number;
   videos?: { total: number; completed: number; pending: number };
   tasks?: { total: number; completed: number; pending: number };
   assignments?: { total: number; completed: number; pending: number };
   quizzes?: { total: number; completed: number; pending: number };
+  documents?: { total: number; completed: number; pending: number };
 }
 
 export default function StudentDashboard() {
@@ -38,22 +34,35 @@ export default function StudentDashboard() {
     videos: { total: 0, completed: 0, pending: 0 },
     tasks: { total: 0, completed: 0, pending: 0 },
     assignments: { total: 0, completed: 0, pending: 0 },
-    quizzes: { total: 0, completed: 0, pending: 0 }
+    quizzes: { total: 0, completed: 0, pending: 0 },
+    documents: { total: 0, completed: 0, pending: 0 }
   });
   const [todayTasks, setTodayTasks] = useState<any[]>([]);
   const [upcomingDeadlines, setUpcomingDeadlines] = useState<any[]>([]);
+  const [activityData, setActivityData] = useState<{ label: string, value: number, isToday: boolean }[]>([]);
+  const [attendanceMatrix, setAttendanceMatrix] = useState<{ date: Date, isPresent: boolean }[]>([]);
   const [hasEnrollments, setHasEnrollments] = useState(false);
   const [enrolledPrograms, setEnrolledPrograms] = useState<any[]>([]);
   const [activeProgramId, setActiveProgramId] = useState<string | null>(null);
-  
+
   const [isVerified, setIsVerified] = useState(false);
   const [showVerificationModal, setShowVerificationModal] = useState(false);
   const [showCelebrationModal, setShowCelebrationModal] = useState(false);
   const [userEmail, setUserEmail] = useState("");
-  const [switchTargetId, setSwitchTargetId] = useState<string | null>(null);
 
   const [hasCheckedInToday, setHasCheckedInToday] = useState(false);
   const [checkingIn, setCheckingIn] = useState(false);
+  const [currentTime, setCurrentTime] = useState("");
+
+  useEffect(() => {
+    const updateTime = () => {
+      const now = new Date();
+      setCurrentTime(`${now.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: '2-digit' }).toUpperCase()} // ${now.toLocaleTimeString('en-US', { hour12: false })}`);
+    };
+    updateTime();
+    const timer = setInterval(updateTime, 1000);
+    return () => clearInterval(timer);
+  }, []);
 
   // 1. Initial Load: Fetch Profile & Enrolled Programs
   useEffect(() => {
@@ -211,7 +220,7 @@ export default function StudentDashboard() {
             const fetchedDeadlines = deadlineLessons.map(lesson => ({
               title: lesson.title,
               type: lesson.content_type,
-              timeText: lesson.content_type === 'QUIZ' || lesson.content_type === 'ASSIGNMENT' ? "End of Module Deadline" : "Upcoming Task"
+              timeText: lesson.content_type === 'QUIZ' || lesson.content_type === 'ASSIGNMENT' ? "PHASE_END" : "SUBMIT_REQ"
             }));
 
             setUpcomingDeadlines(fetchedDeadlines);
@@ -222,10 +231,78 @@ export default function StudentDashboard() {
         const totalCompleted = vComp + tComp + aComp + qComp + dComp;
         const progressPercent = totalItems > 0 ? Math.round((totalCompleted / totalItems) * 100) : 0;
 
+        // Calculate actual streak based on attendance records
+        const { data: allAtt } = await supabase
+          .from('student_attendance')
+          .select('date')
+          .eq('student_id', user.id)
+          .eq('internship_id', activeProgramId)
+          .order('date', { ascending: true });
+
+        let calculatedStreak = 0;
+        let checkedInToday = false;
+        if (allAtt && allAtt.length > 0) {
+          const today = new Date();
+          today.setHours(0, 0, 0, 0);
+
+          const dates = allAtt.map((r: any) => {
+            const d = new Date(r.date);
+            d.setHours(0, 0, 0, 0);
+            return d.getTime();
+          }).sort((a: number, b: number) => b - a);
+
+          checkedInToday = dates.includes(today.getTime());
+
+          let checkDate = today.getTime();
+          if (dates.includes(checkDate) || dates.includes(checkDate - 86400000)) {
+            if (dates.includes(checkDate)) {
+              calculatedStreak++;
+              checkDate -= 86400000;
+            }
+            for (let i = 0; i < dates.length; i++) {
+              if (dates.includes(checkDate)) {
+                calculatedStreak++;
+                checkDate -= 86400000;
+              } else {
+                break;
+              }
+            }
+          }
+
+          // Generate real-time activity for the last 6 days
+          const last6 = Array.from({ length: 6 }).map((_, i) => {
+            const d = new Date(today);
+            d.setDate(today.getDate() - (5 - i));
+            const isPresent = dates.includes(d.getTime());
+
+            // Pseudo-random height based on date to make it look like dynamic network activity
+            const seed = d.getDate();
+            const value = isPresent ? 40 + (seed % 60) : 5 + (seed % 10);
+
+            return {
+              label: d.toLocaleDateString('en-US', { weekday: 'narrow' }),
+              value,
+              isToday: i === 5
+            };
+          });
+          setActivityData(last6);
+
+          // Generate 28-day creative attendance matrix
+          const last28 = Array.from({ length: 28 }).map((_, i) => {
+            const d = new Date(today);
+            d.setDate(today.getDate() - (27 - i));
+            return {
+              date: d,
+              isPresent: dates.includes(d.getTime())
+            };
+          });
+          setAttendanceMatrix(last28);
+        }
+
         setStats({
           internshipName: internship?.title || "Technology Internship",
           progressPercentage: progressPercent,
-          streakCount: totalCompleted > 0 ? 5 : 0,
+          streakCount: calculatedStreak,
           videos: { total: vTotal, completed: vComp, pending: vTotal - vComp },
           tasks: { total: tTotal, completed: tComp, pending: tTotal - tComp },
           assignments: { total: aTotal, completed: aComp, pending: aTotal - aComp },
@@ -233,17 +310,7 @@ export default function StudentDashboard() {
           documents: { total: dTotal, completed: dComp, pending: dTotal - dComp }
         });
         setTodayTasks(fetchedTasks);
-
-        const dateObj = new Date();
-        const todayStr = `${dateObj.getFullYear()}-${String(dateObj.getMonth() + 1).padStart(2, '0')}-${String(dateObj.getDate()).padStart(2, '0')}`;
-        const { data: attData } = await supabase
-          .from('student_attendance')
-          .select('id')
-          .eq('internship_id', activeProgramId)
-          .eq('date', todayStr)
-          .single();
-        if (attData) setHasCheckedInToday(true);
-        else setHasCheckedInToday(false);
+        setHasCheckedInToday(checkedInToday);
 
       } catch (e) {
         console.error("Error loading program stats:", e);
@@ -271,11 +338,11 @@ export default function StudentDashboard() {
       });
 
       if (error && error.code !== '23505') throw error;
-      
-      toast.success("Successfully checked in for today!");
+
+      toast.success("Successfully synced session!");
       setHasCheckedInToday(true);
     } catch (e) {
-      toast.error("Failed to check in.");
+      toast.error("Failed to sync session.");
     } finally {
       setCheckingIn(false);
     }
@@ -286,309 +353,374 @@ export default function StudentDashboard() {
   }
 
   return (
-    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-      <header className="flex flex-col md:flex-row md:items-end justify-between gap-4">
-        <div>
-          <h1 className="text-4xl font-heading font-extrabold tracking-tight">
-            Welcome back, <span className="text-primary">{profile?.first_name || 'Student'}</span>
-          </h1>
-          <p className="text-muted-foreground mt-2 text-lg">
-            {stats.streakCount > 0 ? (
-              <span className="text-primary font-semibold flex items-center gap-1.5">
-                <Flame className="w-5 h-5 inline text-primary animate-pulse" /> {stats.streakCount}-day streak! Keep up the great work.
-              </span>
-            ) : (
-              "Explore courses and start tracking your learning progress."
-            )}
-          </p>
-        </div>
-        <div className="flex flex-col sm:flex-row items-center gap-3">
-          {isVerified && (
-            <Badge className="bg-emerald-500/10 text-emerald-500 border-emerald-500/20 px-3 py-1 flex items-center gap-1 shrink-0">
-              <ShieldCheck className="w-4 h-4" /> Verified
-            </Badge>
-          )}
-          
-          {hasEnrollments && (
-            <Button 
-              onClick={handleManualCheckIn} 
-              disabled={hasCheckedInToday || checkingIn}
-              className={`rounded-full px-6 transition-all duration-300 flex items-center gap-2 ${
-                hasCheckedInToday 
-                  ? "bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500/20 border border-emerald-500/30 cursor-not-allowed shadow-none" 
-                  : "bg-gradient-to-r from-blue-600 to-indigo-600 text-white hover:scale-105 hover:shadow-[0_0_20px_rgba(37,99,235,0.4)]"
-              }`}
-            >
-              {checkingIn ? (
-                <Loader2 className="w-4 h-4 animate-spin" />
-              ) : hasCheckedInToday ? (
-                <><CheckCircle2 className="w-4 h-4" /> Checked In</>
-              ) : (
-                <><CalendarCheck className="w-4 h-4" /> Check In Now</>
-              )}
-            </Button>
-          )}
+    <div className="space-y-8 max-w-[1400px] mx-auto animate-in fade-in slide-in-from-bottom-4 duration-500">
 
-          <div className="flex items-center gap-3 bg-card px-4 py-2 rounded-full border border-border shrink-0">
-            <CalendarDays className="w-5 h-5 text-primary" />
-            <span className="font-medium text-sm">Today: {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })}</span>
+      {/* Verification Warning */}
+      {!isVerified && (
+        <div className="mb-8 glass-panel border border-destructive/50 p-6 rounded-sm flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-4">
+            <div className="w-10 h-10 rounded-sm bg-destructive/10 flex items-center justify-center animate-pulse">
+              <ShieldAlert className="w-5 h-5 text-destructive" />
+            </div>
+            <div>
+              <p className="font-mono font-bold text-destructive uppercase tracking-widest text-sm">Action Required: Identity Verification</p>
+              <p className="text-xs text-muted-foreground font-mono mt-1">System cannot grant full access until profile verification is complete.</p>
+            </div>
           </div>
+          <button onClick={() => setShowVerificationModal(true)} className="px-6 py-3 bg-destructive text-destructive-foreground font-mono text-xs font-bold uppercase tracking-widest hover:bg-destructive/80 transition-all glow-primary">
+            Verify Now
+          </button>
+        </div>
+      )}
+
+      {/* Header: Telemetry Header */}
+      <header className="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-8 relative">
+        <div className="space-y-1">
+          <div className="flex items-center gap-2 text-[10px] font-mono text-muted-foreground tracking-widest uppercase mb-2">
+            <span className="inline-block w-2 h-2 rounded-full bg-green-500 animate-pulse glow-primary"></span>
+            System Online // User: {profile?.first_name || 'Active'}
+          </div>
+          <h2 className="font-heading text-4xl lg:text-5xl font-bold tracking-tighter text-foreground uppercase">
+            {profile?.first_name ? `Welcome, ${profile.first_name}` : 'STUDENT DASHBOARD'}
+          </h2>
+          <div className="flex items-center gap-2 text-xs font-mono text-muted-foreground pt-2">
+            <Bolt className="w-4 h-4 text-primary" />
+            <span>{stats.streakCount > 0 ? `${stats.streakCount}-DAY CONTINUITY STREAK MAINTAINED` : 'NO ACTIVE CONTINUITY STREAK DETECTED'}</span>
+          </div>
+        </div>
+
+        <div className="flex flex-wrap items-center gap-6">
+          <div className="flex flex-col items-end">
+            <span className="text-[10px] font-mono text-muted-foreground uppercase">Local Timestamp</span>
+            <span className="text-sm font-mono text-foreground">{currentTime}</span>
+          </div>
+          <div className="hidden sm:block h-10 w-[1px] bg-border"></div>
+          <button
+            onClick={handleManualCheckIn}
+            disabled={hasCheckedInToday || checkingIn}
+            className={`h-12 px-8 font-mono text-xs font-bold tracking-widest uppercase transition-all flex items-center justify-center gap-2 ${hasCheckedInToday
+              ? "bg-muted text-muted-foreground cursor-not-allowed border border-border"
+              : "bg-primary text-primary-foreground hover:bg-primary/80 active:scale-95 glow-primary"
+              }`}
+          >
+            {checkingIn ? <Loader2 className="w-4 h-4 animate-spin" /> : hasCheckedInToday ? "Session Synced" : "Sync Session"}
+          </button>
         </div>
       </header>
 
-      {!isVerified && (
-        <Card className="bg-red-500/5 border-red-500/20 shadow-none">
-          <CardContent className="flex flex-col sm:flex-row items-center justify-between p-4 gap-4">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-red-500/10 flex items-center justify-center animate-pulse">
-                <ShieldAlert className="w-5 h-5 text-red-500" />
-              </div>
-              <div>
-                <p className="font-bold text-red-500">Action Required: Account Verification</p>
-                <p className="text-sm text-muted-foreground">You must complete your profile to verify your identity and unlock full access.</p>
-              </div>
-            </div>
-            <Button onClick={() => setShowVerificationModal(true)} className="bg-red-500 hover:bg-red-600 text-white font-bold px-6 whitespace-nowrap">
-              Get Verified Now
-            </Button>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
-        <Card className="bg-card border-border shadow-lg relative overflow-hidden group">
-          <CardHeader className="pb-2 flex flex-row items-center justify-between space-y-0">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Videos</CardTitle>
-            <PlayCircle className="w-5 h-5 text-primary opacity-70" />
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-end gap-2">
-              <div className="text-3xl font-bold text-foreground">{stats.videos?.completed || 0}</div>
-              <div className="text-sm text-muted-foreground mb-1">/ {stats.videos?.total || 0}</div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-card border-border shadow-lg relative overflow-hidden group">
-          <CardHeader className="pb-2 flex flex-row items-center justify-between space-y-0">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Tasks</CardTitle>
-            <BookOpen className="w-5 h-5 text-primary opacity-70" />
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-end gap-2">
-              <div className="text-3xl font-bold text-foreground">{stats.tasks?.completed || 0}</div>
-              <div className="text-sm text-muted-foreground mb-1">/ {stats.tasks?.total || 0}</div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-card border-border shadow-lg relative overflow-hidden group">
-          <CardHeader className="pb-2 flex flex-row items-center justify-between space-y-0">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Assignments</CardTitle>
-            <Award className="w-5 h-5 text-primary opacity-70" />
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-end gap-2">
-              <div className="text-3xl font-bold text-foreground">{stats.assignments?.completed || 0}</div>
-              <div className="text-sm text-muted-foreground mb-1">/ {stats.assignments?.total || 0}</div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-card border-border shadow-lg relative overflow-hidden group">
-          <CardHeader className="pb-2 flex flex-row items-center justify-between space-y-0">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Quizzes</CardTitle>
-            <Award className="w-5 h-5 text-primary opacity-70" />
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-end gap-2">
-              <div className="text-3xl font-bold text-foreground">{stats.quizzes?.completed || 0}</div>
-              <div className="text-sm text-muted-foreground mb-1">/ {stats.quizzes?.total || 0}</div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-card border-border shadow-lg relative overflow-hidden group">
-          <CardHeader className="pb-2 flex flex-row items-center justify-between space-y-0">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Materials</CardTitle>
-            <FileText className="w-5 h-5 text-rose-500 opacity-70" />
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-end gap-2">
-              <div className="text-3xl font-bold text-foreground">{stats.documents?.completed || 0}</div>
-              <div className="text-sm text-muted-foreground mb-1">/ {stats.documents?.total || 0}</div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Enrolled Programs Cards */}
-      {hasEnrollments && enrolledPrograms.length > 0 && (
-        <div className="space-y-4">
-          <h2 className="text-xl font-bold tracking-tight">My Active Programs</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {enrolledPrograms.map((program, idx) => {
-              const isActive = program.id === activeProgramId;
-              return (
-                <Card
-                  key={idx}
-                  onClick={() => {
-                    if (program.id !== activeProgramId) {
-                      setSwitchTargetId(program.id);
-                    }
-                  }}
-                  className={`bg-card shadow-lg hover:shadow-xl transition-all flex flex-col justify-between group cursor-pointer border-2 ${isActive ? 'border-primary shadow-primary/20' : 'border-border/50 hover:border-primary/50'}`}
-                >
-                  <CardHeader>
-                    <CardTitle className={`text-lg line-clamp-2 leading-tight transition-colors ${isActive ? 'text-primary' : 'group-hover:text-primary'}`}>
-                      {program.title}
-                    </CardTitle>
-                    <CardDescription className="line-clamp-2 mt-2">
-                      {program.description || "Comprehensive learning track."}
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="pt-0 mt-auto flex flex-col gap-3">
-                    <div className="flex items-center justify-between">
-                      <Badge variant={isActive ? "default" : "outline"} className={isActive ? "bg-primary text-white" : "bg-primary/5 text-primary border-primary/20"}>
-                        {isActive ? "Viewing Stats" : "Enrolled"}
-                      </Badge>
-                      <Link href="/student/courses">
-                        <Button size="sm" variant="ghost" className="text-primary hover:text-primary hover:bg-primary/10 rounded-full px-4" onClick={(e) => e.stopPropagation()}>
-                          Continue <ArrowRight className="w-4 h-4 ml-1" />
-                        </Button>
-                      </Link>
-                    </div>
-                    <div className="border-t border-border pt-3 mt-1">
-                      <Link href={`/offer-letter?programId=${program.id}`} target="_blank">
-                        <Button variant="outline" className="w-full border-blue-200 bg-blue-50/50 hover:bg-blue-100 text-blue-700 hover:text-blue-800 transition-colors shadow-sm" onClick={(e) => e.stopPropagation()}>
-                          <Award className="w-4 h-4 mr-2 text-blue-600" />
-                          View Offer Letter
-                        </Button>
-                      </Link>
-                    </div>
-                  </CardContent>
-                </Card>
-              );
-            })}
+      {/* Dynamic Grid: Core Metrics */}
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-12">
+        {/* Metric 1: Videos */}
+        <div className="glass-panel corner-accent p-6 rounded-sm group hover:bg-primary/5 transition-colors">
+          <div className="flex justify-between items-start mb-4">
+            <span className="font-mono text-[10px] text-muted-foreground tracking-[0.2em]">VIDEOS.LOG</span>
+            <Play className="w-3 h-3 text-muted-foreground group-hover:text-primary transition-colors" />
+          </div>
+          <div className="flex items-baseline gap-2">
+            <span className="text-4xl font-mono font-bold tracking-tighter">{String(stats.videos?.completed || 0).padStart(2, '0')}</span>
+            <span className="text-xs font-mono text-muted-foreground">/ {String(stats.videos?.total || 0).padStart(2, '0')}</span>
+          </div>
+          <div className="mt-4 h-[2px] w-full bg-border">
+            <div className="h-full bg-primary shadow-[0_0_10px_rgba(var(--primary),0.5)] transition-all duration-1000" style={{ width: `${stats.videos?.total ? (stats.videos.completed / stats.videos.total) * 100 : 0}%` }}></div>
           </div>
         </div>
-      )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Main Progress Section */}
-        <div className="lg:col-span-2 space-y-6">
-          <Card className="bg-card border-border shadow-lg">
-            <CardHeader>
-              <div className="flex justify-between items-center">
-                <div>
-                  <CardTitle>Overall Progress</CardTitle>
-                  <CardDescription>
-                    {hasEnrollments ? "Track your curriculum completion path." : "Enroll in a program to see progress."}
-                  </CardDescription>
-                </div>
-                <Badge variant="outline" className="text-primary border-primary/50 bg-primary/10">{stats.progressPercentage}% Complete</Badge>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <Progress value={stats.progressPercentage} className="h-3 bg-muted" />
-              <div className="flex justify-between mt-4 text-sm text-muted-foreground font-mono">
-                <span>Start: Dynamic Enrollment</span>
-                <span>Expected: Term End</span>
-              </div>
-            </CardContent>
-          </Card>
+        {/* Metric 2: Tasks */}
+        <div className="glass-panel corner-accent p-6 rounded-sm group hover:bg-primary/5 transition-colors">
+          <div className="flex justify-between items-start mb-4">
+            <span className="font-mono text-[10px] text-muted-foreground tracking-[0.2em]">TASKS.EXE</span>
+            <Terminal className="w-3 h-3 text-muted-foreground group-hover:text-primary transition-colors" />
+          </div>
+          <div className="flex items-baseline gap-2">
+            <span className="text-4xl font-mono font-bold tracking-tighter">{String(stats.tasks?.completed || 0).padStart(2, '0')}</span>
+            <span className="text-xs font-mono text-muted-foreground">/ {String(stats.tasks?.total || 0).padStart(2, '0')}</span>
+          </div>
+          <div className="mt-4 h-[2px] w-full bg-border">
+            <div className="h-full bg-primary transition-all duration-1000" style={{ width: `${stats.tasks?.total ? (stats.tasks.completed / stats.tasks.total) * 100 : 0}%` }}></div>
+          </div>
+        </div>
 
-          <Card className="bg-card border-border shadow-lg">
-            <CardHeader>
-              <CardTitle>Today's Tasks</CardTitle>
-              <CardDescription>Complete these to unlock subsequent lessons.</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {hasEnrollments && todayTasks.length > 0 ? (
-                todayTasks.map((task, idx) => (
-                  <div key={idx} className="flex items-center justify-between p-4 rounded-xl bg-background border border-border/50 hover:border-primary/30 transition-all cursor-pointer group">
-                    <div className="flex items-center gap-4">
-                      <div className={`w-10 h-10 rounded-full flex items-center justify-center bg-primary/20 text-primary border border-primary/30`}>
-                        <PlayCircle className="w-5 h-5" />
+        {/* Metric 3: Assignments */}
+        <div className="glass-panel corner-accent p-6 rounded-sm group hover:bg-primary/5 transition-colors">
+          <div className="flex justify-between items-start mb-4">
+            <span className="font-mono text-[10px] text-muted-foreground tracking-[0.2em]">ASGN.DAT</span>
+            <FolderOpen className="w-3 h-3 text-muted-foreground group-hover:text-primary transition-colors" />
+          </div>
+          <div className="flex items-baseline gap-2">
+            <span className="text-4xl font-mono font-bold tracking-tighter">{String(stats.assignments?.completed || 0).padStart(2, '0')}</span>
+            <span className="text-xs font-mono text-muted-foreground">/ {String(stats.assignments?.total || 0).padStart(2, '0')}</span>
+          </div>
+          <div className="mt-4 h-[2px] w-full bg-border">
+            <div className="h-full bg-primary transition-all duration-1000" style={{ width: `${stats.assignments?.total ? (stats.assignments.completed / stats.assignments.total) * 100 : 0}%` }}></div>
+          </div>
+        </div>
+
+        {/* Metric 4: Quizzes */}
+        <div className="glass-panel corner-accent p-6 rounded-sm group hover:bg-primary/5 transition-colors">
+          <div className="flex justify-between items-start mb-4">
+            <span className="font-mono text-[10px] text-muted-foreground tracking-[0.2em]">QUIZ.SYS</span>
+            <Activity className="w-3 h-3 text-muted-foreground group-hover:text-primary transition-colors" />
+          </div>
+          <div className="flex items-baseline gap-2">
+            <span className="text-4xl font-mono font-bold tracking-tighter">{String(stats.quizzes?.completed || 0).padStart(2, '0')}</span>
+            <span className="text-xs font-mono text-muted-foreground">/ {String(stats.quizzes?.total || 0).padStart(2, '0')}</span>
+          </div>
+          <div className="mt-4 h-[2px] w-full bg-border">
+            <div className="h-full bg-primary transition-all duration-1000" style={{ width: `${stats.quizzes?.total ? (stats.quizzes.completed / stats.quizzes.total) * 100 : 0}%` }}></div>
+          </div>
+        </div>
+
+        {/* Metric 5: Documents */}
+        <div className="glass-panel corner-accent p-6 rounded-sm group hover:bg-destructive/5 transition-colors">
+          <div className="flex justify-between items-start mb-4">
+            <span className="font-mono text-[10px] text-destructive tracking-[0.2em] uppercase">Docs.ref</span>
+            <AlertCircle className="w-3 h-3 text-destructive animate-pulse" />
+          </div>
+          <div className="flex items-baseline gap-2">
+            <span className="text-4xl font-mono font-bold tracking-tighter">{String(stats.documents?.completed || 0).padStart(2, '0')}</span>
+            <span className="text-xs font-mono text-muted-foreground">/ {String(stats.documents?.total || 0).padStart(2, '0')}</span>
+          </div>
+          <div className="mt-4 h-[2px] w-full bg-border">
+            <div className="h-full bg-destructive shadow-[0_0_10px_rgba(var(--destructive),0.5)] transition-all duration-1000" style={{ width: `${stats.documents?.total ? (stats.documents.completed / stats.documents.total) * 100 : 0}%` }}></div>
+          </div>
+        </div>
+      </div>
+
+      {/* Main Layout Split */}
+      <div className="grid grid-cols-12 gap-8">
+
+        {/* Left: Active Operations */}
+        <div className="col-span-12 xl:col-span-8 space-y-8">
+          <section>
+            <div className="flex items-center gap-4 mb-6">
+              <h3 className="font-heading text-xl font-bold tracking-tight uppercase">ACTIVE OPERATIONS</h3>
+              <div className="h-[1px] flex-1 bg-border"></div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {enrolledPrograms.length > 0 ? (
+                <>
+                  {enrolledPrograms.map((prog, idx) => (
+                    <div key={prog.id} className="glass-panel p-8 rounded-sm group hover:bg-primary/5 transition-all">
+                      <div className="flex justify-between mb-8">
+                        <div>
+                          <div className="text-[10px] font-mono text-muted-foreground uppercase mb-1">Project ID: {prog.id.split('-')[0]}</div>
+                          <h4 className="text-xl font-heading font-bold uppercase">{prog.title}</h4>
+                        </div>
+                        <span className="px-2 py-1 h-fit border border-primary/20 font-mono text-[9px] uppercase text-primary tracking-widest">
+                          {prog.id === activeProgramId ? 'Tracking' : 'Standby'}
+                        </span>
                       </div>
-                      <div>
-                        <h4 className="font-semibold text-foreground group-hover:text-primary transition-colors">{task.title}</h4>
-                        <p className="text-xs text-muted-foreground">{task.type} &bull; {task.duration}</p>
+                      <div className="space-y-4">
+                        <div className="flex justify-between items-end text-xs font-mono text-muted-foreground">
+                          <span>PHASE_COMPLETION</span>
+                          <span className="text-foreground">{prog.id === activeProgramId ? stats.progressPercentage : 0}%</span>
+                        </div>
+                        <div className="h-1 w-full bg-border relative overflow-hidden">
+                          <div className={`h-full ${prog.id === activeProgramId ? 'bg-primary glow-primary' : 'bg-muted-foreground'} transition-all duration-1000`} style={{ width: `${prog.id === activeProgramId ? stats.progressPercentage : 0}%` }}></div>
+                        </div>
+                      </div>
+                      <Link href="/student/courses" className="block mt-8">
+                        <button className="w-full h-10 border border-border flex items-center justify-center gap-3 font-mono text-[10px] tracking-widest hover:bg-primary hover:text-primary-foreground transition-all uppercase">
+                          <FileText className="w-3.5 h-3.5" /> Access Documentation
+                        </button>
+                      </Link>
+                    </div>
+                  ))}
+                  
+                  {/* Fill empty grid slot with spinning SPD logo if only 1 program */}
+                  {enrolledPrograms.length === 1 && (
+                    <div className="hidden md:flex justify-center items-center py-4 relative z-10 h-full w-full">
+                      {/* Static glow behind the image so it doesn't hurt rotation performance */}
+                      <div className="absolute w-32 h-32 bg-primary/20 blur-[40px] rounded-full"></div>
+                      
+                      {/* Pure CSS GPU-accelerated rotation for maximum smoothness */}
+                      <div 
+                        className="relative w-48 h-48"
+                        style={{ animation: "spin 20s linear infinite", willChange: "transform" }}
+                      >
+                        <Image src="/SPD.png" alt="SPD" fill className="object-contain" priority />
                       </div>
                     </div>
-                    <Badge variant={task.status === 'Completed' ? 'default' : 'secondary'} className={task.status === 'Completed' ? 'bg-primary text-primary-foreground' : 'bg-muted'}>
-                      {task.status}
-                    </Badge>
-                  </div>
-                ))
+                  )}
+                </>
               ) : (
-                <div className="py-8 flex flex-col items-center justify-center text-center text-xs text-muted-foreground">
-                  <ShieldAlert className="w-8 h-8 text-muted-foreground/60 mb-2" />
-                  <span>No active tasks available. Visit the catalog to enroll.</span>
-                  <Link href="/programs" className="mt-4">
-                    <Button variant="outline" size="sm">Browse Programs</Button>
+                <div className="col-span-2 glass-panel p-8 text-center border-dashed border-border flex flex-col items-center justify-center gap-4 text-muted-foreground">
+                  <Monitor className="w-8 h-8 opacity-50" />
+                  <p className="font-mono text-xs uppercase tracking-widest">No Active Operations Detected</p>
+                  <Link href="/programs">
+                    <button className="px-6 py-2 border border-primary/50 text-primary font-mono text-xs uppercase hover:bg-primary/10 transition-colors">
+                      Initialize Program
+                    </button>
                   </Link>
                 </div>
               )}
-            </CardContent>
-          </Card>
+            </div>
+          </section>
+
+          {/* System Progress & Data Visualization */}
+          <section className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {/* Progress Node */}
+            <div className="glass-panel p-8 rounded-sm corner-accent">
+              <div className="flex justify-between items-center mb-8">
+                <h4 className="font-mono text-xs tracking-widest uppercase text-muted-foreground">Aggregate Progress</h4>
+                <span className="font-mono text-2xl font-bold text-foreground">{stats.progressPercentage.toFixed(2)}%</span>
+              </div>
+              <div className="relative py-8 flex justify-center">
+                <div className="w-32 h-32 rounded-full border border-border flex items-center justify-center relative">
+                  <div className="absolute inset-2 rounded-full border-t-2 border-primary glow-primary animate-[spin_3s_linear_infinite]"></div>
+                  <Activity className="w-8 h-8 opacity-20 text-foreground" />
+                </div>
+              </div>
+              <div className="flex justify-between text-[10px] font-mono text-muted-foreground pt-4 border-t border-border mt-4">
+                <span>LNK_STATUS: {stats.progressPercentage > 0 ? 'STABLE' : 'IDLE'}</span>
+                <span>ETA: {hasEnrollments ? 'TERM END' : 'N/A'}</span>
+              </div>
+            </div>
+
+            {/* Activity Graph */}
+            <div className="glass-panel p-8 rounded-sm overflow-hidden flex flex-col">
+              <div className="flex justify-between items-center mb-8">
+                <h4 className="font-mono text-xs tracking-widest uppercase text-muted-foreground">Weekly Activity Forecast</h4>
+                <div className="flex gap-1">
+                  <div className="w-1 h-1 bg-primary"></div>
+                  <div className="w-1 h-1 bg-primary/40"></div>
+                  <div className="w-1 h-1 bg-primary/10"></div>
+                </div>
+              </div>
+              <div className="relative flex-1 w-full min-h-[128px]">
+                {activityData.length > 0 ? (
+                  <svg className="absolute inset-0 w-full h-full opacity-30" preserveAspectRatio="none" viewBox="0 0 100 100">
+                    <defs>
+                      <linearGradient id="chartGradient" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor="var(--primary)" stopOpacity="0.8" />
+                        <stop offset="100%" stopColor="var(--primary)" stopOpacity="0" />
+                      </linearGradient>
+                    </defs>
+                    <polygon
+                      fill="url(#chartGradient)"
+                      points={`0,100 ${activityData.map((d, i) => `${(i / 5) * 100},${100 - d.value}`).join(' ')} 100,100`}
+                    />
+                    <polyline
+                      fill="none"
+                      stroke="var(--primary)"
+                      strokeWidth="1.5"
+                      points={activityData.map((d, i) => `${(i / 5) * 100},${100 - d.value}`).join(' ')}
+                    />
+                  </svg>
+                ) : (
+                  <div className="area-chart absolute inset-0 opacity-20"></div>
+                )}
+
+                <div className="absolute bottom-0 left-0 w-full flex justify-between px-0">
+                  {(activityData.length > 0 ? activityData : [{ label: 'M', isToday: false }, { label: 'T', isToday: false }, { label: 'W', isToday: false }, { label: 'T', isToday: false }, { label: 'F', isToday: false }, { label: 'S', isToday: true }]).map((day: any, i) => (
+                    <div key={i} className="w-[1px] h-4 bg-border relative">
+                      <span className={`absolute -bottom-4 left-1/2 -translate-x-1/2 text-[8px] font-mono ${day.isToday ? 'text-primary font-bold glow-primary' : 'text-muted-foreground'}`}>{day.label}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </section>
         </div>
 
-        {/* Sidebar Info Section */}
-        <div className="space-y-6">
-          <Card className="bg-card border-border shadow-lg">
-            <CardHeader>
-              <CardTitle>Upcoming Deadlines</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {hasEnrollments && upcomingDeadlines.length > 0 ? (
-                upcomingDeadlines.map((deadline, idx) => (
-                  <div key={idx} className={`p-3 rounded-lg border relative overflow-hidden ${deadline.type === 'QUIZ' ? 'bg-red-500/5 border-red-500/10' : 'bg-primary/5 border-primary/10'}`}>
-                    <div className={`absolute left-0 top-0 bottom-0 w-1 ${deadline.type === 'QUIZ' ? 'bg-red-500' : 'bg-primary'}`} />
-                    <h4 className="font-semibold text-foreground mb-1 text-xs">{deadline.title}</h4>
-                    <p className="text-[10px] text-muted-foreground flex items-center gap-1">
-                      <Clock className="w-3 h-3 text-primary" /> {deadline.timeText} &bull; {deadline.type}
-                    </p>
-                  </div>
-                ))
-              ) : (
-                <div className="py-4 text-center text-xs text-muted-foreground">
-                  No upcoming deadlines.
-                </div>
-              )}
-            </CardContent>
-          </Card>
+        {/* Right: System Feed & Deadlines */}
+        <div className="col-span-12 xl:col-span-4 space-y-8">
 
-          <Card className="bg-card border-border shadow-lg">
-            <CardHeader>
-              <CardTitle>Recent Achievements</CardTitle>
-            </CardHeader>
-            <CardContent>
-              {hasEnrollments && stats.streakCount > 0 ? (
-                <div className="flex gap-4">
-                  <div className="flex flex-col items-center gap-2 group">
-                    <div className="w-16 h-16 rounded-full bg-primary/10 border-2 border-primary/20 flex items-center justify-center transform group-hover:scale-110 transition-transform shadow-[0_0_15px_rgba(59,130,246,0.1)]">
-                      <Award className="w-8 h-8 text-primary" />
+          {/* Creative Attendance Graph */}
+          <div className="glass-panel p-8 rounded-sm relative overflow-hidden group">
+            {/* Background ambient glow */}
+            <div className="absolute -inset-20 bg-primary/5 blur-3xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-1000 pointer-events-none"></div>
+
+            <h4 className="font-mono text-[10px] tracking-[0.3em] uppercase text-muted-foreground mb-8 flex items-center gap-2 relative z-10">
+              <span className="w-1 h-1 bg-primary"></span> ATTENDANCE_MATRIX
+            </h4>
+
+            <div className="relative z-10">
+              {/* Vertical Bars for Last 7 Days */}
+              <div className="flex items-end justify-between h-24 mb-6 border-b border-border/50 pb-2">
+                {attendanceMatrix.slice(-7).map((day, i) => (
+                  <div key={`bar-${i}`} className="w-full flex flex-col items-center gap-2 group/bar cursor-pointer px-1">
+                    <div className="w-full h-20 bg-border/20 rounded-t-sm relative overflow-hidden">
+                      <div
+                        className={`absolute bottom-0 w-full transition-all duration-1000 ease-out rounded-t-sm ${day.isPresent ? 'bg-primary glow-primary' : 'bg-transparent'}`}
+                        style={{ height: day.isPresent ? '100%' : '5%', transitionDelay: `${i * 100}ms` }}
+                      ></div>
                     </div>
-                    <span className="text-[10px] font-medium text-center">Fast Learner</span>
+                    <span className={`text-[8px] font-mono uppercase ${day.isPresent ? 'text-primary font-bold' : 'text-muted-foreground'}`}>
+                      {day.date.toLocaleDateString('en-US', { weekday: 'narrow' })}
+                    </span>
                   </div>
-                  <div className="flex flex-col items-center gap-2 group">
-                    <div className="w-16 h-16 rounded-full bg-primary/10 border-2 border-primary/20 flex items-center justify-center transform group-hover:scale-110 transition-transform shadow-[0_0_15px_rgba(59,130,246,0.1)]">
-                      <Flame className="w-8 h-8 text-primary" />
+                ))}
+              </div>
+
+              {/* 28-Day Heatmap Grid */}
+              <div className="grid grid-cols-7 gap-2">
+                {attendanceMatrix.map((day, i) => (
+                  <div
+                    key={`matrix-${i}`}
+                    className={`aspect-square rounded-[2px] transition-all duration-500 hover:scale-125 hover:z-20 relative ${day.isPresent ? 'bg-primary shadow-[0_0_8px_rgba(var(--primary),0.8)]' : 'bg-border/20 hover:bg-border/40'}`}
+                    title={day.date.toDateString()}
+                  />
+                ))}
+              </div>
+
+              {/* Legend */}
+              <div className="mt-6 flex justify-between items-center text-[9px] font-mono text-muted-foreground uppercase tracking-widest pt-4">
+                <span>{attendanceMatrix.filter(d => d.isPresent).length} / 28 DAYS</span>
+                <div className="flex gap-2 items-center">
+                  <span>IDLE</span>
+                  <div className="w-2 h-2 bg-border/20 rounded-[1px]"></div>
+                  <div className="w-2 h-2 bg-primary shadow-[0_0_8px_rgba(var(--primary),0.8)] rounded-[1px]"></div>
+                  <span>SYNCED</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Achievements Feed */}
+          <div className="glass-panel p-8 rounded-sm">
+            <h4 className="font-mono text-[10px] tracking-[0.3em] uppercase text-muted-foreground mb-8 flex items-center gap-2">
+              <span className="w-1 h-1 bg-primary"></span> RECENT_NODES
+            </h4>
+            <div className="flex gap-4">
+              <div className={`w-14 h-14 rounded-sm border ${stats.streakCount >= 1 ? 'border-primary text-primary glow-primary' : 'border-border opacity-20'} flex items-center justify-center transition-all cursor-pointer`}>
+                <Award className="w-6 h-6" />
+              </div>
+              <div className={`w-14 h-14 rounded-sm border ${stats.streakCount >= 5 ? 'border-primary text-primary glow-primary' : 'border-border opacity-20'} flex items-center justify-center transition-all cursor-pointer`}>
+                <Flame className="w-6 h-6" />
+              </div>
+              <div className="w-14 h-14 rounded-sm border border-border flex items-center justify-center opacity-10">
+                <Shield className="w-6 h-6" />
+              </div>
+            </div>
+          </div>
+
+          {/* Daily Protocol */}
+          <div className="glass-panel p-8 rounded-sm">
+            <h4 className="font-mono text-[10px] tracking-[0.3em] uppercase text-muted-foreground mb-8 flex items-center gap-2">
+              <span className="w-1 h-1 bg-primary"></span> DAILY_PROTOCOL
+            </h4>
+            <div className="space-y-4">
+              {todayTasks.length > 0 ? todayTasks.map((task, i) => (
+                <Link href="/student/lectures" key={i}>
+                  <div className={`group flex flex-col gap-1 p-4 border border-border hover:border-primary/50 transition-all cursor-pointer mt-3 ${task.status === 'Completed' ? 'opacity-40 grayscale' : ''}`}>
+                    <div className="flex items-center gap-3">
+                      <div className={`w-2 h-2 shrink-0 ${task.status === 'Completed' ? 'bg-muted-foreground' : 'bg-primary glow-primary'}`}></div>
+                      <span className="font-mono text-[11px] tracking-wide uppercase text-foreground truncate">EXEC: {task.title}</span>
                     </div>
-                    <span className="text-[10px] font-medium text-center">Streak Active</span>
+                    <div className="font-mono text-[9px] text-muted-foreground pl-5 uppercase">{task.type} // {task.duration}</div>
                   </div>
-                </div>
-              ) : (
-                <div className="py-4 text-center text-xs text-muted-foreground">
-                  No achievements earned yet.
-                </div>
+                </Link>
+              )) : (
+                <div className="text-xs font-mono text-muted-foreground uppercase">All protocols completed.</div>
               )}
-            </CardContent>
-          </Card>
+            </div>
+          </div>
+
         </div>
       </div>
+
       {showVerificationModal && (
         <VerificationFormModal
           email={userEmail}
@@ -604,17 +736,6 @@ export default function StudentDashboard() {
       {showCelebrationModal && (
         <CelebrationModal onClose={() => setShowCelebrationModal(false)} />
       )}
-
-      <SwitchProgramModal
-        isOpen={!!switchTargetId}
-        currentProgramName={enrolledPrograms.find(p => p.id === activeProgramId)?.title || ""}
-        targetProgramName={enrolledPrograms.find(p => p.id === switchTargetId)?.title || ""}
-        onConfirm={() => {
-          if (switchTargetId) setActiveProgramId(switchTargetId);
-          setSwitchTargetId(null);
-        }}
-        onCancel={() => setSwitchTargetId(null)}
-      />
     </div>
   );
 }

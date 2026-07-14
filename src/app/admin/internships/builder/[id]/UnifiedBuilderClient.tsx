@@ -28,16 +28,16 @@ export function UnifiedBuilderClient({ internship, initialDays }: { internship: 
     }
   };
 
-  async function handleAddDay() {
+  async function handleAddWeek() {
     const newOrder = days.length + 1;
     const { data, error } = await supabase.from('days').insert([{
       internship_id: internship.id,
-      title: `Day ${newOrder}`,
+      title: `Week ${newOrder}`,
       order_index: newOrder
     }]).select().single();
 
     if (error) {
-      toast.error("Failed to add day. Ensure SQL migration was run!");
+      toast.error("Failed to add week. Ensure SQL migration was run!");
     } else {
       setDays([...days, { ...data, lessons: [] }]);
       setSelectedDay(data);
@@ -74,7 +74,7 @@ export function UnifiedBuilderClient({ internship, initialDays }: { internship: 
           </Button>
           <div>
             <h1 className="text-2xl font-heading font-bold tracking-tight">{internship.title}</h1>
-            <p className="text-sm text-muted-foreground">Manage curriculum and days.</p>
+            <p className="text-sm text-muted-foreground">Manage curriculum weeks and activities.</p>
           </div>
         </div>
       </div>
@@ -84,8 +84,8 @@ export function UnifiedBuilderClient({ internship, initialDays }: { internship: 
         {/* LEFT SIDEBAR: Days List */}
         <div className="lg:col-span-1 bg-card border border-border rounded-xl shadow-sm flex flex-col h-[calc(100vh-140px)] sticky top-24">
           <div className="p-4 border-b border-border flex items-center justify-between">
-            <h2 className="font-bold">Curriculum Days</h2>
-            <Badge variant="secondary">{days.length} Days</Badge>
+            <h2 className="font-bold">Curriculum Weeks</h2>
+            <Badge variant="secondary">{days.length} {days.length === 1 ? 'Week' : 'Weeks'}</Badge>
           </div>
           
           <div className="flex-1 overflow-y-auto p-4 space-y-4">
@@ -132,8 +132,8 @@ export function UnifiedBuilderClient({ internship, initialDays }: { internship: 
               );
             })}
             
-            <Button onClick={handleAddDay} variant="outline" className="w-full border-dashed gap-2 mt-6">
-              <Plus className="w-4 h-4" /> Add Day
+            <Button onClick={handleAddWeek} variant="outline" className="w-full border-dashed gap-2 mt-6">
+              <Plus className="w-4 h-4" /> Add Week
             </Button>
           </div>
         </div>
@@ -155,7 +155,7 @@ export function UnifiedBuilderClient({ internship, initialDays }: { internship: 
                </div>
                <div>
                  <h2 className="text-xl font-bold text-foreground mb-1">{selectedDay.title} Overview</h2>
-                 <p>This day has {(selectedDay.lessons || []).length} activities.</p>
+                 <p>This week has {(selectedDay.lessons || []).length} activities.</p>
                </div>
                <Button onClick={() => setSelectedActivity({})} className="gap-2">
                  <Plus className="w-4 h-4" /> Add First Activity
@@ -164,7 +164,7 @@ export function UnifiedBuilderClient({ internship, initialDays }: { internship: 
           ) : (
             <div className="h-full flex flex-col items-center justify-center text-muted-foreground">
               <LayoutTemplate className="w-12 h-12 mb-4 opacity-20" />
-              <p>Select or add a day from the sidebar to configure its curriculum.</p>
+              <p>Select or add a week from the sidebar to configure its activities.</p>
             </div>
           )}
         </div>

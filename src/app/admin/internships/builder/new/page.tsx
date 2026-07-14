@@ -50,8 +50,10 @@ export default function InternshipBuilderPage() {
       if (result?.error) {
         toast.error(result.error);
       } else {
-        toast.success("Internship program saved successfully.");
-        router.push("/admin/internships");
+        toast.success("Internship program created! Setting up your weeks...");
+        // Redirect to the builder with the new ID and the desired week count
+        const durationWeeks = (document.getElementById("duration_weeks_input") as HTMLInputElement)?.value || "0";
+        router.push(`/admin/internships/builder/${result.id}?setup_weeks=${durationWeeks}`);
       }
     } catch (error) {
       toast.error("Failed to save program.");
@@ -137,8 +139,9 @@ export default function InternshipBuilderPage() {
                   </select>
                 </div>
                 <div className="space-y-2">
-                  <Label>Duration (Number)</Label>
-                  <Input name="duration_weeks" type="number" placeholder="e.g. 12" />
+                  <Label>Number of Weeks *</Label>
+                  <Input id="duration_weeks_input" name="duration_weeks" type="number" min="1" max="52" placeholder="e.g. 8" required />
+                  <p className="text-xs text-muted-foreground">The builder will automatically create this many weeks for you.</p>
                 </div>
                 <div className="space-y-2">
                   <Label>Duration Unit</Label>

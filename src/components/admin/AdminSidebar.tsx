@@ -158,24 +158,22 @@ export function AdminSidebar({ profile }: { profile: any }) {
   return (
     <aside className="w-full md:w-72 border-b md:border-b-0 md:border-r border-border bg-card flex-shrink-0 flex flex-col max-h-screen">
       <div className="h-20 flex items-center px-6 border-b border-border flex-shrink-0">
-        <div className="flex items-center gap-1 group">
+        <div className="flex items-center group cursor-pointer">
           <div className="relative">
             <Image 
               src="/logo.png" 
               alt="Quantim Labz Logo" 
-              width={120} 
-              height={32} 
-              className="relative object-contain h-8 w-auto z-10 transition-transform duration-500 group-hover:scale-105" 
+              width={64} 
+              height={64} 
+              className="relative object-contain h-12 w-auto z-10 transition-transform duration-500 group-hover:scale-105" 
               style={{ filter: "brightness(0)" }}
               priority 
             />
           </div>
           
-          <div className="h-6 w-px bg-slate-200 mx-2 transform rotate-12" />
-          
           <div className="flex flex-col">
-            <span className="text-lg font-heading font-black tracking-tighter text-slate-900 leading-none">
-              QUANTIM<span className="text-blue-600">LABS</span>
+            <span className="text-xl font-heading font-extrabold tracking-tighter text-slate-900 leading-none uppercase -ml-2">
+              UANTIM LABZ
             </span>
           </div>
         </div>

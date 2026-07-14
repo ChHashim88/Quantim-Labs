@@ -78,9 +78,11 @@ export async function createInternship(formData: FormData) {
 
   if (!payload.title) return { error: "Title is required" };
 
-  const { error } = await supabase
+  const { data, error } = await supabase
     .from('internships')
-    .insert([payload]);
+    .insert([payload])
+    .select('id')
+    .single();
 
   if (error) {
     console.error("DB Insert Error:", error);
@@ -88,7 +90,7 @@ export async function createInternship(formData: FormData) {
   }
   
   revalidatePath('/admin/internships');
-  return { success: true };
+  return { success: true, id: data.id };
 }
 
 export async function updateInternship(id: string, formData: FormData) {

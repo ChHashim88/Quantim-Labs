@@ -31,15 +31,8 @@ export function WhyChooseUs() {
     <section className="py-24 bg-background relative border-b border-border">
       <div className="max-w-[1400px] mx-auto px-8 md:px-16">
         <div className="text-center max-w-3xl mx-auto mb-16">
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="inline-flex items-center px-4 py-1.5 rounded-full bg-black/5 border border-black/10 text-sm font-semibold text-foreground mb-6 tracking-wide"
-          >
-            Why Choose Us
-          </motion.div>
-          <motion.h2 
+
+          <motion.h2
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -48,7 +41,7 @@ export function WhyChooseUs() {
           >
             Why <span className="text-primary">Quantim Labz</span> AI
           </motion.h2>
-          <motion.p 
+          <motion.p
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -71,7 +64,7 @@ export function WhyChooseUs() {
             >
               {/* Subtle gradient glow effect on hover */}
               <div className="absolute inset-0 bg-gradient-to-br from-black/[0.02] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-              
+
               <div className="w-20 h-20 rounded-[20px] bg-secondary group-hover:bg-primary transition-colors duration-500 flex items-center justify-center mb-8 relative z-10 shadow-sm">
                 <feature.icon className="w-10 h-10 text-foreground group-hover:text-white transition-colors duration-500" strokeWidth={1.5} />
               </div>

@@ -2,9 +2,10 @@
 
 import { useEffect } from "react";
 import { motion } from "framer-motion";
-import { CheckCircle } from "lucide-react";
+import { CheckCircle, X } from "lucide-react";
 import confetti from "canvas-confetti";
 import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 
 interface Props {
   onClose: () => void;
@@ -54,7 +55,14 @@ export function CelebrationModal({ onClose }: Props) {
         transition={{ type: "spring", stiffness: 300, damping: 20 }}
       >
         <Card className="bg-card border-2 border-emerald-500 shadow-[0_0_50px_rgba(16,185,129,0.3)] overflow-hidden">
-          <CardContent className="p-12 text-center flex flex-col items-center">
+          <button 
+            onClick={onClose}
+            className="absolute top-4 right-4 p-2 rounded-full hover:bg-muted text-muted-foreground hover:text-foreground transition-colors z-10"
+          >
+            <X className="w-5 h-5" />
+          </button>
+          
+          <CardContent className="p-12 text-center flex flex-col items-center relative">
             <motion.div
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
@@ -67,9 +75,13 @@ export function CelebrationModal({ onClose }: Props) {
             <h2 className="text-4xl font-extrabold font-heading text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-blue-500 mb-2">
               Congratulations!
             </h2>
-            <p className="text-xl text-muted-foreground font-medium">
+            <p className="text-xl text-muted-foreground font-medium mb-8">
               You are now Verified.
             </p>
+            
+            <Button onClick={onClose} className="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold h-12 text-lg rounded-xl">
+              Continue to Dashboard
+            </Button>
           </CardContent>
         </Card>
       </motion.div>

@@ -90,15 +90,9 @@ export function ProgramDetailsClient({ program }: ProgramDetailsClientProps) {
   };
 
   // Determine fallback image based on a hash of the title or ID if missing
-  const fallbacks = [
-    "/assets/quantum_core.png",
-    "/assets/data_nodes.png",
-    "/assets/robot_hand.png"
-  ];
-  const hash = program.id.length > 5 ? program.id.charCodeAt(0) : parseInt(program.id);
-  const fallbackImage = fallbacks[hash % fallbacks.length];
-  
-  const coverImage = program.cover_banner_url || fallbackImage;
+  const fallbacks = ["/assets/quantum_core.png", "/assets/data_nodes.png", "/assets/robot_hand.png"];
+  const fallbackImage = fallbacks[0];
+  const coverImage = program.thumbnail_url || program.cover_banner_url || fallbackImage;
 
   return (
     <div className="w-full relative">
