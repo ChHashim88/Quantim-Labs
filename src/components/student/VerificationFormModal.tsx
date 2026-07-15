@@ -228,7 +228,7 @@ export function VerificationFormModal({ email, onClose, onSuccess }: Props) {
                       You must follow our official channels to complete your verification and stay updated.
                     </p>
                   </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     {socialLinks.map((link) => {
                       const isClicked = clickedLinks.has(link.platform);
                       
@@ -236,6 +236,7 @@ export function VerificationFormModal({ email, onClose, onSuccess }: Props) {
                       if (link.platform === "Instagram") Icon = Camera;
                       if (link.platform === "TikTok") Icon = Video;
                       if (link.platform === "YouTube") Icon = PlaySquare;
+                      if (link.platform === "LinkedIn") Icon = Globe;
 
                       return (
                         <Button

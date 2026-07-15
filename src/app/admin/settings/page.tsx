@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter }
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Save, Loader2, Link as LinkIcon, Camera, PlaySquare, Video } from "lucide-react";
+import { Save, Loader2, Link as LinkIcon, Camera, PlaySquare, Video, Globe } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { toast } from "sonner";
 
@@ -18,7 +18,8 @@ export default function SettingsPage() {
   const [socialLinks, setSocialLinks] = useState<{ [key: string]: { id?: string; url: string } }>({
     Instagram: { url: "" },
     TikTok: { url: "" },
-    YouTube: { url: "" }
+    YouTube: { url: "" },
+    LinkedIn: { url: "" }
   });
 
   useEffect(() => {
@@ -145,6 +146,17 @@ export default function SettingsPage() {
                     placeholder="https://youtube.com/@quantimlabz" 
                     value={socialLinks.YouTube?.url || ""}
                     onChange={(e) => handleUrlChange("YouTube", e.target.value)}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label className="flex items-center gap-2">
+                    <Globe className="w-4 h-4" /> LinkedIn URL
+                  </Label>
+                  <Input 
+                    placeholder="https://linkedin.com/company/quantimlabz" 
+                    value={socialLinks.LinkedIn?.url || ""}
+                    onChange={(e) => handleUrlChange("LinkedIn", e.target.value)}
                   />
                 </div>
               </>

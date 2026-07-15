@@ -155,7 +155,7 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
   return (
     <div className="bg-background text-foreground min-h-screen overflow-hidden font-sans selection:bg-primary selection:text-primary-foreground">
       {/* Sidebar: Command Strip */}
-      <aside className="fixed left-0 top-0 h-full w-[80px] lg:w-[240px] glass-panel border-r border-border z-50 flex flex-col items-center lg:items-stretch transition-all duration-500">
+      <aside className="!fixed left-0 top-0 h-full w-[80px] lg:w-[240px] glass-panel border-r border-border z-50 flex flex-col items-center lg:items-stretch transition-all duration-500">
 
         <div className="h-20 flex items-center justify-center lg:justify-start lg:px-6 mb-8 mt-4">
           <Image

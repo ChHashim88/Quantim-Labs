@@ -25,5 +25,6 @@ CREATE POLICY "Allow authenticated full access on social_links"
 INSERT INTO public.social_links (platform, url, is_active) VALUES
     ('Instagram', 'https://instagram.com/quantimlabz', true),
     ('TikTok', 'https://tiktok.com/@quantimlabz', true),
-    ('YouTube', 'https://youtube.com/@quantimlabz', true)
+    ('YouTube', 'https://youtube.com/@quantimlabz', true),
+    ('LinkedIn', 'https://linkedin.com/company/quantimlabz', true)
 ON CONFLICT (platform) DO NOTHING;
