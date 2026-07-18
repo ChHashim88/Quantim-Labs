@@ -47,9 +47,9 @@ export function ContactSection() {
               <span className="w-2 h-2 rounded-full bg-[#111] animate-pulse" />
               <span className="text-sm font-semibold text-[#111] uppercase tracking-widest">Get In Touch</span>
             </div>
-            <h2 className="text-5xl md:text-6xl font-heading font-extrabold mb-6 text-foreground leading-[1.1] tracking-tight">
+            <h2 className="text-5xl md:text-6xl font-heading font-extrabold mb-6 text-black leading-[1.1] tracking-tight">
               Let's build something <br className="hidden lg:block"/>
-              <span className="text-[#111] relative inline-block">
+              <span className="text-black relative inline-block">
                 extraordinary.
                 <svg className="absolute -bottom-2 left-0 w-full text-[#DCDCDC] -z-10" viewBox="0 0 100 10" preserveAspectRatio="none">
                   <path d="M0 5 Q 50 10 100 5" stroke="currentColor" strokeWidth="4" fill="transparent"/>

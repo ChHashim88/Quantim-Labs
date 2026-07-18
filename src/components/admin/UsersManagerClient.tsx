@@ -10,16 +10,39 @@ import { createClient } from "@/lib/supabase/client";
 
 export function UsersManagerClient({ roleName, title, description }: { roleName: string, title: string, description: string }) {
   const [users, setUsers] = useState<any[]>([]);
+  const [verifications, setVerifications] = useState<Record<string, any>>({});
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
   const supabase = createClient();
 
   useEffect(() => {
-    fetchUsers();
+    fetchUsers(true);
+
+    const profilesSub = supabase.channel('profiles-changes')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'profiles' }, () => {
+        fetchUsers(false);
+      })
+      .subscribe();
+
+    let verificationsSub: any = null;
+    if (roleName.toUpperCase() === 'STUDENT') {
+      verificationsSub = supabase.channel('verifications-changes')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'student_verifications' }, () => {
+          fetchUsers(false);
+        })
+        .subscribe();
+    }
+
+    return () => {
+      supabase.removeChannel(profilesSub);
+      if (verificationsSub) {
+        supabase.removeChannel(verificationsSub);
+      }
+    };
   }, [roleName]);
 
-  async function fetchUsers() {
-    setLoading(true);
+  async function fetchUsers(showLoading = true) {
+    if (showLoading) setLoading(true);
     let query = supabase.from('profiles').select('*').order('created_at', { ascending: false });
     
     if (roleName.toUpperCase() === 'ADMIN') {
@@ -36,8 +59,19 @@ export function UsersManagerClient({ roleName, title, description }: { roleName:
     
     if (data) {
       setUsers(data);
+      
+      if (roleName.toUpperCase() === 'STUDENT') {
+        const { data: vData, error: vError } = await supabase.from('student_verifications').select('*');
+        if (!vError && vData) {
+          const vMap: Record<string, any> = {};
+          vData.forEach(v => {
+            vMap[v.student_id] = v;
+          });
+          setVerifications(vMap);
+        }
+      }
     }
-    setLoading(false);
+    if (showLoading) setLoading(false);
   }
 
   const filteredUsers = users.filter(u => 
@@ -133,8 +167,9 @@ export function UsersManagerClient({ roleName, title, description }: { roleName:
               <tr>
                 <th className="px-6 py-4 font-semibold">User</th>
                 <th className="px-6 py-4 font-semibold">Contact</th>
+                {roleName.toLowerCase() === 'student' && <th className="px-6 py-4 font-semibold">Status / Details</th>}
                 <th className="px-6 py-4 font-semibold">Gender</th>
-                <th className="px-6 py-4 font-semibold">Skills</th>
+                {roleName.toLowerCase() !== 'student' && <th className="px-6 py-4 font-semibold">Skills</th>}
                 <th className="px-6 py-4 font-semibold">Joined Date</th>
               </tr>
             </thead>
@@ -167,20 +202,49 @@ export function UsersManagerClient({ roleName, title, description }: { roleName:
                     </td>
                     <td className="px-6 py-4">
                       <div className="text-foreground">{user.email || 'No Email'}</div>
+                      {roleName.toLowerCase() === 'student' && verifications[user.id] && (
+                        <div className="text-xs text-muted-foreground mt-1">{verifications[user.id].phone_number}</div>
+                      )}
                     </td>
+                    {roleName.toLowerCase() === 'student' && (
+                      <td className="px-6 py-4">
+                        {verifications[user.id] ? (
+                          <div className="flex flex-col gap-1">
+                            <Badge variant="default" className="w-fit bg-emerald-500 hover:bg-emerald-600 gap-1">
+                              <UserCheck className="w-3 h-3" /> Verified
+                            </Badge>
+                            <span className="text-xs text-muted-foreground mt-1">
+                              {verifications[user.id].city}, {verifications[user.id].country}
+                            </span>
+                            <span className="text-[10px] text-muted-foreground truncate max-w-[150px]">
+                              {verifications[user.id].education}
+                            </span>
+                          </div>
+                        ) : (
+                          <Badge variant="outline" className="text-amber-500 border-amber-500/30">
+                            Unverified
+                          </Badge>
+                        )}
+                      </td>
+                    )}
                     <td className="px-6 py-4">
                       <Badge variant="outline" className={user.gender === 'Male' ? 'text-blue-500 border-blue-500/30' : user.gender === 'Female' ? 'text-pink-500 border-pink-500/30' : ''}>
-                        {user.gender || 'Unknown'}
+                        {roleName.toLowerCase() === 'student' && verifications[user.id]?.gender ? verifications[user.id].gender : (user.gender || 'Unknown')}
                       </Badge>
+                      {roleName.toLowerCase() === 'student' && verifications[user.id]?.age && (
+                        <div className="text-xs text-muted-foreground mt-1">{verifications[user.id].age} yrs, {verifications[user.id].marital_status}</div>
+                      )}
                     </td>
-                    <td className="px-6 py-4">
-                      <div className="flex flex-wrap gap-1 max-w-[250px]">
-                        {(user.skills || []).slice(0, 3).map((skill: string, i: number) => (
-                          <Badge key={i} variant="secondary" className="text-[10px] py-0">{skill}</Badge>
-                        ))}
-                        {(user.skills?.length > 3) && <Badge variant="secondary" className="text-[10px] py-0">+{user.skills.length - 3}</Badge>}
-                      </div>
-                    </td>
+                    {roleName.toLowerCase() !== 'student' && (
+                      <td className="px-6 py-4">
+                        <div className="flex flex-wrap gap-1 max-w-[250px]">
+                          {(user.skills || []).slice(0, 3).map((skill: string, i: number) => (
+                            <Badge key={i} variant="secondary" className="text-[10px] py-0">{skill}</Badge>
+                          ))}
+                          {(user.skills?.length > 3) && <Badge variant="secondary" className="text-[10px] py-0">+{user.skills.length - 3}</Badge>}
+                        </div>
+                      </td>
+                    )}
                     <td className="px-6 py-4 whitespace-nowrap">
                       {new Date(user.created_at).toLocaleDateString()}
                     </td>

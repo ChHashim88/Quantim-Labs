@@ -53,7 +53,7 @@ export function TechnologyPartner() {
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="text-3xl md:text-5xl font-heading font-bold mb-8 text-foreground leading-[1.15]"
+              className="text-3xl md:text-5xl font-heading font-bold mb-8 text-black leading-[1.15]"
             >
               Technology partner to the world&apos;s leading brands
             </motion.h2>

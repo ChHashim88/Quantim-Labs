@@ -15,7 +15,7 @@ export function Hero() {
     <section className="relative min-h-screen bg-[#F2F2F2] text-[#111] overflow-hidden flex flex-col">
 
       {/* ─── Main Content ─── */}
-      <div className="relative flex-1 flex flex-col px-8 md:px-16 pt-28 pb-10 max-w-[1400px] mx-auto w-full">
+      <div className="relative flex-1 flex flex-col px-8 md:px-16 pt-28 pb-22 max-w-[1400px] mx-auto w-full">
 
         {/* Top Badge */}
         <motion.p
@@ -32,7 +32,7 @@ export function Hero() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.1 }}
-          className="text-[clamp(3rem,8vw,7rem)] font-extrabold leading-[1.02] tracking-tight w-full md:max-w-[55%] font-heading text-[#111]"
+          className="text-[clamp(3rem,8vw,7rem)] font-extrabold leading-[1.02] tracking-tight w-full md:max-w-[55%] font-heading text-black"
         >
           <span className="md:hidden">
             Introducing<br />
@@ -111,9 +111,8 @@ export function Hero() {
                 src={images[currentImageIndex]}
                 alt="AI Robot"
                 fill
-                className={`object-contain object-right-bottom transition-all duration-[1200ms] ease-in-out ${
-                  isImageLoading ? 'blur-xl grayscale opacity-40 scale-[0.98]' : 'blur-0 grayscale-0 opacity-100 scale-100'
-                }`}
+                className={`object-contain object-right-bottom transition-all duration-[1200ms] ease-in-out ${isImageLoading ? 'blur-xl grayscale opacity-40 scale-[0.98]' : 'blur-0 grayscale-0 opacity-100 scale-100'
+                  }`}
                 priority
                 sizes="55vw"
               />

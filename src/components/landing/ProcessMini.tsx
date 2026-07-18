@@ -40,7 +40,7 @@ export function ProcessMini() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.1 }}
-              className="text-4xl md:text-6xl font-extrabold tracking-tighter leading-tight text-[#111] font-heading"
+              className="text-4xl md:text-6xl font-extrabold tracking-tighter leading-tight text-black font-heading"
             >
               How we build <br className="hidden md:block"/> the future.
             </motion.h2>

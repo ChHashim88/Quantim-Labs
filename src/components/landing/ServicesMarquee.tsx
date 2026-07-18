@@ -66,8 +66,8 @@ export function ServicesMarquee() {
       `}</style>
 
       <div className="text-center max-w-3xl mx-auto mb-16 px-4">
-        <h2 className="text-3xl md:text-5xl font-heading font-bold mb-6">
-          Our <span className="text-primary">Services</span>
+        <h2 className="text-3xl md:text-5xl font-heading font-bold mb-6 text-black">
+          Our <span className="text-black">Services</span>
         </h2>
         <p className="text-muted-foreground text-lg">
           Elevate your digital presence with our comprehensive solutions built for modern businesses.

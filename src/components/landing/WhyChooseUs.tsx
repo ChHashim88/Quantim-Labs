@@ -37,9 +37,9 @@ export function WhyChooseUs() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.1 }}
-            className="text-3xl md:text-5xl font-heading font-bold mb-6"
+            className="text-3xl md:text-5xl font-heading font-bold mb-6 text-black"
           >
-            Why <span className="text-primary">Quantim Labz</span> AI
+            Why <span className="text-black">Quantim Labz</span> AI
           </motion.h2>
           <motion.p
             initial={{ opacity: 0, y: 20 }}

@@ -186,7 +186,22 @@ export default function LecturesPage() {
               <div className="flex-1 flex flex-col justify-between">
                 {activeLesson.videoUrl ? (
                   <div className="w-full aspect-video rounded-sm bg-black border border-primary/20 flex flex-col items-center justify-center relative overflow-hidden group shadow-[0_0_30px_rgba(var(--primary),0.05)]">
-                    <iframe src={activeLesson.videoUrl.replace("watch?v=", "embed/")} className="w-full h-full absolute inset-0" frameBorder="0" allowFullScreen></iframe>
+                    <iframe 
+                      src={(() => {
+                        let url = activeLesson.videoUrl;
+                        if (url.includes("drive.google.com")) {
+                          return url.replace(/\/view.*$/, "/preview");
+                        } else if (url.includes("youtube.com/watch?v=")) {
+                          return url.replace("watch?v=", "embed/");
+                        } else if (url.includes("youtu.be/")) {
+                          return url.replace("youtu.be/", "youtube.com/embed/");
+                        }
+                        return url;
+                      })()} 
+                      className="w-full h-full absolute inset-0" 
+                      frameBorder="0" 
+                      allowFullScreen
+                    ></iframe>
                   </div>
                 ) : (
                   <div className="w-full aspect-video rounded-sm grid-bg border border-border/40 flex flex-col items-center justify-center relative overflow-hidden group">
