@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { ListTodo, CheckCircle2, ChevronRight } from "lucide-react";
+import { ListTodo, CheckCircle2, ChevronRight, Clock } from "lucide-react";
 import Link from "next/link";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
@@ -21,8 +21,28 @@ export default function TasksPage() {
 
   useAttendance(activeProgramId);
 
+  useEffect(() => {
+    if (activeProgram) {
+      const unlockedLessons = activeProgram.weeks.filter(w => w.isUnlocked).flatMap(w => w.lessons);
+      const exists = unlockedLessons.some(l => l.id === activeId);
+      if ((!activeId || !exists) && unlockedLessons.length > 0) {
+        setActiveId(unlockedLessons[0].id);
+      }
+    }
+  }, [activeProgram, activeId]);
+
   const activeTask = activeProgram?.weeks.flatMap(w => w.lessons).find(l => l.id === activeId);
   const activeWeek = activeProgram?.weeks.find(w => w.lessons.some(l => l.id === activeId));
+
+  const getDaysRemaining = (unlocksAt: Date | null) => {
+    if (!unlocksAt) return 0;
+    const now = new Date();
+    const diffTime = unlocksAt.getTime() - now.getTime();
+    return Math.max(0, Math.ceil(diffTime / (1000 * 60 * 60 * 24)));
+  };
+
+  const nextLockedWeek = activeProgram?.weeks.find(w => !w.isUnlocked && w.unlocksAt);
+  const daysLeft = nextLockedWeek ? getDaysRemaining(nextLockedWeek.unlocksAt) : null;
 
   if (loading) return <FuturisticLoader text="Retrieving Active Tasks..." />;
 
@@ -48,16 +68,26 @@ export default function TasksPage() {
   }
 
   return (
-    <div className="space-y-8 max-w-6xl mx-auto">
-      <header>
-        <h1 className="text-4xl lg:text-5xl font-heading font-extrabold tracking-tighter uppercase">TASKS</h1>
-        <p className="font-mono text-[10px] tracking-[0.2em] uppercase text-muted-foreground mt-2 flex items-center gap-2">
-          <span className="w-1 h-1 bg-primary"></span> WEEKLY TASK ASSIGNMENTS — UNLOCKS EVERY 7 DAYS
-        </p>
+    <div className="space-y-6 sm:space-y-8 max-w-6xl mx-auto w-full overflow-x-hidden">
+      <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 max-w-full overflow-hidden">
+        <div className="max-w-full overflow-hidden">
+          <div className="flex flex-wrap items-center gap-2 sm:gap-3 max-w-full">
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-heading font-extrabold tracking-tighter uppercase">TASKS</h1>
+            {nextLockedWeek && daysLeft !== null && (
+              <span className="inline-flex items-center gap-1.5 px-2.5 sm:px-3.5 py-1 sm:py-1.5 rounded-sm border border-primary/40 bg-primary/10 text-primary text-[10px] sm:text-xs font-mono font-bold tracking-wider uppercase glow-primary truncate max-w-full">
+                <Clock className="w-3.5 h-3.5 animate-pulse shrink-0" />
+                <span>W{nextLockedWeek.weekNumber} UNLOCKS IN {daysLeft} {daysLeft === 1 ? 'DAY' : 'DAYS'}</span>
+              </span>
+            )}
+          </div>
+          <p className="font-mono text-[9px] sm:text-[10px] tracking-[0.15em] sm:tracking-[0.2em] uppercase text-muted-foreground mt-2 flex items-center gap-2 max-w-full overflow-hidden break-words">
+            <span className="w-1 h-1 bg-primary shrink-0"></span> WEEKLY TASK ASSIGNMENTS — UNLOCKS EVERY 7 DAYS
+          </p>
+        </div>
       </header>
 
       {programs.length > 0 && (
-        <div className="flex items-center justify-start w-full relative z-10">
+        <div className="flex items-center justify-start w-full relative z-10 max-w-full overflow-hidden">
           <div className="relative flex p-1 rounded-sm bg-card border border-border overflow-x-auto no-scrollbar max-w-full">
             {programs.map((program) => {
               const isActive = program.id === activeProgramId;
@@ -65,7 +95,7 @@ export default function TasksPage() {
                 <button
                   key={program.id}
                   onClick={() => { if (program.id !== activeProgramId) setSwitchTargetId(program.id); }}
-                  className={`relative px-5 py-2 rounded-sm text-xs font-mono tracking-widest uppercase transition-colors flex items-center justify-center outline-none whitespace-nowrap min-w-fit z-20 ${isActive ? "text-primary-foreground" : "text-muted-foreground hover:text-foreground hover:bg-foreground/5"}`}
+                  className={`relative px-4 sm:px-5 py-2 rounded-sm text-xs font-mono tracking-widest uppercase transition-colors flex items-center justify-center outline-none whitespace-nowrap min-w-fit z-20 ${isActive ? "text-primary-foreground" : "text-muted-foreground hover:text-foreground hover:bg-foreground/5"}`}
                 >
                   {isActive && (
                     <motion.div layoutId="tasks-active-pill" className="absolute inset-0 bg-primary rounded-sm shadow-lg shadow-primary/20 z-0" transition={{ type: "spring", bounce: 0.25, duration: 0.5 }} />
@@ -81,12 +111,12 @@ export default function TasksPage() {
         </div>
       )}
 
-      <div className="grid lg:grid-cols-12 gap-8 items-start">
-        <div className="lg:col-span-4">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start w-full max-w-full overflow-hidden">
+        <div className="lg:col-span-4 max-w-full overflow-hidden order-2 lg:order-1">
           <WeeklySidebar weeks={activeProgram?.weeks || []} activeId={activeId} onSelect={setActiveId} />
         </div>
 
-        <div className="lg:col-span-8 flex flex-col min-h-[500px]">
+        <div className="lg:col-span-8 flex flex-col min-h-[500px] order-1 lg:order-2">
           {activeTask ? (
             <div className="flex-1 glass-panel corner-accent overflow-hidden flex flex-col relative">
               <div className="absolute top-0 right-0 p-8 opacity-5 pointer-events-none">

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { HelpCircle, CheckCircle2, PlayCircle, Clock } from "lucide-react";
 import Link from "next/link";
@@ -21,8 +21,28 @@ export default function QuizzesPage() {
 
   useAttendance(activeProgramId);
 
+  useEffect(() => {
+    if (activeProgram) {
+      const unlockedLessons = activeProgram.weeks.filter(w => w.isUnlocked).flatMap(w => w.lessons);
+      const exists = unlockedLessons.some(l => l.id === activeId);
+      if ((!activeId || !exists) && unlockedLessons.length > 0) {
+        setActiveId(unlockedLessons[0].id);
+      }
+    }
+  }, [activeProgram, activeId]);
+
   const activeQuiz = activeProgram?.weeks.flatMap(w => w.lessons).find(l => l.id === activeId);
   const activeWeek = activeProgram?.weeks.find(w => w.lessons.some(l => l.id === activeId));
+
+  const getDaysRemaining = (unlocksAt: Date | null) => {
+    if (!unlocksAt) return 0;
+    const now = new Date();
+    const diffTime = unlocksAt.getTime() - now.getTime();
+    return Math.max(0, Math.ceil(diffTime / (1000 * 60 * 60 * 24)));
+  };
+
+  const nextLockedWeek = activeProgram?.weeks.find(w => !w.isUnlocked && w.unlocksAt);
+  const daysLeft = nextLockedWeek ? getDaysRemaining(nextLockedWeek.unlocksAt) : null;
 
   if (loading) return <FuturisticLoader text="Loading Assessment Matrix..." />;
 
@@ -49,11 +69,21 @@ export default function QuizzesPage() {
 
   return (
     <div className="space-y-8 max-w-6xl mx-auto">
-      <header>
-        <h1 className="text-4xl lg:text-5xl font-heading font-extrabold tracking-tighter uppercase">QUIZZES</h1>
-        <p className="font-mono text-[10px] tracking-[0.2em] uppercase text-muted-foreground mt-2 flex items-center gap-2">
-          <span className="w-1 h-1 bg-primary"></span> KNOWLEDGE ASSESSMENTS — WEEKLY UNLOCK SYSTEM
-        </p>
+      <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <div className="flex flex-wrap items-center gap-3">
+            <h1 className="text-4xl lg:text-5xl font-heading font-extrabold tracking-tighter uppercase">QUIZZES</h1>
+            {nextLockedWeek && daysLeft !== null && (
+              <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-sm border border-primary/40 bg-primary/10 text-primary text-xs font-mono font-bold tracking-wider uppercase glow-primary">
+                <Clock className="w-3.5 h-3.5 animate-pulse" />
+                <span>W{nextLockedWeek.weekNumber} UNLOCKS IN {daysLeft} {daysLeft === 1 ? 'DAY' : 'DAYS'}</span>
+              </span>
+            )}
+          </div>
+          <p className="font-mono text-[10px] tracking-[0.2em] uppercase text-muted-foreground mt-2 flex items-center gap-2">
+            <span className="w-1 h-1 bg-primary"></span> KNOWLEDGE ASSESSMENTS — WEEKLY UNLOCK SYSTEM
+          </p>
+        </div>
       </header>
 
       {programs.length > 0 && (

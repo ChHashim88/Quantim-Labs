@@ -54,6 +54,13 @@ export default function StudentDashboard() {
   const [checkingIn, setCheckingIn] = useState(false);
   const [currentTime, setCurrentTime] = useState("");
 
+  const [nextWeekInfo, setNextWeekInfo] = useState<{
+    currentWeek: number;
+    nextWeekNumber: number;
+    daysLeft: number;
+    unlocksAt: string;
+  } | null>(null);
+
   useEffect(() => {
     const updateTime = () => {
       const now = new Date();
@@ -312,6 +319,34 @@ export default function StudentDashboard() {
         setTodayTasks(fetchedTasks);
         setHasCheckedInToday(checkedInToday);
 
+        // Calculate next week unlock countdown
+        const { data: enrollmentsData } = await supabase
+          .from('student_enrollments')
+          .select('enrolled_at')
+          .eq('student_id', user.id)
+          .eq('internship_id', activeProgramId);
+
+        if (enrollmentsData && enrollmentsData.length > 0 && enrollmentsData[0].enrolled_at) {
+          const enrolledAt = new Date(enrollmentsData[0].enrolled_at);
+          const now = new Date();
+          const daysSinceEnrollment = Math.floor((now.getTime() - enrolledAt.getTime()) / (1000 * 60 * 60 * 24));
+          const currentWeek = Math.floor(daysSinceEnrollment / 7) + 1;
+          const nextWeekNumber = currentWeek + 1;
+          const daysNeeded = (nextWeekNumber - 1) * 7;
+
+          const unlocksAtDate = new Date(enrolledAt);
+          unlocksAtDate.setDate(unlocksAtDate.getDate() + daysNeeded);
+
+          const daysLeft = Math.max(0, Math.ceil((unlocksAtDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)));
+
+          setNextWeekInfo({
+            currentWeek,
+            nextWeekNumber,
+            daysLeft,
+            unlocksAt: unlocksAtDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+          });
+        }
+
       } catch (e) {
         console.error("Error loading program stats:", e);
       } finally {
@@ -353,52 +388,52 @@ export default function StudentDashboard() {
   }
 
   return (
-    <div className="space-y-8 max-w-[1400px] mx-auto animate-in fade-in slide-in-from-bottom-4 duration-500">
+    <div className="space-y-6 sm:space-y-8 max-w-[1400px] mx-auto w-full overflow-x-hidden animate-in fade-in slide-in-from-bottom-4 duration-500">
 
       {/* Verification Warning */}
       {!isVerified && (
-        <div className="mb-8 glass-panel border border-destructive/50 p-6 rounded-sm flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-4">
-            <div className="w-10 h-10 rounded-sm bg-destructive/10 flex items-center justify-center animate-pulse">
+        <div className="mb-6 sm:mb-8 glass-panel border border-destructive/50 p-4 sm:p-6 rounded-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 max-w-full overflow-hidden">
+          <div className="flex items-start sm:items-center gap-3 sm:gap-4 overflow-hidden">
+            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-sm bg-destructive/10 flex items-center justify-center animate-pulse shrink-0">
               <ShieldAlert className="w-5 h-5 text-destructive" />
             </div>
-            <div>
-              <p className="font-mono font-bold text-destructive uppercase tracking-widest text-sm">Action Required: Identity Verification</p>
-              <p className="text-xs text-muted-foreground font-mono mt-1">System cannot grant full access until profile verification is complete.</p>
+            <div className="overflow-hidden">
+              <p className="font-mono font-bold text-destructive uppercase tracking-widest text-xs sm:text-sm truncate">Action Required: Identity Verification</p>
+              <p className="text-[10px] sm:text-xs text-muted-foreground font-mono mt-1 break-words">System cannot grant full access until profile verification is complete.</p>
             </div>
           </div>
-          <button onClick={() => setShowVerificationModal(true)} className="px-6 py-3 bg-destructive text-destructive-foreground font-mono text-xs font-bold uppercase tracking-widest hover:bg-destructive/80 transition-all glow-primary">
+          <button onClick={() => setShowVerificationModal(true)} className="w-full sm:w-auto px-6 py-3 bg-destructive text-destructive-foreground font-mono text-xs font-bold uppercase tracking-widest hover:bg-destructive/80 transition-all glow-primary shrink-0">
             Verify Now
           </button>
         </div>
       )}
 
       {/* Header: Telemetry Header */}
-      <header className="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-8 relative">
-        <div className="space-y-1">
+      <header className="mb-8 sm:mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6 sm:gap-8 relative overflow-hidden">
+        <div className="space-y-1 max-w-full overflow-hidden">
           <div className="flex items-center gap-2 text-[10px] font-mono text-muted-foreground tracking-widest uppercase mb-2">
             <span className="inline-block w-2 h-2 rounded-full bg-green-500 animate-pulse glow-primary"></span>
             System Online // User: {profile?.first_name || 'Active'}
           </div>
-          <h2 className="font-heading text-4xl lg:text-5xl font-bold tracking-tighter text-foreground uppercase">
+          <h2 className="font-heading text-2xl sm:text-4xl lg:text-5xl font-bold tracking-tighter text-foreground uppercase break-words">
             {profile?.first_name ? `Welcome, ${profile.first_name}` : 'STUDENT DASHBOARD'}
           </h2>
-          <div className="flex items-center gap-2 text-xs font-mono text-muted-foreground pt-2">
-            <Bolt className="w-4 h-4 text-primary" />
-            <span>{stats.streakCount > 0 ? `${stats.streakCount}-DAY CONTINUITY STREAK MAINTAINED` : 'NO ACTIVE CONTINUITY STREAK DETECTED'}</span>
+          <div className="flex items-center gap-2 text-[10px] sm:text-xs font-mono text-muted-foreground pt-1 sm:pt-2">
+            <Bolt className="w-4 h-4 text-primary shrink-0" />
+            <span className="truncate">{stats.streakCount > 0 ? `${stats.streakCount}-DAY CONTINUITY STREAK MAINTAINED` : 'NO ACTIVE CONTINUITY STREAK DETECTED'}</span>
           </div>
         </div>
 
-        <div className="flex flex-wrap items-center gap-6">
-          <div className="flex flex-col items-end">
-            <span className="text-[10px] font-mono text-muted-foreground uppercase">Local Timestamp</span>
-            <span className="text-sm font-mono text-foreground">{currentTime}</span>
+        <div className="flex flex-wrap items-center justify-between sm:justify-end gap-4 sm:gap-6">
+          <div className="flex flex-col items-start sm:items-end">
+            <span className="text-[9px] sm:text-[10px] font-mono text-muted-foreground uppercase">Local Timestamp</span>
+            <span className="text-xs sm:text-sm font-mono text-foreground">{currentTime}</span>
           </div>
           <div className="hidden sm:block h-10 w-[1px] bg-border"></div>
           <button
             onClick={handleManualCheckIn}
             disabled={hasCheckedInToday || checkingIn}
-            className={`h-12 px-8 font-mono text-xs font-bold tracking-widest uppercase transition-all flex items-center justify-center gap-2 ${hasCheckedInToday
+            className={`h-10 sm:h-12 px-5 sm:px-8 font-mono text-[10px] sm:text-xs font-bold tracking-widest uppercase transition-all flex items-center justify-center gap-2 ${hasCheckedInToday
               ? "bg-muted text-muted-foreground cursor-not-allowed border border-border"
               : "bg-primary text-primary-foreground hover:bg-primary/80 active:scale-95 glow-primary"
               }`}
@@ -408,106 +443,138 @@ export default function StudentDashboard() {
         </div>
       </header>
 
+      {/* Next Week Unlock Countdown Banner */}
+      {nextWeekInfo && (
+        <div className="mb-6 sm:mb-8 glass-panel border border-primary/40 p-4 sm:p-6 rounded-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-primary/5 shadow-[0_0_30px_rgba(var(--primary),0.05)] max-w-full overflow-hidden">
+          <div className="flex items-center gap-3 sm:gap-4 overflow-hidden">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-sm bg-primary/10 border border-primary/30 flex items-center justify-center text-primary glow-primary shrink-0">
+              <Clock className="w-5 h-5 sm:w-6 sm:h-6 animate-pulse" />
+            </div>
+            <div className="overflow-hidden">
+              <div className="flex items-center gap-2 text-[9px] sm:text-[10px] font-mono text-primary uppercase tracking-widest font-bold glow-primary">
+                <span>ACTIVE: W{nextWeekInfo.currentWeek}</span>
+                <span>&bull;</span>
+                <span>NEXT: W{nextWeekInfo.nextWeekNumber}</span>
+              </div>
+              <h3 className="font-heading text-sm sm:text-lg font-bold uppercase tracking-tight text-foreground mt-0.5 break-words">
+                WEEK {nextWeekInfo.nextWeekNumber} UNLOCKS IN {nextWeekInfo.daysLeft} {nextWeekInfo.daysLeft === 1 ? 'DAY' : 'DAYS'} ({nextWeekInfo.unlocksAt})
+              </h3>
+            </div>
+          </div>
+          <div className="flex items-center justify-between w-full sm:w-auto gap-3 shrink-0">
+            <div className="text-right hidden md:block">
+              <div className="text-[9px] font-mono text-muted-foreground uppercase tracking-widest">SYLLABUS ROTATION</div>
+              <div className="text-xs font-mono text-primary font-bold uppercase">7-DAY AUTOMATIC UNLOCK</div>
+            </div>
+            <Link href="/student/lectures" className="w-full sm:w-auto">
+              <Button size="sm" className="w-full sm:w-auto rounded-sm font-mono text-[10px] font-bold uppercase tracking-widest bg-primary text-primary-foreground hover:bg-primary/90 glow-primary px-4 sm:px-5 py-4 sm:py-5">
+                VIEW SYLLABUS
+              </Button>
+            </Link>
+          </div>
+        </div>
+      )}
+
       {/* Dynamic Grid: Core Metrics */}
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-12">
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-2.5 sm:gap-4 mb-8 sm:mb-12">
         {/* Metric 1: Videos */}
-        <div className="glass-panel corner-accent p-6 rounded-sm group hover:bg-primary/5 transition-colors">
-          <div className="flex justify-between items-start mb-4">
-            <span className="font-mono text-[10px] text-muted-foreground tracking-[0.2em]">VIDEOS.LOG</span>
-            <Play className="w-3 h-3 text-muted-foreground group-hover:text-primary transition-colors" />
+        <div className="glass-panel corner-accent p-3.5 sm:p-6 rounded-sm group hover:bg-primary/5 transition-colors overflow-hidden">
+          <div className="flex justify-between items-start mb-2 sm:mb-4">
+            <span className="font-mono text-[8px] sm:text-[10px] text-muted-foreground tracking-[0.2em] truncate">VIDEOS.LOG</span>
+            <Play className="w-3 h-3 text-muted-foreground group-hover:text-primary transition-colors shrink-0" />
           </div>
-          <div className="flex items-baseline gap-2">
-            <span className="text-4xl font-mono font-bold tracking-tighter">{String(stats.videos?.completed || 0).padStart(2, '0')}</span>
-            <span className="text-xs font-mono text-muted-foreground">/ {String(stats.videos?.total || 0).padStart(2, '0')}</span>
+          <div className="flex items-baseline gap-1 sm:gap-2">
+            <span className="text-2xl sm:text-4xl font-mono font-bold tracking-tighter">{String(stats.videos?.completed || 0).padStart(2, '0')}</span>
+            <span className="text-[10px] sm:text-xs font-mono text-muted-foreground">/ {String(stats.videos?.total || 0).padStart(2, '0')}</span>
           </div>
-          <div className="mt-4 h-[2px] w-full bg-border">
+          <div className="mt-3 sm:mt-4 h-[2px] w-full bg-border">
             <div className="h-full bg-primary shadow-[0_0_10px_rgba(var(--primary),0.5)] transition-all duration-1000" style={{ width: `${stats.videos?.total ? (stats.videos.completed / stats.videos.total) * 100 : 0}%` }}></div>
           </div>
         </div>
 
         {/* Metric 2: Tasks */}
-        <div className="glass-panel corner-accent p-6 rounded-sm group hover:bg-primary/5 transition-colors">
-          <div className="flex justify-between items-start mb-4">
-            <span className="font-mono text-[10px] text-muted-foreground tracking-[0.2em]">TASKS.EXE</span>
-            <Terminal className="w-3 h-3 text-muted-foreground group-hover:text-primary transition-colors" />
+        <div className="glass-panel corner-accent p-3.5 sm:p-6 rounded-sm group hover:bg-primary/5 transition-colors overflow-hidden">
+          <div className="flex justify-between items-start mb-2 sm:mb-4">
+            <span className="font-mono text-[8px] sm:text-[10px] text-muted-foreground tracking-[0.2em] truncate">TASKS.EXE</span>
+            <Terminal className="w-3 h-3 text-muted-foreground group-hover:text-primary transition-colors shrink-0" />
           </div>
-          <div className="flex items-baseline gap-2">
-            <span className="text-4xl font-mono font-bold tracking-tighter">{String(stats.tasks?.completed || 0).padStart(2, '0')}</span>
-            <span className="text-xs font-mono text-muted-foreground">/ {String(stats.tasks?.total || 0).padStart(2, '0')}</span>
+          <div className="flex items-baseline gap-1 sm:gap-2">
+            <span className="text-2xl sm:text-4xl font-mono font-bold tracking-tighter">{String(stats.tasks?.completed || 0).padStart(2, '0')}</span>
+            <span className="text-[10px] sm:text-xs font-mono text-muted-foreground">/ {String(stats.tasks?.total || 0).padStart(2, '0')}</span>
           </div>
-          <div className="mt-4 h-[2px] w-full bg-border">
+          <div className="mt-3 sm:mt-4 h-[2px] w-full bg-border">
             <div className="h-full bg-primary transition-all duration-1000" style={{ width: `${stats.tasks?.total ? (stats.tasks.completed / stats.tasks.total) * 100 : 0}%` }}></div>
           </div>
         </div>
 
         {/* Metric 3: Assignments */}
-        <div className="glass-panel corner-accent p-6 rounded-sm group hover:bg-primary/5 transition-colors">
-          <div className="flex justify-between items-start mb-4">
-            <span className="font-mono text-[10px] text-muted-foreground tracking-[0.2em]">ASGN.DAT</span>
-            <FolderOpen className="w-3 h-3 text-muted-foreground group-hover:text-primary transition-colors" />
+        <div className="glass-panel corner-accent p-3.5 sm:p-6 rounded-sm group hover:bg-primary/5 transition-colors overflow-hidden">
+          <div className="flex justify-between items-start mb-2 sm:mb-4">
+            <span className="font-mono text-[8px] sm:text-[10px] text-muted-foreground tracking-[0.2em] truncate">ASGN.DAT</span>
+            <FolderOpen className="w-3 h-3 text-muted-foreground group-hover:text-primary transition-colors shrink-0" />
           </div>
-          <div className="flex items-baseline gap-2">
-            <span className="text-4xl font-mono font-bold tracking-tighter">{String(stats.assignments?.completed || 0).padStart(2, '0')}</span>
-            <span className="text-xs font-mono text-muted-foreground">/ {String(stats.assignments?.total || 0).padStart(2, '0')}</span>
+          <div className="flex items-baseline gap-1 sm:gap-2">
+            <span className="text-2xl sm:text-4xl font-mono font-bold tracking-tighter">{String(stats.assignments?.completed || 0).padStart(2, '0')}</span>
+            <span className="text-[10px] sm:text-xs font-mono text-muted-foreground">/ {String(stats.assignments?.total || 0).padStart(2, '0')}</span>
           </div>
-          <div className="mt-4 h-[2px] w-full bg-border">
+          <div className="mt-3 sm:mt-4 h-[2px] w-full bg-border">
             <div className="h-full bg-primary transition-all duration-1000" style={{ width: `${stats.assignments?.total ? (stats.assignments.completed / stats.assignments.total) * 100 : 0}%` }}></div>
           </div>
         </div>
 
         {/* Metric 4: Quizzes */}
-        <div className="glass-panel corner-accent p-6 rounded-sm group hover:bg-primary/5 transition-colors">
-          <div className="flex justify-between items-start mb-4">
-            <span className="font-mono text-[10px] text-muted-foreground tracking-[0.2em]">QUIZ.SYS</span>
-            <Activity className="w-3 h-3 text-muted-foreground group-hover:text-primary transition-colors" />
+        <div className="glass-panel corner-accent p-3.5 sm:p-6 rounded-sm group hover:bg-primary/5 transition-colors overflow-hidden">
+          <div className="flex justify-between items-start mb-2 sm:mb-4">
+            <span className="font-mono text-[8px] sm:text-[10px] text-muted-foreground tracking-[0.2em] truncate">QUIZ.SYS</span>
+            <Activity className="w-3 h-3 text-muted-foreground group-hover:text-primary transition-colors shrink-0" />
           </div>
-          <div className="flex items-baseline gap-2">
-            <span className="text-4xl font-mono font-bold tracking-tighter">{String(stats.quizzes?.completed || 0).padStart(2, '0')}</span>
-            <span className="text-xs font-mono text-muted-foreground">/ {String(stats.quizzes?.total || 0).padStart(2, '0')}</span>
+          <div className="flex items-baseline gap-1 sm:gap-2">
+            <span className="text-2xl sm:text-4xl font-mono font-bold tracking-tighter">{String(stats.quizzes?.completed || 0).padStart(2, '0')}</span>
+            <span className="text-[10px] sm:text-xs font-mono text-muted-foreground">/ {String(stats.quizzes?.total || 0).padStart(2, '0')}</span>
           </div>
-          <div className="mt-4 h-[2px] w-full bg-border">
+          <div className="mt-3 sm:mt-4 h-[2px] w-full bg-border">
             <div className="h-full bg-primary transition-all duration-1000" style={{ width: `${stats.quizzes?.total ? (stats.quizzes.completed / stats.quizzes.total) * 100 : 0}%` }}></div>
           </div>
         </div>
 
         {/* Metric 5: Documents */}
-        <div className="glass-panel corner-accent p-6 rounded-sm group hover:bg-destructive/5 transition-colors">
-          <div className="flex justify-between items-start mb-4">
-            <span className="font-mono text-[10px] text-destructive tracking-[0.2em] uppercase">Docs.ref</span>
-            <AlertCircle className="w-3 h-3 text-destructive animate-pulse" />
+        <div className="glass-panel corner-accent p-3.5 sm:p-6 rounded-sm group hover:bg-destructive/5 transition-colors overflow-hidden col-span-2 md:col-span-1">
+          <div className="flex justify-between items-start mb-2 sm:mb-4">
+            <span className="font-mono text-[8px] sm:text-[10px] text-destructive tracking-[0.2em] uppercase truncate">Docs.ref</span>
+            <AlertCircle className="w-3 h-3 text-destructive animate-pulse shrink-0" />
           </div>
-          <div className="flex items-baseline gap-2">
-            <span className="text-4xl font-mono font-bold tracking-tighter">{String(stats.documents?.completed || 0).padStart(2, '0')}</span>
-            <span className="text-xs font-mono text-muted-foreground">/ {String(stats.documents?.total || 0).padStart(2, '0')}</span>
+          <div className="flex items-baseline gap-1 sm:gap-2">
+            <span className="text-2xl sm:text-4xl font-mono font-bold tracking-tighter">{String(stats.documents?.completed || 0).padStart(2, '0')}</span>
+            <span className="text-[10px] sm:text-xs font-mono text-muted-foreground">/ {String(stats.documents?.total || 0).padStart(2, '0')}</span>
           </div>
-          <div className="mt-4 h-[2px] w-full bg-border">
+          <div className="mt-3 sm:mt-4 h-[2px] w-full bg-border">
             <div className="h-full bg-destructive shadow-[0_0_10px_rgba(var(--destructive),0.5)] transition-all duration-1000" style={{ width: `${stats.documents?.total ? (stats.documents.completed / stats.documents.total) * 100 : 0}%` }}></div>
           </div>
         </div>
       </div>
 
       {/* Main Layout Split */}
-      <div className="grid grid-cols-12 gap-8">
+      <div className="grid grid-cols-12 gap-6 sm:gap-8">
 
         {/* Left: Active Operations */}
-        <div className="col-span-12 xl:col-span-8 space-y-8">
+        <div className="col-span-12 xl:col-span-8 space-y-6 sm:space-y-8 max-w-full overflow-hidden">
           <section>
-            <div className="flex items-center gap-4 mb-6">
-              <h3 className="font-heading text-xl font-bold tracking-tight uppercase">ACTIVE OPERATIONS</h3>
+            <div className="flex items-center gap-4 mb-4 sm:mb-6">
+              <h3 className="font-heading text-lg sm:text-xl font-bold tracking-tight uppercase">ACTIVE OPERATIONS</h3>
               <div className="h-[1px] flex-1 bg-border"></div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
               {enrolledPrograms.length > 0 ? (
                 <>
                   {enrolledPrograms.map((prog, idx) => (
-                    <div key={prog.id} className="glass-panel p-8 rounded-sm group hover:bg-primary/5 transition-all">
-                      <div className="flex justify-between mb-8">
-                        <div>
-                          <div className="text-[10px] font-mono text-muted-foreground uppercase mb-1">Project ID: {prog.id.split('-')[0]}</div>
-                          <h4 className="text-xl font-heading font-bold uppercase">{prog.title}</h4>
+                    <div key={prog.id} className="glass-panel p-5 sm:p-8 rounded-sm group hover:bg-primary/5 transition-all max-w-full overflow-hidden">
+                      <div className="flex justify-between items-start mb-6 sm:mb-8 gap-2">
+                        <div className="overflow-hidden">
+                          <div className="text-[9px] sm:text-[10px] font-mono text-muted-foreground uppercase mb-1 truncate">Project ID: {prog.id.split('-')[0]}</div>
+                          <h4 className="text-base sm:text-xl font-heading font-bold uppercase truncate max-w-[170px] sm:max-w-none">{prog.title}</h4>
                         </div>
-                        <span className="px-2 py-1 h-fit border border-primary/20 font-mono text-[9px] uppercase text-primary tracking-widest">
+                        <span className="px-2 py-1 h-fit border border-primary/20 font-mono text-[9px] uppercase text-primary tracking-widest shrink-0">
                           {prog.id === activeProgramId ? 'Tracking' : 'Standby'}
                         </span>
                       </div>
@@ -697,19 +764,19 @@ export default function StudentDashboard() {
           </div>
 
           {/* Daily Protocol */}
-          <div className="glass-panel p-8 rounded-sm">
-            <h4 className="font-mono text-[10px] tracking-[0.3em] uppercase text-muted-foreground mb-8 flex items-center gap-2">
+          <div className="glass-panel p-5 sm:p-8 rounded-sm max-w-full overflow-hidden">
+            <h4 className="font-mono text-[10px] tracking-[0.3em] uppercase text-muted-foreground mb-6 sm:mb-8 flex items-center gap-2">
               <span className="w-1 h-1 bg-primary"></span> DAILY_PROTOCOL
             </h4>
-            <div className="space-y-4">
+            <div className="space-y-3 sm:space-y-4 max-w-full overflow-hidden">
               {todayTasks.length > 0 ? todayTasks.map((task, i) => (
-                <Link href="/student/lectures" key={i}>
-                  <div className={`group flex flex-col gap-1 p-4 border border-border hover:border-primary/50 transition-all cursor-pointer mt-3 ${task.status === 'Completed' ? 'opacity-40 grayscale' : ''}`}>
-                    <div className="flex items-center gap-3">
+                <Link href="/student/lectures" key={i} className="block max-w-full overflow-hidden">
+                  <div className={`group flex flex-col gap-1 p-3 sm:p-4 border border-border hover:border-primary/50 transition-all cursor-pointer mt-2 sm:mt-3 max-w-full overflow-hidden ${task.status === 'Completed' ? 'opacity-40 grayscale' : ''}`}>
+                    <div className="flex items-center gap-2 sm:gap-3 min-w-0 overflow-hidden">
                       <div className={`w-2 h-2 shrink-0 ${task.status === 'Completed' ? 'bg-muted-foreground' : 'bg-primary glow-primary'}`}></div>
-                      <span className="font-mono text-[11px] tracking-wide uppercase text-foreground truncate">EXEC: {task.title}</span>
+                      <span className="font-mono text-[10px] sm:text-[11px] tracking-wide uppercase text-foreground truncate block flex-1">EXEC: {task.title}</span>
                     </div>
-                    <div className="font-mono text-[9px] text-muted-foreground pl-5 uppercase">{task.type} // {task.duration}</div>
+                    <div className="font-mono text-[8px] sm:text-[9px] text-muted-foreground pl-4 sm:pl-5 uppercase truncate">{task.type} // {task.duration}</div>
                   </div>
                 </Link>
               )) : (

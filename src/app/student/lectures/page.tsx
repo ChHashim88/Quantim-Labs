@@ -59,6 +59,16 @@ export default function LecturesPage() {
   const totalSeconds = activeLesson?.durationHours ? Math.round(activeLesson.durationHours * 3600) : 900;
 
   useEffect(() => {
+    if (activeProgram) {
+      const unlockedLessons = activeProgram.weeks.filter(w => w.isUnlocked).flatMap(w => w.lessons);
+      const exists = unlockedLessons.some(l => l.id === activeId);
+      if ((!activeId || !exists) && unlockedLessons.length > 0) {
+        setActiveId(unlockedLessons[0].id);
+      }
+    }
+  }, [activeProgram, activeId]);
+
+  useEffect(() => {
     setIsPlaying(false);
     setCurrentTime(0);
   }, [activeId, activeProgramId]);
@@ -87,6 +97,16 @@ export default function LecturesPage() {
 
     return () => clearInterval(timer);
   }, [isPlaying, activeId, totalSeconds, activeLesson, activeProgramId, markComplete]);
+
+  const getDaysRemaining = (unlocksAt: Date | null) => {
+    if (!unlocksAt) return 0;
+    const now = new Date();
+    const diffTime = unlocksAt.getTime() - now.getTime();
+    return Math.max(0, Math.ceil(diffTime / (1000 * 60 * 60 * 24)));
+  };
+
+  const nextLockedWeek = activeProgram?.weeks.find(w => !w.isUnlocked && w.unlocksAt);
+  const daysLeft = nextLockedWeek ? getDaysRemaining(nextLockedWeek.unlocksAt) : null;
 
   if (loading) {
     return <FuturisticLoader text="Loading video environment..." />;
@@ -117,16 +137,26 @@ export default function LecturesPage() {
   }
 
   return (
-    <div className="space-y-8 max-w-6xl mx-auto">
-      <header>
-        <h1 className="text-4xl lg:text-5xl font-heading font-extrabold tracking-tighter uppercase">LECTURES</h1>
-        <p className="font-mono text-[10px] tracking-[0.2em] uppercase text-muted-foreground mt-2 flex items-center gap-2">
-          <span className="w-1 h-1 bg-primary"></span> WATCH COURSE VIDEOS AND TRACK SYLLABUS PROGRESS — WEEKLY UNLOCK SYSTEM
-        </p>
+    <div className="space-y-6 sm:space-y-8 max-w-6xl mx-auto w-full overflow-x-hidden">
+      <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 max-w-full overflow-hidden">
+        <div className="max-w-full overflow-hidden">
+          <div className="flex flex-wrap items-center gap-2 sm:gap-3 max-w-full">
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-heading font-extrabold tracking-tighter uppercase">LECTURES</h1>
+            {nextLockedWeek && daysLeft !== null && (
+              <span className="inline-flex items-center gap-1.5 px-2.5 sm:px-3.5 py-1 sm:py-1.5 rounded-sm border border-primary/40 bg-primary/10 text-primary text-[10px] sm:text-xs font-mono font-bold tracking-wider uppercase glow-primary truncate max-w-full">
+                <Clock className="w-3.5 h-3.5 animate-pulse shrink-0" />
+                <span>W{nextLockedWeek.weekNumber} UNLOCKS IN {daysLeft} {daysLeft === 1 ? 'DAY' : 'DAYS'}</span>
+              </span>
+            )}
+          </div>
+          <p className="font-mono text-[9px] sm:text-[10px] tracking-[0.15em] sm:tracking-[0.2em] uppercase text-muted-foreground mt-2 flex items-center gap-2 max-w-full overflow-hidden break-words">
+            <span className="w-1 h-1 bg-primary shrink-0"></span> WATCH COURSE VIDEOS AND TRACK SYLLABUS PROGRESS — WEEKLY UNLOCK SYSTEM
+          </p>
+        </div>
       </header>
 
       {programs.length > 0 && (
-        <div className="flex items-center justify-start w-full relative z-10">
+        <div className="flex items-center justify-start w-full relative z-10 max-w-full overflow-hidden">
           <div className="relative flex p-1 rounded-sm bg-card border border-border overflow-x-auto no-scrollbar max-w-full">
             {programs.map((program) => {
               const isActive = program.id === activeProgramId;
@@ -134,7 +164,7 @@ export default function LecturesPage() {
                 <button
                   key={program.id}
                   onClick={() => { if (program.id !== activeProgramId) setSwitchTargetId(program.id); }}
-                  className={`relative px-5 py-2 rounded-sm text-xs font-mono tracking-widest uppercase transition-colors flex items-center justify-center outline-none whitespace-nowrap min-w-fit z-20 ${isActive ? "text-primary-foreground" : "text-muted-foreground hover:text-foreground hover:bg-foreground/5"}`}
+                  className={`relative px-4 sm:px-5 py-2 rounded-sm text-xs font-mono tracking-widest uppercase transition-colors flex items-center justify-center outline-none whitespace-nowrap min-w-fit z-20 ${isActive ? "text-primary-foreground" : "text-muted-foreground hover:text-foreground hover:bg-foreground/5"}`}
                 >
                   {isActive && (
                     <motion.div layoutId="lectures-active-pill" className="absolute inset-0 bg-primary rounded-sm shadow-lg shadow-primary/20 z-0" transition={{ type: "spring", bounce: 0.25, duration: 0.5 }} />
@@ -150,9 +180,9 @@ export default function LecturesPage() {
         </div>
       )}
 
-      <div className="grid lg:grid-cols-12 gap-8 items-start">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start w-full max-w-full overflow-hidden">
         {/* Weekly Sidebar */}
-        <div className="lg:col-span-4">
+        <div className="lg:col-span-4 max-w-full overflow-hidden order-2 lg:order-1">
           <WeeklySidebar
             weeks={activeProgram?.weeks || []}
             activeId={activeId}
@@ -161,45 +191,52 @@ export default function LecturesPage() {
         </div>
 
         {/* Video Player */}
-        <div className="lg:col-span-8 flex flex-col justify-between glass-panel p-8 corner-accent relative min-h-[500px]">
+        <div className="lg:col-span-8 flex flex-col justify-between glass-panel px-2 py-3.5 sm:p-8 corner-accent relative min-h-0 sm:min-h-[450px] max-w-full overflow-hidden order-1 lg:order-2">
           {activeLesson ? (
-            <div className="relative z-10 flex-1 flex flex-col justify-between">
-              <div className="flex items-center justify-between border-b border-border/40 pb-6 mb-8">
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-sm bg-primary/10 flex items-center justify-center text-primary border border-primary/20 glow-primary">
-                    <BookOpen className="w-6 h-6" />
+            <div className="relative z-10 flex-1 flex flex-col justify-between max-w-full overflow-hidden">
+              <div className="flex flex-wrap items-center justify-between border-b border-border/40 pb-3 sm:pb-6 mb-4 sm:mb-8 gap-2 sm:gap-3 max-w-full overflow-hidden px-1 sm:px-0">
+                <div className="flex items-center gap-3 sm:gap-4 overflow-hidden min-w-0 flex-1">
+                  <div className="w-9 h-9 sm:w-12 sm:h-12 rounded-sm bg-primary/10 flex items-center justify-center text-primary border border-primary/20 glow-primary shrink-0">
+                    <BookOpen className="w-4 h-4 sm:w-6 sm:h-6" />
                   </div>
-                  <div>
-                    <h3 className="text-2xl font-heading font-bold uppercase text-foreground tracking-tight max-w-[400px] truncate">
+                  <div className="overflow-hidden min-w-0 flex-1">
+                    <h3 className="text-base sm:text-2xl font-heading font-bold uppercase text-foreground tracking-tight max-w-[180px] xs:max-w-[260px] sm:max-w-[400px] truncate">
                       {activeLesson.title}
                     </h3>
-                    <p className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground mt-1">
+                    <p className="font-mono text-[8px] sm:text-[10px] uppercase tracking-widest text-muted-foreground mt-0.5 sm:mt-1 truncate">
                       {activeWeek?.weekTitle} &bull; VIDEO
                     </p>
                   </div>
                 </div>
-                <div className="text-[10px] font-mono tracking-widest text-primary border border-primary/40 bg-primary/10 py-1.5 px-3 rounded-sm glow-primary uppercase">
+                <div className="text-[8px] sm:text-[10px] font-mono tracking-widest text-primary border border-primary/40 bg-primary/10 py-1 px-2.5 sm:py-1.5 sm:px-3 rounded-sm glow-primary uppercase shrink-0">
                   VIDEO
                 </div>
               </div>
 
-              <div className="flex-1 flex flex-col justify-between">
+              <div className="flex-1 flex flex-col justify-between max-w-full">
                 {activeLesson.videoUrl ? (
-                  <div className="w-full aspect-video rounded-sm bg-black border border-primary/20 flex flex-col items-center justify-center relative overflow-hidden group shadow-[0_0_30px_rgba(var(--primary),0.05)]">
+                  <div className="relative -mx-2 sm:mx-0 w-[calc(100%+1rem)] sm:w-full h-[340px] xs:h-[380px] sm:h-[440px] lg:h-auto lg:aspect-video rounded-sm bg-black border border-primary/20 overflow-hidden shadow-[0_0_30px_rgba(var(--primary),0.05)]">
                     <iframe 
                       src={(() => {
-                        let url = activeLesson.videoUrl;
+                        let url = activeLesson.videoUrl || "";
                         if (url.includes("drive.google.com")) {
+                          const driveIdMatch = url.match(/\/d\/([a-zA-Z0-9_-]+)/) || url.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+                          if (driveIdMatch && driveIdMatch[1]) {
+                            return `https://drive.google.com/file/d/${driveIdMatch[1]}/preview`;
+                          }
                           return url.replace(/\/view.*$/, "/preview");
                         } else if (url.includes("youtube.com/watch?v=")) {
-                          return url.replace("watch?v=", "embed/");
+                          const vId = url.split("watch?v=")[1]?.split("&")[0];
+                          return `https://www.youtube.com/embed/${vId}?rel=0`;
                         } else if (url.includes("youtu.be/")) {
-                          return url.replace("youtu.be/", "youtube.com/embed/");
+                          const vId = url.split("youtu.be/")[1]?.split("?")[0];
+                          return `https://www.youtube.com/embed/${vId}?rel=0`;
                         }
                         return url;
                       })()} 
-                      className="w-full h-full absolute inset-0" 
-                      frameBorder="0" 
+                      className="w-full h-full absolute inset-0 border-0 block" 
+                      style={{ width: "100%", height: "100%", border: "none" }}
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen"
                       allowFullScreen
                     ></iframe>
                   </div>
@@ -232,21 +269,21 @@ export default function LecturesPage() {
                   </div>
                 )}
 
-                <div className="mt-8 flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-border/40 pt-6 relative z-10">
-                  <div className="flex items-center gap-3 text-[10px] uppercase tracking-widest text-muted-foreground font-mono">
-                    <Clock className="w-4 h-4" />
-                    <span>STREAM_DURATION: {activeLesson.durationHours ? Math.round(activeLesson.durationHours * 60) : 15} MINS</span>
+                <div className="mt-6 sm:mt-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4 border-t border-border/40 pt-4 sm:pt-6 relative z-10 max-w-full overflow-hidden">
+                  <div className="flex items-center gap-2 sm:gap-3 text-[9px] sm:text-[10px] uppercase tracking-widest text-muted-foreground font-mono truncate max-w-full">
+                    <Clock className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
+                    <span className="truncate">STREAM_DURATION: {activeLesson.durationHours ? Math.round(activeLesson.durationHours * 60) : 15} MINS</span>
                   </div>
                   {activeLesson.completed ? (
-                    <div className="flex items-center gap-2 text-primary text-[10px] uppercase tracking-widest font-mono glow-primary">
-                      <CheckCircle2 className="w-4 h-4" />
+                    <div className="flex items-center gap-2 text-primary text-[9px] sm:text-[10px] uppercase tracking-widest font-mono glow-primary shrink-0">
+                      <CheckCircle2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                       <span>MODULE_COMPLETED</span>
                     </div>
                   ) : (
                     <Button 
                       variant="outline" 
                       size="sm" 
-                      className="text-[10px] font-mono tracking-widest uppercase"
+                      className="text-[9px] sm:text-[10px] font-mono tracking-widest uppercase w-full sm:w-auto"
                       onClick={() => {
                         markComplete(activeLesson.id, activeProgramId, true);
                         playChime();

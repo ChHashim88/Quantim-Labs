@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Lock, CheckCircle2, ChevronDown, ChevronRight, Calendar } from "lucide-react";
+import { Lock, CheckCircle2, ChevronDown, ChevronRight, Calendar, Clock } from "lucide-react";
 import { WeeklyGroup } from "@/hooks/useWeeklyData";
 
 interface WeeklySidebarProps {
@@ -12,7 +12,14 @@ interface WeeklySidebarProps {
 }
 
 const formatUnlockDate = (date: Date) =>
-  date.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+  date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+
+const getDaysRemaining = (unlocksAt: Date | null) => {
+  if (!unlocksAt) return 0;
+  const now = new Date();
+  const diffTime = unlocksAt.getTime() - now.getTime();
+  return Math.max(0, Math.ceil(diffTime / (1000 * 60 * 60 * 24)));
+};
 
 export function WeeklySidebar({ weeks, activeId, onSelect }: WeeklySidebarProps) {
   // By default expand ALL unlocked weeks so their content is immediately visible
@@ -33,6 +40,9 @@ export function WeeklySidebar({ weeks, activeId, onSelect }: WeeklySidebarProps)
     });
   };
 
+  const nextLockedWeek = weeks.find(w => !w.isUnlocked && w.unlocksAt);
+  const nextDaysLeft = nextLockedWeek ? getDaysRemaining(nextLockedWeek.unlocksAt) : null;
+
   return (
     <div className="glass-panel p-5 h-full">
       <h4 className="font-mono text-[10px] tracking-[0.3em] uppercase text-muted-foreground mb-1 flex items-center gap-2">
@@ -48,6 +58,7 @@ export function WeeklySidebar({ weeks, activeId, onSelect }: WeeklySidebarProps)
           const completedCount = week.lessons.filter(l => l.completed).length;
           const hasActive = week.lessons.some(l => l.id === activeId);
           const allDone = week.lessons.length > 0 && completedCount === week.lessons.length;
+          const daysLeft = getDaysRemaining(week.unlocksAt);
 
           return (
             <div key={week.dayId}>
@@ -92,11 +103,11 @@ export function WeeklySidebar({ weeks, activeId, onSelect }: WeeklySidebarProps)
                     </span>
 
                     {!week.isUnlocked && week.unlocksAt ? (
-                      <span className="text-[8px] font-mono uppercase tracking-widest text-muted-foreground/40 flex items-center gap-1 mt-0.5">
-                        <Calendar className="w-2 h-2" /> UNLOCKS {formatUnlockDate(week.unlocksAt)}
+                      <span className="text-[8px] font-mono uppercase tracking-widest text-primary/90 flex items-center gap-1 mt-0.5 truncate max-w-[130px] sm:max-w-none">
+                        <Clock className="w-2.5 h-2.5 text-primary shrink-0" /> UNLOCKS IN {daysLeft} {daysLeft === 1 ? "DAY" : "DAYS"} ({formatUnlockDate(week.unlocksAt)})
                       </span>
                     ) : (
-                      <span className="text-[8px] font-mono uppercase tracking-widest text-muted-foreground/50 mt-0.5 block">
+                      <span className="text-[8px] font-mono uppercase tracking-widest text-muted-foreground/50 mt-0.5 block truncate">
                         {completedCount}/{week.lessons.length} DONE
                       </span>
                     )}
@@ -121,7 +132,7 @@ export function WeeklySidebar({ weeks, activeId, onSelect }: WeeklySidebarProps)
                     transition={{ duration: 0.18 }}
                     className="overflow-hidden"
                   >
-                    <div className="mt-1 mb-2 space-y-1 pl-3 border-l-2 border-primary/20 ml-4">
+                    <div className="mt-1 mb-2 space-y-1 pl-2 sm:pl-3 border-l-2 border-primary/20 ml-2 sm:ml-4">
                       {week.lessons.length === 0 ? (
                         <p className="text-[9px] font-mono uppercase tracking-widest text-muted-foreground/40 py-2.5 pl-2">
                           NO CONTENT YET
@@ -133,19 +144,19 @@ export function WeeklySidebar({ weeks, activeId, onSelect }: WeeklySidebarProps)
                             <div
                               key={lesson.id}
                               onClick={() => onSelect(lesson.id)}
-                              className={`flex items-center justify-between p-2.5 rounded-sm border text-xs transition-all cursor-pointer ${
+                              className={`flex items-center justify-between p-2 sm:p-2.5 rounded-sm border text-xs transition-all cursor-pointer max-w-full overflow-hidden ${
                                 isActive
                                   ? "border-primary/50 bg-primary/8 active-glow"
                                   : "border-border/20 hover:bg-muted/30 hover:border-primary/20"
                               }`}
                             >
-                              <div className="flex items-center gap-2 overflow-hidden">
+                              <div className="flex items-center gap-2 overflow-hidden min-w-0 flex-1">
                                 {lesson.completed ? (
                                   <CheckCircle2 className="w-3.5 h-3.5 text-primary glow-primary shrink-0" />
                                 ) : (
                                   <div className={`w-3.5 h-3.5 rounded-sm border shrink-0 ${isActive ? "border-primary/60" : "border-border/50"}`} />
                                 )}
-                                <span className={`font-mono text-[9px] uppercase tracking-widest truncate max-w-[140px] ${
+                                <span className={`font-mono text-[9px] uppercase tracking-widest truncate max-w-[110px] xs:max-w-[130px] sm:max-w-[140px] ${
                                   isActive ? "text-primary font-bold" : lesson.completed ? "text-foreground/60" : "text-foreground/80"
                                 }`}>
                                   {lesson.title}

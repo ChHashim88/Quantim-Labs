@@ -118,7 +118,7 @@ export function useWeeklyData({ contentType, progressType }: UseWeeklyDataOption
                 contentType: l.content_type,
                 dayId: day.id,
                 completed: completedIds.has(l.id),
-                videoUrl: l.video_url,
+                videoUrl: l.video_url || l.metadata?.video_url || l.metadata?.videoUrl || l.metadata?.url,
                 documentUrl: l.metadata?.document_url || l.video_url,
                 htmlNotes: l.html_notes,
                 durationHours: l.duration_hours,

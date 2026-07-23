@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
-import { Code2, LayoutDashboard, PlaySquare, FileText, CheckCircle, Award, Calendar, Settings, LogOut, ListTodo, BookOpen, CalendarCheck } from "lucide-react";
+import { Code2, LayoutDashboard, PlaySquare, FileText, CheckCircle, Award, Calendar, Settings, LogOut, ListTodo, BookOpen, CalendarCheck, FileCheck, FileQuestion } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { logout } from "@/app/login/actions";
 import { createClient } from "@/lib/supabase/client";
@@ -15,8 +15,8 @@ const baseSidebarLinks = [
   { name: "Lectures", href: "/student/lectures", icon: PlaySquare, badgeKey: "lectures" },
   { name: "Tasks", href: "/student/tasks", icon: ListTodo, badgeKey: "tasks" },
   { name: "Documents", href: "/student/documents", icon: FileText, badgeKey: "documents" },
-  { name: "Assignments", href: "/student/assignments", icon: CheckCircle, badgeKey: "assignments" },
-  { name: "Quizzes", href: "/student/quizzes", icon: CheckCircle, badgeKey: "quizzes" },
+  { name: "Assignments", href: "/student/assignments", icon: FileCheck, badgeKey: "assignments" },
+  { name: "Quizzes", href: "/student/quizzes", icon: FileQuestion, badgeKey: "quizzes" },
   { name: "Attendance", href: "/student/attendance", icon: CalendarCheck },
   { name: "Certificates", href: "/student/certificates", icon: Award },
   { name: "Calendar", href: "/student/calendar", icon: Calendar },
@@ -155,21 +155,21 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
   return (
     <div className="bg-background text-foreground min-h-screen overflow-hidden font-sans selection:bg-primary selection:text-primary-foreground">
       {/* Sidebar: Command Strip */}
-      <aside className="!fixed left-0 top-0 h-full w-[80px] lg:w-[240px] glass-panel border-r border-border z-50 flex flex-col items-center lg:items-stretch transition-all duration-500">
+      <aside className="!fixed left-0 top-0 h-full w-[60px] sm:w-[72px] lg:w-[240px] glass-panel border-r border-border z-50 flex flex-col items-center lg:items-stretch transition-all duration-500">
 
-        <div className="h-20 flex items-center justify-center lg:justify-start lg:px-6 mb-8 mt-4">
+        <div className="h-16 lg:h-20 flex items-center justify-center lg:justify-start lg:px-6 mb-4 sm:mb-8 mt-2 sm:mt-4">
           <Image
             src="/logo.png"
             alt="Logo"
             width={56}
             height={56}
-            className="w-14 h-14 object-contain shrink-0"
+            className="w-10 h-10 sm:w-12 sm:h-12 lg:w-14 lg:h-14 object-contain shrink-0"
             priority
           />
           <span className="hidden lg:block -ml-3 font-heading font-extrabold tracking-tighter text-lg uppercase ">Uantim Labz</span>
         </div>
 
-        <nav className="flex-1 px-4 space-y-2 overflow-y-auto custom-scrollbar w-full">
+        <nav className="flex-1 px-2 sm:px-3 lg:px-4 space-y-2 overflow-y-auto custom-scrollbar w-full">
           {baseSidebarLinks.map((link) => {
             const isActive = pathname === link.href;
 
@@ -184,7 +184,7 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
               <Link
                 key={link.name}
                 href={link.href}
-                className={`group flex items-center justify-center lg:justify-start gap-4 p-3 rounded-lg transition-all relative ${isActive
+                className={`group flex items-center justify-center lg:justify-start gap-4 p-2.5 sm:p-3 rounded-lg transition-all relative ${isActive
                   ? "bg-primary/10 text-primary active-glow"
                   : "text-muted-foreground hover:text-foreground hover:bg-foreground/5"
                   }`}
@@ -207,10 +207,10 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
           })}
         </nav>
 
-        <div className="p-4 mt-auto w-full">
+        <div className="p-2 sm:p-4 mt-auto w-full">
           <button
             onClick={handleSignOut}
-            className="w-full flex items-center justify-center lg:justify-start gap-4 p-3 rounded-lg text-muted-foreground hover:text-destructive transition-all group"
+            className="w-full flex items-center justify-center lg:justify-start gap-4 p-2.5 sm:p-3 rounded-lg text-muted-foreground hover:text-destructive transition-all group"
           >
             <LogOut className="w-5 h-5 shrink-0 group-hover:text-destructive" />
             <span className="hidden lg:block text-xs font-mono tracking-wider uppercase">Sign Out</span>
@@ -219,8 +219,8 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
       </aside>
 
       {/* Main Container */}
-      <main className="ml-[80px] lg:ml-[240px] h-screen overflow-y-auto custom-scrollbar relative grid-bg">
-        <div className="relative z-10 p-6 lg:p-10 max-w-7xl mx-auto w-full">
+      <main className="ml-[60px] sm:ml-[72px] lg:ml-[240px] h-screen overflow-y-auto custom-scrollbar relative grid-bg overflow-x-hidden">
+        <div className="relative z-10 p-3 sm:p-6 lg:p-10 max-w-7xl mx-auto w-full overflow-x-hidden">
           {children}
         </div>
       </main>
