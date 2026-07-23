@@ -36,8 +36,8 @@ export default function CalendarPage() {
   // States for Booking Session
   const [showBookingForm, setShowBookingForm] = useState(false);
   const [bookingTime, setBookingTime] = useState("10:00 AM");
-  const [bookingTopic, setBookingTopic] = useState("React Code Review");
-  const [bookingMentor, setBookingMentor] = useState("Muhammad Hashim Dawood");
+  const [bookingTopic, setBookingTopic] = useState("Full-Stack (React, Next.js, Node.js)");
+  const [bookingMentor, setBookingMentor] = useState("Full-Stack Engineering Mentor");
 
   useEffect(() => {
     async function loadEnrollments() {
@@ -303,8 +303,8 @@ export default function CalendarPage() {
           <div className="glass-panel corner-accent border-primary/30 p-3.5 sm:p-8 w-full max-w-[calc(100vw-80px)] sm:max-w-md shadow-2xl relative max-h-[90vh] overflow-y-auto">
             <div className="absolute top-0 left-0 w-full h-1 bg-primary glow-primary" />
             <div className="pb-4 sm:pb-6 mb-4 sm:mb-6 border-b border-border/40 max-w-full overflow-hidden">
-              <h3 className="font-heading text-lg sm:text-2xl font-bold uppercase tracking-tight text-foreground truncate">BOOK_MENTORING_CALL</h3>
-              <p className="font-mono text-[8px] sm:text-[10px] tracking-widest uppercase text-muted-foreground mt-1 truncate">SCHEDULE PROTOCOL ON OCTOBER {selectedDay}.</p>
+              <h3 className="font-heading text-lg sm:text-2xl font-bold uppercase tracking-tight text-foreground truncate">BOOK_MENTORING_SESSION</h3>
+              <p className="font-mono text-[8px] sm:text-[10px] tracking-widest uppercase text-muted-foreground mt-1 truncate">SCHEDULE 1-ON-1 CODE REVIEW AND TECHNICAL MENTORSHIP.</p>
             </div>
             <form onSubmit={handleBookSession} className="space-y-4 sm:space-y-6 max-w-full overflow-hidden">
               <div className="space-y-2 sm:space-y-3">
@@ -315,9 +315,13 @@ export default function CalendarPage() {
                   onChange={(e) => setBookingMentor(e.target.value)}
                   className="w-full h-10 sm:h-12 rounded-sm grid-bg border border-border/50 font-mono text-[9px] sm:text-[10px] tracking-widest uppercase px-3 sm:px-4 text-foreground focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/50 transition-all truncate"
                 >
-                  <option value="Muhammad Hashim Dawood">Hashim Dawood (Full Stack)</option>
-                  <option value="Ali Asghar (AI Engineer)">Ali Asghar (AI Engineer)</option>
-                  <option value="Muhammad Dawood (CMS & API)">Muhammad Dawood (CMS & API)</option>
+                  <option value="Full-Stack Engineering Mentor">Full-Stack Engineering Mentor</option>
+                  <option value="Front-End Development Mentor">Front-End Development Mentor</option>
+                  <option value="Back-End Engineering Mentor">Back-End Engineering Mentor</option>
+                  <option value="AI & Generative AI Engineer Mentor">AI & Generative AI Engineer Mentor</option>
+                  <option value="Software Systems Engineer Mentor">Software Systems Engineer Mentor</option>
+                  <option value="DevOps & Cloud Solutions Mentor">DevOps & Cloud Solutions Mentor</option>
+                  <option value="Mobile App Development Mentor">Mobile App Development Mentor</option>
                 </select>
               </div>
 
@@ -329,10 +333,17 @@ export default function CalendarPage() {
                   onChange={(e) => setBookingTopic(e.target.value)}
                   className="w-full h-10 sm:h-12 rounded-sm grid-bg border border-border/50 font-mono text-[9px] sm:text-[10px] tracking-widest uppercase px-3 sm:px-4 text-foreground focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/50 transition-all truncate"
                 >
-                  <option value="Next.js App Routing Code Review">Next.js App Routing Review</option>
-                  <option value="Zustand State Management Help">Zustand State Help</option>
-                  <option value="Career & Interview Mentoring">Career & Interview Mentoring</option>
-                  <option value="AI Integration & Prompt Review">AI Integration & Prompt Review</option>
+                  <option value="Full-Stack (React, Next.js, Node.js)">Full-Stack (React, Next.js, Node.js)</option>
+                  <option value="Front-End (HTML, CSS, JS, Tailwind)">Front-End (HTML, CSS, JS, Tailwind)</option>
+                  <option value="TypeScript & Modern JavaScript">TypeScript & Modern JavaScript</option>
+                  <option value="Back-End (Node.js, Express, NestJS)">Back-End (Node.js, Express, NestJS)</option>
+                  <option value="AI, LangChain & Agentic Systems">AI, LangChain & Agentic Systems</option>
+                  <option value="Databases (PostgreSQL, Supabase, SQL)">Databases (PostgreSQL, Supabase, SQL)</option>
+                  <option value="REST APIs, GraphQL & System Design">REST APIs, GraphQL & System Design</option>
+                  <option value="Cloud, Docker & DevOps Deployment">Cloud, Docker & DevOps Deployment</option>
+                  <option value="Git, GitHub & Version Control">Git, GitHub & Version Control</option>
+                  <option value="Capstone Project Review & Debugging">Capstone Project Review & Debugging</option>
+                  <option value="Career & Technical Resume Guidance">Career & Technical Resume Guidance</option>
                 </select>
               </div>
 
