@@ -287,8 +287,8 @@ export default function CalendarPage() {
               )}
             </div>
             
-            <div className="p-6 border-t border-border/30 bg-muted/5">
-              <Button onClick={() => setShowBookingForm(true)} variant="outline" className="w-full rounded-sm font-mono text-[10px] tracking-widest uppercase font-bold border-border/50 text-foreground hover:bg-primary/10 hover:text-primary transition-all">
+            <div className="p-4 sm:p-6 border-t border-border/30 bg-muted/5 max-w-full overflow-hidden">
+              <Button onClick={() => setShowBookingForm(true)} variant="outline" className="w-full rounded-sm font-mono text-[9px] sm:text-[10px] tracking-widest uppercase font-bold border-border/50 text-foreground hover:bg-primary/10 hover:text-primary transition-all py-3.5 sm:py-2 h-auto truncate">
                 ADD_CUSTOM_EVENT
               </Button>
             </div>
@@ -299,50 +299,50 @@ export default function CalendarPage() {
 
       {/* Booking Dialog Overlay */}
       {showBookingForm && (
-        <div className="fixed inset-0 bg-background/80 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
-          <div className="glass-panel corner-accent border-primary/30 p-8 max-w-md w-full shadow-2xl relative">
+        <div className="fixed inset-0 bg-background/80 flex items-center justify-center z-50 p-3 sm:p-4 backdrop-blur-sm">
+          <div className="glass-panel corner-accent border-primary/30 p-4 sm:p-8 max-w-md w-full shadow-2xl relative max-h-[90vh] overflow-y-auto max-w-full">
             <div className="absolute top-0 left-0 w-full h-1 bg-primary glow-primary" />
-            <div className="pb-6 mb-6 border-b border-border/40">
-              <h3 className="font-heading text-2xl font-bold uppercase tracking-tight text-foreground">BOOK_MENTORING_CALL</h3>
-              <p className="font-mono text-[10px] tracking-widest uppercase text-muted-foreground mt-2">SCHEDULE PROTOCOL ON OCTOBER {selectedDay}.</p>
+            <div className="pb-4 sm:pb-6 mb-4 sm:mb-6 border-b border-border/40 max-w-full overflow-hidden">
+              <h3 className="font-heading text-lg sm:text-2xl font-bold uppercase tracking-tight text-foreground truncate">BOOK_MENTORING_CALL</h3>
+              <p className="font-mono text-[8px] sm:text-[10px] tracking-widest uppercase text-muted-foreground mt-1 truncate">SCHEDULE PROTOCOL ON OCTOBER {selectedDay}.</p>
             </div>
-            <form onSubmit={handleBookSession} className="space-y-6">
-              <div className="space-y-3">
-                <Label htmlFor="mentor" className="font-mono text-[10px] tracking-widest uppercase text-muted-foreground">TARGET_MENTOR</Label>
+            <form onSubmit={handleBookSession} className="space-y-4 sm:space-y-6 max-w-full overflow-hidden">
+              <div className="space-y-2 sm:space-y-3">
+                <Label htmlFor="mentor" className="font-mono text-[9px] sm:text-[10px] tracking-widest uppercase text-muted-foreground truncate block">TARGET_MENTOR</Label>
                 <select
                   id="mentor"
                   value={bookingMentor}
                   onChange={(e) => setBookingMentor(e.target.value)}
-                  className="w-full h-12 rounded-sm grid-bg border border-border/50 font-mono text-[10px] tracking-widest uppercase px-4 text-foreground focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/50 transition-all"
+                  className="w-full h-10 sm:h-12 rounded-sm grid-bg border border-border/50 font-mono text-[9px] sm:text-[10px] tracking-widest uppercase px-3 sm:px-4 text-foreground focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/50 transition-all truncate"
                 >
-                  <option value="Muhammad Hashim Dawood">Muhammad Hashim Dawood (Full Stack)</option>
+                  <option value="Muhammad Hashim Dawood">Hashim Dawood (Full Stack)</option>
                   <option value="Ali Asghar (AI Engineer)">Ali Asghar (AI Engineer)</option>
                   <option value="Muhammad Dawood (CMS & API)">Muhammad Dawood (CMS & API)</option>
                 </select>
               </div>
 
-              <div className="space-y-3">
-                <Label htmlFor="topic" className="font-mono text-[10px] tracking-widest uppercase text-muted-foreground">DISCUSSION_TOPIC</Label>
+              <div className="space-y-2 sm:space-y-3">
+                <Label htmlFor="topic" className="font-mono text-[9px] sm:text-[10px] tracking-widest uppercase text-muted-foreground truncate block">DISCUSSION_TOPIC</Label>
                 <select
                   id="topic"
                   value={bookingTopic}
                   onChange={(e) => setBookingTopic(e.target.value)}
-                  className="w-full h-12 rounded-sm grid-bg border border-border/50 font-mono text-[10px] tracking-widest uppercase px-4 text-foreground focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/50 transition-all"
+                  className="w-full h-10 sm:h-12 rounded-sm grid-bg border border-border/50 font-mono text-[9px] sm:text-[10px] tracking-widest uppercase px-3 sm:px-4 text-foreground focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/50 transition-all truncate"
                 >
-                  <option value="Next.js App Routing Code Review">Next.js App Routing Code Review</option>
-                  <option value="Zustand State Management Help">Zustand State Management Help</option>
+                  <option value="Next.js App Routing Code Review">Next.js App Routing Review</option>
+                  <option value="Zustand State Management Help">Zustand State Help</option>
                   <option value="Career & Interview Mentoring">Career & Interview Mentoring</option>
                   <option value="AI Integration & Prompt Review">AI Integration & Prompt Review</option>
                 </select>
               </div>
 
-              <div className="space-y-3">
-                <Label htmlFor="time" className="font-mono text-[10px] tracking-widest uppercase text-muted-foreground">PREFERRED_TIMESCALE</Label>
+              <div className="space-y-2 sm:space-y-3">
+                <Label htmlFor="time" className="font-mono text-[9px] sm:text-[10px] tracking-widest uppercase text-muted-foreground truncate block">PREFERRED_TIMESCALE</Label>
                 <select
                   id="time"
                   value={bookingTime}
                   onChange={(e) => setBookingTime(e.target.value)}
-                  className="w-full h-12 rounded-sm grid-bg border border-border/50 font-mono text-[10px] tracking-widest uppercase px-4 text-foreground focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/50 transition-all"
+                  className="w-full h-10 sm:h-12 rounded-sm grid-bg border border-border/50 font-mono text-[9px] sm:text-[10px] tracking-widest uppercase px-3 sm:px-4 text-foreground focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/50 transition-all truncate"
                 >
                   <option value="10:00 AM">10:00 AM</option>
                   <option value="11:30 AM">11:30 AM</option>
@@ -351,20 +351,20 @@ export default function CalendarPage() {
                 </select>
               </div>
 
-              <div className="flex gap-4 pt-6 border-t border-border/20 mt-8">
+              <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 pt-4 sm:pt-6 border-t border-border/20 mt-6 sm:mt-8 w-full">
                 <Button
                   type="button"
                   onClick={() => setShowBookingForm(false)}
                   variant="outline"
-                  className="flex-1 rounded-sm font-mono text-[10px] tracking-widest uppercase border-border/50 text-muted-foreground hover:text-foreground"
+                  className="w-full sm:flex-1 rounded-sm font-mono text-[9px] sm:text-[10px] tracking-widest uppercase border-border/50 text-muted-foreground hover:text-foreground py-3 sm:py-2 h-auto truncate"
                 >
                   CANCEL_OPERATION
                 </Button>
                 <Button
                   type="submit"
-                  className="flex-1 rounded-sm bg-primary text-primary-foreground hover:bg-primary/90 font-mono text-[10px] font-bold uppercase tracking-widest flex items-center justify-center gap-2 glow-primary"
+                  className="w-full sm:flex-1 rounded-sm bg-primary text-primary-foreground hover:bg-primary/90 font-mono text-[9px] sm:text-[10px] font-bold uppercase tracking-widest flex items-center justify-center gap-2 glow-primary py-3 sm:py-2 h-auto truncate"
                 >
-                  <Check className="w-4 h-4" />
+                  <Check className="w-4 h-4 shrink-0" />
                   CONFIRM_BOOKING
                 </Button>
               </div>
