@@ -253,8 +253,8 @@ export default function CertificatesPage() {
 
       {/* Diploma Modal Overlay */}
       {selectedCert && (
-        <div className="fixed inset-0 bg-background/80 flex items-center justify-center z-50 p-4 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="glass-panel border-primary/30 rounded-sm p-8 max-w-3xl w-full shadow-2xl relative flex flex-col justify-between min-h-[600px] animate-in zoom-in-95 duration-300 overflow-hidden corner-accent">
+        <div className="fixed inset-y-0 right-0 left-[60px] sm:left-[72px] lg:left-[240px] bg-background/80 flex items-center justify-center z-50 p-2 sm:p-4 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="glass-panel border-primary/30 rounded-sm p-4 sm:p-8 max-w-[calc(100vw-80px)] lg:max-w-3xl w-full shadow-2xl relative flex flex-col justify-between min-h-0 sm:min-h-[600px] animate-in zoom-in-95 duration-300 overflow-y-auto max-h-[90vh] corner-accent">
             
             {/* Header trim decoration */}
             <div className="absolute top-0 inset-x-0 h-1 bg-primary glow-primary" />

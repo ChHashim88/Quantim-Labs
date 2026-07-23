@@ -299,8 +299,8 @@ export default function CalendarPage() {
 
       {/* Booking Dialog Overlay */}
       {showBookingForm && (
-        <div className="fixed inset-0 bg-background/80 flex items-center justify-center z-50 p-3 sm:p-4 backdrop-blur-sm">
-          <div className="glass-panel corner-accent border-primary/30 p-4 sm:p-8 max-w-md w-full shadow-2xl relative max-h-[90vh] overflow-y-auto max-w-full">
+        <div className="fixed inset-y-0 right-0 left-[60px] sm:left-[72px] lg:left-[240px] bg-background/80 flex items-center justify-center z-50 p-2 sm:p-4 backdrop-blur-sm">
+          <div className="glass-panel corner-accent border-primary/30 p-3.5 sm:p-8 w-full max-w-[calc(100vw-80px)] sm:max-w-md shadow-2xl relative max-h-[90vh] overflow-y-auto">
             <div className="absolute top-0 left-0 w-full h-1 bg-primary glow-primary" />
             <div className="pb-4 sm:pb-6 mb-4 sm:mb-6 border-b border-border/40 max-w-full overflow-hidden">
               <h3 className="font-heading text-lg sm:text-2xl font-bold uppercase tracking-tight text-foreground truncate">BOOK_MENTORING_CALL</h3>

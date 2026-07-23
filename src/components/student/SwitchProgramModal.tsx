@@ -39,13 +39,13 @@ export function SwitchProgramModal({ isOpen, currentProgramName, targetProgramNa
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 bg-background/80 flex items-center justify-center z-[120] p-4 backdrop-blur-sm">
+        <div className="fixed inset-y-0 right-0 left-[60px] sm:left-[72px] lg:left-[240px] bg-background/80 flex items-center justify-center z-[120] p-3 sm:p-4 backdrop-blur-sm">
           <motion.div
             initial={{ scale: 0.95, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.95, opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="w-full max-w-md relative"
+            className="w-full max-w-[calc(100vw-80px)] sm:max-w-md relative"
           >
             <Card className="bg-card border-2 border-primary/20 shadow-2xl overflow-hidden relative rounded-2xl">
               <CardHeader className="text-center pb-2 pt-8">
