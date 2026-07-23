@@ -20,14 +20,19 @@ interface CalendarEvent {
   link?: string;
 }
 
-const INITIAL_EVENTS: CalendarEvent[] = [];
+const INITIAL_EVENTS: CalendarEvent[] = [
+  { id: "e1", title: "Task 1.1 Submission", date: 8, time: "11:59 PM", type: "Deadline" },
+  { id: "e2", title: "Live Sync with Hashim Dawood", date: 10, time: "4:00 PM", type: "Mentor_Session", mentor: "Muhammad Hashim Dawood", link: "https://zoom.us/j/mock" },
+  { id: "e3", title: "Dynamic Metadata Review", date: 15, time: "2:00 PM", type: "Lecture" },
+  { id: "e4", title: "Final Capstone Pitch", date: 28, time: "6:00 PM", type: "Mentor_Session", mentor: "Ali Asghar", link: "https://zoom.us/j/mock2" }
+];
 
 export default function CalendarPage() {
   const [hasEnrollments, setHasEnrollments] = useState(false);
   const [loading, setLoading] = useState(true);
   const [events, setEvents] = useState<CalendarEvent[]>(INITIAL_EVENTS);
   const [selectedDay, setSelectedDay] = useState<number>(new Date().getDate());
-  
+
   // States for Booking Session
   const [showBookingForm, setShowBookingForm] = useState(false);
   const [bookingTime, setBookingTime] = useState("10:00 AM");
@@ -41,7 +46,7 @@ export default function CalendarPage() {
       try {
         const { createClient } = await import('@/lib/supabase/client');
         const supabase = createClient();
-        
+
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) {
           setLoading(false);
@@ -99,7 +104,7 @@ export default function CalendarPage() {
         osc.start();
         osc.stop(ctx.currentTime + 0.15);
       }
-    } catch (e) {}
+    } catch (e) { }
   };
 
   const daysInMonth = 31;
@@ -150,7 +155,7 @@ export default function CalendarPage() {
       </header>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-stretch w-full max-w-full overflow-hidden">
-        
+
         {/* Left Column: Calendar Grid */}
         <div className="lg:col-span-8 flex flex-col justify-between glass-panel corner-accent p-3.5 sm:p-8 min-h-0 sm:min-h-[500px] max-w-full overflow-hidden">
           <div>
@@ -187,13 +192,12 @@ export default function CalendarPage() {
                     onClick={() => {
                       if (isDayCell) setSelectedDay(dayNumber);
                     }}
-                    className={`aspect-square rounded-sm flex flex-col items-center justify-between p-1 sm:p-2 font-mono text-[9px] sm:text-xs border relative transition-all ${
-                      !isDayCell
+                    className={`aspect-square rounded-sm flex flex-col items-center justify-between p-1 sm:p-2 font-mono text-[9px] sm:text-xs border relative transition-all ${!isDayCell
                         ? "border-transparent select-none pointer-events-none opacity-0"
                         : isSelected
-                        ? "border-primary bg-primary/10 text-primary cursor-pointer shadow-md font-bold glow-primary active-glow"
-                        : "border-border/40 hover:border-primary/50 cursor-pointer text-muted-foreground/70 grid-bg"
-                    }`}
+                          ? "border-primary bg-primary/10 text-primary cursor-pointer shadow-md font-bold glow-primary active-glow"
+                          : "border-border/40 hover:border-primary/50 cursor-pointer text-muted-foreground/70 grid-bg"
+                      }`}
                   >
                     {isDayCell && (
                       <>
@@ -203,9 +207,8 @@ export default function CalendarPage() {
                             {dayEvents.map((e) => (
                               <div
                                 key={e.id}
-                                className={`w-1 h-1 sm:w-1.5 sm:h-1.5 rounded-sm ${
-                                  e.type === "Deadline" ? "bg-red-500 glow-red" : e.type === "Mentor_Session" ? "bg-blue-500 glow-blue animate-pulse" : "bg-primary glow-primary"
-                                }`}
+                                className={`w-1 h-1 sm:w-1.5 sm:h-1.5 rounded-sm ${e.type === "Deadline" ? "bg-red-500 glow-red" : e.type === "Mentor_Session" ? "bg-blue-500 glow-blue animate-pulse" : "bg-primary glow-primary"
+                                  }`}
                               />
                             ))}
                           </div>
@@ -221,7 +224,7 @@ export default function CalendarPage() {
 
         {/* Right Column: Schedule / Event Details */}
         <div className="lg:col-span-4 space-y-6 flex flex-col justify-between">
-          
+
           {/* Active Date Agenda Card */}
           <div className="glass-panel corner-accent flex-1 flex flex-col justify-between">
             <div className="p-6 border-b border-border/40 mb-2">
@@ -235,23 +238,20 @@ export default function CalendarPage() {
                 selectedEvents.map((e) => (
                   <div
                     key={e.id}
-                    className={`p-4 rounded-sm border relative overflow-hidden flex flex-col gap-2 transition-all ${
-                      e.type === "Deadline"
+                    className={`p-4 rounded-sm border relative overflow-hidden flex flex-col gap-2 transition-all ${e.type === "Deadline"
                         ? "bg-red-500/5 border-red-500/20 hover:border-red-500/50"
                         : e.type === "Mentor_Session"
-                        ? "bg-blue-500/5 border-blue-500/20 hover:border-blue-500/50"
-                        : "grid-bg border-border/40 hover:border-border/80"
-                    }`}
+                          ? "bg-blue-500/5 border-blue-500/20 hover:border-blue-500/50"
+                          : "grid-bg border-border/40 hover:border-border/80"
+                      }`}
                   >
-                    <div className={`absolute left-0 top-0 bottom-0 w-1 ${
-                      e.type === "Deadline" ? "bg-red-500 glow-red" : e.type === "Mentor_Session" ? "bg-blue-500 glow-blue" : "bg-primary glow-primary"
-                    }`} />
-                    
+                    <div className={`absolute left-0 top-0 bottom-0 w-1 ${e.type === "Deadline" ? "bg-red-500 glow-red" : e.type === "Mentor_Session" ? "bg-blue-500 glow-blue" : "bg-primary glow-primary"
+                      }`} />
+
                     <div className="flex justify-between items-start gap-2 pl-3">
                       <span className="font-mono text-xs uppercase tracking-widest font-bold text-foreground leading-tight">{e.title}</span>
-                      <div className={`text-[9px] font-mono tracking-widest uppercase border px-2 py-0.5 rounded-sm ${
-                        e.type === "Deadline" ? "border-red-500/30 text-red-500" : e.type === "Mentor_Session" ? "border-blue-500/30 text-blue-500" : "border-primary/30 text-primary"
-                      }`}>
+                      <div className={`text-[9px] font-mono tracking-widest uppercase border px-2 py-0.5 rounded-sm ${e.type === "Deadline" ? "border-red-500/30 text-red-500" : e.type === "Mentor_Session" ? "border-blue-500/30 text-blue-500" : "border-primary/30 text-primary"
+                        }`}>
                         {e.type.replace("_", " ")}
                       </div>
                     </div>
@@ -286,8 +286,8 @@ export default function CalendarPage() {
                 </div>
               )}
             </div>
-            
-            <div className="p-4 sm:p-6 border-t border-border/30 bg-muted/5 max-w-full overflow-hidden">
+
+            <div className="p-3.5 sm:p-6 border-t border-border/30 bg-muted/5 max-w-full overflow-hidden">
               <Button onClick={() => setShowBookingForm(true)} variant="outline" className="w-full rounded-sm font-mono text-[9px] sm:text-[10px] tracking-widest uppercase font-bold border-border/50 text-foreground hover:bg-primary/10 hover:text-primary transition-all py-3.5 sm:py-2 h-auto truncate">
                 ADD_CUSTOM_EVENT
               </Button>
