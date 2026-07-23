@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
-import { PlayCircle, PauseCircle, CheckCircle2, BookOpen, Clock } from "lucide-react";
+import { PlayCircle, PauseCircle, CheckCircle2, BookOpen, Clock, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
 import Link from "next/link";
@@ -192,14 +192,28 @@ export default function LecturesPage() {
                     </p>
                   </div>
                 </div>
-                <div className="text-[8px] sm:text-[10px] font-mono tracking-widest text-primary border border-primary/40 bg-primary/10 py-1 px-2.5 sm:py-1.5 sm:px-3 rounded-sm glow-primary uppercase shrink-0">
-                  VIDEO
+                <div className="flex items-center gap-2 shrink-0">
+                  {activeLesson.videoUrl && (
+                    <a
+                      href={activeLesson.videoUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex items-center gap-1 text-[8px] sm:text-[10px] font-mono tracking-widest text-primary border border-primary/40 bg-primary/10 hover:bg-primary/20 py-1 px-2.5 sm:py-1.5 sm:px-3 rounded-sm glow-primary uppercase transition-all"
+                      title="Open Stream in Fullscreen Window"
+                    >
+                      <ExternalLink className="w-3 h-3" />
+                      <span>FULLSCREEN</span>
+                    </a>
+                  )}
+                  <div className="text-[8px] sm:text-[10px] font-mono tracking-widest text-primary border border-primary/40 bg-primary/10 py-1 px-2.5 sm:py-1.5 sm:px-3 rounded-sm glow-primary uppercase">
+                    VIDEO
+                  </div>
                 </div>
               </div>
 
               <div className="flex-1 flex flex-col justify-between max-w-full">
                 {activeLesson.videoUrl ? (
-                  <div className="relative -mx-2 sm:mx-0 w-[calc(100%+1rem)] sm:w-full h-[340px] xs:h-[380px] sm:h-[440px] lg:h-auto lg:aspect-video rounded-sm bg-black border border-primary/20 overflow-hidden shadow-[0_0_30px_rgba(var(--primary),0.05)]">
+                  <div className="relative w-full aspect-video rounded-sm bg-black border border-primary/20 overflow-hidden shadow-lg">
                     <iframe 
                       src={(() => {
                         let url = activeLesson.videoUrl || "";
@@ -225,21 +239,21 @@ export default function LecturesPage() {
                     ></iframe>
                   </div>
                 ) : (
-                  <div className="w-full aspect-video rounded-sm grid-bg border border-border/40 flex flex-col items-center justify-center relative overflow-hidden group">
+                  <div className="relative w-full aspect-video rounded-sm grid-bg border border-border/40 flex flex-col items-center justify-center overflow-hidden p-4">
                     <button
                       onClick={() => setIsPlaying(!isPlaying)}
-                      className="z-10 bg-transparent border-none focus:outline-none transition-all transform hover:scale-105 active:scale-95"
+                      className="z-10 bg-primary/10 border border-primary/30 p-3 sm:p-4 rounded-full focus:outline-none transition-all transform hover:scale-105 active:scale-95 glow-primary"
                     >
                       {isPlaying ? (
-                        <PauseCircle className="w-20 h-20 text-primary opacity-80 hover:opacity-100 glow-primary" />
+                        <PauseCircle className="w-10 h-10 sm:w-14 sm:h-14 text-primary" />
                       ) : (
-                        <PlayCircle className="w-20 h-20 text-primary opacity-80 hover:opacity-100 glow-primary" />
+                        <PlayCircle className="w-10 h-10 sm:w-14 sm:h-14 text-primary" />
                       )}
                     </button>
-                    <div className="absolute bottom-0 inset-x-0 p-6 bg-gradient-to-t from-background to-transparent flex flex-col gap-3 z-10 border-t border-primary/10">
-                      <div className="flex items-center justify-between text-[10px] text-foreground font-mono tracking-widest uppercase">
-                        <span>{formatSeconds(currentTime)} // {activeLesson.durationHours ? Math.round(activeLesson.durationHours * 60) : 15} MINS</span>
-                        <span className="text-primary glow-primary">HD_STREAM</span>
+                    <div className="absolute bottom-0 inset-x-0 p-3 sm:p-4 bg-gradient-to-t from-background via-background/80 to-transparent flex flex-col gap-2 z-10 border-t border-primary/10">
+                      <div className="flex items-center justify-between text-[9px] sm:text-[10px] text-foreground font-mono tracking-widest uppercase">
+                        <span>{formatSeconds(currentTime)} / {activeLesson.durationHours ? Math.round(activeLesson.durationHours * 60) : 15} MINS</span>
+                        <span className="text-primary glow-primary font-bold">HD_STREAM</span>
                       </div>
                       <input
                         type="range"
