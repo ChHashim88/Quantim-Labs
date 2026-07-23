@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { ListTodo, CheckCircle2, ChevronRight, Clock } from "lucide-react";
 import Link from "next/link";
@@ -18,6 +18,15 @@ export default function TasksPage() {
 
   const [activeId, setActiveId] = useState<string>("");
   const [switchTargetId, setSwitchTargetId] = useState<string | null>(null);
+
+  const contentRef = useRef<HTMLDivElement>(null);
+
+  const handleSelect = (id: string) => {
+    setActiveId(id);
+    if (contentRef.current) {
+      contentRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  };
 
   useAttendance(activeProgramId);
 
@@ -113,10 +122,10 @@ export default function TasksPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start w-full max-w-full overflow-hidden">
         <div className="lg:col-span-4 max-w-full overflow-hidden order-2 lg:order-1">
-          <WeeklySidebar weeks={activeProgram?.weeks || []} activeId={activeId} onSelect={setActiveId} />
+          <WeeklySidebar weeks={activeProgram?.weeks || []} activeId={activeId} onSelect={handleSelect} />
         </div>
 
-        <div className="lg:col-span-8 flex flex-col min-h-[500px] order-1 lg:order-2">
+        <div ref={contentRef} className="lg:col-span-8 flex flex-col min-h-[500px] order-1 lg:order-2">
           {activeTask ? (
             <div className="flex-1 glass-panel corner-accent overflow-hidden flex flex-col relative">
               <div className="absolute top-0 right-0 p-8 opacity-5 pointer-events-none">

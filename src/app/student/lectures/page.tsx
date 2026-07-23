@@ -20,10 +20,19 @@ const formatSeconds = (secs: number): string => {
 
 export default function LecturesPage() {
   const { programs, activeProgramId, setActiveProgramId, activeProgram, loading, hasEnrollments, markComplete } =
-    useWeeklyData({ contentType: "VIDEO", progressType: "LESSON" });
+    useWeeklyData({ contentType: "VIDEO", progressType: "VIDEO" });
 
   const [activeId, setActiveId] = useState<string>("");
   const [switchTargetId, setSwitchTargetId] = useState<string | null>(null);
+
+  const videoPlayerRef = useRef<HTMLDivElement>(null);
+
+  const handleSelectLesson = (lessonId: string) => {
+    setActiveId(lessonId);
+    if (videoPlayerRef.current) {
+      videoPlayerRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  };
 
   useAttendance(activeProgramId);
 
@@ -186,12 +195,12 @@ export default function LecturesPage() {
           <WeeklySidebar
             weeks={activeProgram?.weeks || []}
             activeId={activeId}
-            onSelect={setActiveId}
+            onSelect={handleSelectLesson}
           />
         </div>
 
         {/* Video Player */}
-        <div className="lg:col-span-8 flex flex-col justify-between glass-panel px-2 py-3.5 sm:p-8 corner-accent relative min-h-0 sm:min-h-[450px] max-w-full overflow-hidden order-1 lg:order-2">
+        <div ref={videoPlayerRef} className="lg:col-span-8 flex flex-col justify-between glass-panel px-2 py-3.5 sm:p-8 corner-accent relative min-h-0 sm:min-h-[450px] max-w-full overflow-hidden order-1 lg:order-2">
           {activeLesson ? (
             <div className="relative z-10 flex-1 flex flex-col justify-between max-w-full overflow-hidden">
               <div className="flex flex-wrap items-center justify-between border-b border-border/40 pb-3 sm:pb-6 mb-4 sm:mb-8 gap-2 sm:gap-3 max-w-full overflow-hidden px-1 sm:px-0">
