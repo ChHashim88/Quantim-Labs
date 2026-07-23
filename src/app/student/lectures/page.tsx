@@ -213,7 +213,7 @@ export default function LecturesPage() {
 
               <div className="flex-1 flex flex-col justify-between max-w-full">
                 {activeLesson.videoUrl ? (
-                  <div className="relative w-full aspect-video rounded-sm bg-black border border-primary/20 overflow-hidden shadow-lg">
+                  <div className="relative w-full min-h-[260px] xs:min-h-[320px] sm:min-h-[380px] lg:min-h-[440px] aspect-video rounded-sm bg-black border border-primary/20 overflow-hidden shadow-lg">
                     <iframe 
                       src={(() => {
                         let url = activeLesson.videoUrl || "";
@@ -239,7 +239,7 @@ export default function LecturesPage() {
                     ></iframe>
                   </div>
                 ) : (
-                  <div className="relative w-full aspect-video rounded-sm grid-bg border border-border/40 flex flex-col items-center justify-center overflow-hidden p-4">
+                  <div className="relative w-full min-h-[260px] xs:min-h-[320px] sm:min-h-[380px] lg:min-h-[440px] aspect-video rounded-sm grid-bg border border-border/40 flex flex-col items-center justify-center overflow-hidden p-4">
                     <button
                       onClick={() => setIsPlaying(!isPlaying)}
                       className="z-10 bg-primary/10 border border-primary/30 p-3 sm:p-4 rounded-full focus:outline-none transition-all transform hover:scale-105 active:scale-95 glow-primary"
