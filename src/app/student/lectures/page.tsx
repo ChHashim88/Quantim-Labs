@@ -1,8 +1,9 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { createPortal } from "react-dom";
 import { Button } from "@/components/ui/button";
-import { PlayCircle, PauseCircle, CheckCircle2, BookOpen, Clock, ExternalLink } from "lucide-react";
+import { PlayCircle, PauseCircle, CheckCircle2, BookOpen, Clock, ExternalLink, X } from "lucide-react";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
 import Link from "next/link";
@@ -24,11 +25,18 @@ export default function LecturesPage() {
 
   const [activeId, setActiveId] = useState<string>("");
   const [switchTargetId, setSwitchTargetId] = useState<string | null>(null);
+  const [isMobileModalOpen, setIsMobileModalOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const videoPlayerRef = useRef<HTMLDivElement>(null);
 
   const handleSelectLesson = (lessonId: string) => {
     setActiveId(lessonId);
+    setIsMobileModalOpen(true);
     if (videoPlayerRef.current) {
       videoPlayerRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
     }
@@ -165,8 +173,8 @@ export default function LecturesPage() {
       )}
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start w-full max-w-full overflow-hidden">
-        {/* Weekly Sidebar */}
-        <div className="lg:col-span-4 max-w-full overflow-hidden order-2 lg:order-1">
+        {/* Weekly Sidebar (Weeks) - LEFT SIDE */}
+        <div className="lg:col-span-4 max-w-full overflow-hidden order-1">
           <WeeklySidebar
             weeks={activeProgram?.weeks || []}
             activeId={activeId}
@@ -174,43 +182,10 @@ export default function LecturesPage() {
           />
         </div>
 
-        {/* Video Player */}
-        <div ref={videoPlayerRef} className="lg:col-span-8 flex flex-col justify-between glass-panel px-2 py-3.5 sm:p-8 corner-accent relative min-h-0 sm:min-h-[450px] max-w-full overflow-hidden order-1 lg:order-2">
+        {/* Desktop Video Player - RIGHT SIDE */}
+        <div ref={videoPlayerRef} className="hidden lg:flex lg:col-span-8 flex-col justify-between glass-panel p-8 corner-accent relative min-h-[450px] max-w-full overflow-hidden order-2">
           {activeLesson ? (
             <div className="relative z-10 flex-1 flex flex-col justify-between max-w-full overflow-hidden">
-              <div className="flex flex-wrap items-center justify-between border-b border-border/40 pb-3 sm:pb-6 mb-4 sm:mb-8 gap-2 sm:gap-3 max-w-full overflow-hidden px-1 sm:px-0">
-                <div className="flex items-center gap-3 sm:gap-4 overflow-hidden min-w-0 flex-1">
-                  <div className="w-9 h-9 sm:w-12 sm:h-12 rounded-sm bg-primary/10 flex items-center justify-center text-primary border border-primary/20 glow-primary shrink-0">
-                    <BookOpen className="w-4 h-4 sm:w-6 sm:h-6" />
-                  </div>
-                  <div className="overflow-hidden min-w-0 flex-1">
-                    <h3 className="text-base sm:text-2xl font-heading font-bold uppercase text-foreground tracking-tight max-w-[180px] xs:max-w-[260px] sm:max-w-[400px] truncate">
-                      {activeLesson.title}
-                    </h3>
-                    <p className="font-mono text-[8px] sm:text-[10px] uppercase tracking-widest text-muted-foreground mt-0.5 sm:mt-1 truncate">
-                      {activeWeek?.weekTitle} &bull; VIDEO
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2 shrink-0">
-                  {activeLesson.videoUrl && (
-                    <a
-                      href={activeLesson.videoUrl}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="inline-flex items-center gap-1 text-[8px] sm:text-[10px] font-mono tracking-widest text-primary border border-primary/40 bg-primary/10 hover:bg-primary/20 py-1 px-2.5 sm:py-1.5 sm:px-3 rounded-sm glow-primary uppercase transition-all"
-                      title="Open Stream in Fullscreen Window"
-                    >
-                      <ExternalLink className="w-3 h-3" />
-                      <span>FULLSCREEN</span>
-                    </a>
-                  )}
-                  <div className="text-[8px] sm:text-[10px] font-mono tracking-widest text-primary border border-primary/40 bg-primary/10 py-1 px-2.5 sm:py-1.5 sm:px-3 rounded-sm glow-primary uppercase">
-                    VIDEO
-                  </div>
-                </div>
-              </div>
-
               <div className="flex-1 flex flex-col justify-between max-w-full">
                 {activeLesson.videoUrl ? (
                   <div className="relative w-full aspect-video rounded-sm bg-black border border-primary/20 overflow-hidden shadow-lg">
@@ -232,8 +207,8 @@ export default function LecturesPage() {
                         }
                         return url;
                       })()} 
-                      className="w-[133.33%] h-[133.33%] sm:w-full sm:h-full absolute top-0 left-0 border-0 block origin-top-left scale-[0.75] sm:scale-100" 
-                      style={{ border: "none" }}
+                      className="w-full h-full absolute inset-0 border-0 block" 
+                      style={{ width: "100%", height: "100%", border: "none" }}
                       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen"
                       allowFullScreen
                     ></iframe>
@@ -242,16 +217,16 @@ export default function LecturesPage() {
                   <div className="relative w-full aspect-video rounded-sm grid-bg border border-border/40 flex flex-col items-center justify-center overflow-hidden p-4">
                     <button
                       onClick={() => setIsPlaying(!isPlaying)}
-                      className="z-10 bg-primary/10 border border-primary/30 p-3 sm:p-4 rounded-full focus:outline-none transition-all transform hover:scale-105 active:scale-95 glow-primary"
+                      className="z-10 bg-primary/10 border border-primary/30 p-4 rounded-full focus:outline-none transition-all transform hover:scale-105 active:scale-95 glow-primary"
                     >
                       {isPlaying ? (
-                        <PauseCircle className="w-10 h-10 sm:w-14 sm:h-14 text-primary" />
+                        <PauseCircle className="w-14 h-14 text-primary" />
                       ) : (
-                        <PlayCircle className="w-10 h-10 sm:w-14 sm:h-14 text-primary" />
+                        <PlayCircle className="w-14 h-14 text-primary" />
                       )}
                     </button>
-                    <div className="absolute bottom-0 inset-x-0 p-3 sm:p-4 bg-gradient-to-t from-background via-background/80 to-transparent flex flex-col gap-2 z-10 border-t border-primary/10">
-                      <div className="flex items-center justify-between text-[9px] sm:text-[10px] text-foreground font-mono tracking-widest uppercase">
+                    <div className="absolute bottom-0 inset-x-0 p-4 bg-gradient-to-t from-background via-background/80 to-transparent flex flex-col gap-2 z-10 border-t border-primary/10">
+                      <div className="flex items-center justify-between text-[10px] text-foreground font-mono tracking-widest uppercase">
                         <span>{formatSeconds(currentTime)} / {activeLesson.durationHours ? Math.round(activeLesson.durationHours * 60) : 15} MINS</span>
                         <span className="text-primary glow-primary font-bold">HD_STREAM</span>
                       </div>
@@ -267,29 +242,29 @@ export default function LecturesPage() {
                   </div>
                 )}
 
-                <div className="mt-6 sm:mt-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4 border-t border-border/40 pt-4 sm:pt-6 relative z-10 max-w-full overflow-hidden">
-                  <div className="flex items-center gap-2 sm:gap-3 text-[9px] sm:text-[10px] uppercase tracking-widest text-muted-foreground font-mono truncate max-w-full">
-                    <Clock className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
+                <div className="mt-8 flex items-center justify-between gap-4 border-t border-border/40 pt-6 relative z-10 max-w-full overflow-hidden">
+                  <div className="flex items-center gap-3 text-[10px] uppercase tracking-widest text-muted-foreground font-mono truncate max-w-full">
+                    <Clock className="w-4 h-4 shrink-0" />
                     <span className="truncate">STREAM_DURATION: {activeLesson.durationHours ? Math.round(activeLesson.durationHours * 60) : 15} MINS</span>
                   </div>
                   {activeLesson.completed ? (
                     <Button
                       variant="outline"
                       size="sm"
-                      className="text-[9px] sm:text-[10px] font-mono tracking-widest uppercase text-primary border-primary/40 bg-primary/10 glow-primary shrink-0 hover:bg-primary/20 transition-all"
+                      className="text-[10px] font-mono tracking-widest uppercase text-primary border-primary/40 bg-primary/10 glow-primary shrink-0 hover:bg-primary/20 transition-all"
                       onClick={() => {
                         markComplete(activeLesson.id, activeProgramId, false);
                         toast.info("Lesson marked as incomplete.");
                       }}
                     >
-                      <CheckCircle2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1.5" />
+                      <CheckCircle2 className="w-4 h-4 mr-1.5" />
                       <span>MODULE_COMPLETED</span>
                     </Button>
                   ) : (
                     <Button 
                       variant="outline" 
                       size="sm" 
-                      className="text-[9px] sm:text-[10px] font-mono tracking-widest uppercase w-full sm:w-auto hover:border-primary/50 hover:text-primary transition-all"
+                      className="text-[10px] font-mono tracking-widest uppercase hover:border-primary/50 hover:text-primary transition-all"
                       onClick={() => {
                         markComplete(activeLesson.id, activeProgramId, true);
                         playChime();
@@ -310,6 +285,100 @@ export default function LecturesPage() {
           )}
         </div>
       </div>
+
+      {/* Mobile Video Player Modal via Portal */}
+      {mounted && isMobileModalOpen && activeLesson && createPortal(
+        <div className="lg:hidden fixed inset-0 z-[99999] bg-background/95 flex items-center justify-center p-1.5 xs:p-2 sm:p-4 backdrop-blur-md animate-in fade-in duration-200">
+          <div className="glass-panel corner-accent border-primary/30 p-3 sm:p-5 w-[98vw] sm:w-full max-w-5xl shadow-2xl relative h-[94vh] flex flex-col justify-between overflow-hidden">
+            <div className="absolute top-0 left-0 w-full h-1 bg-primary glow-primary" />
+            
+            {/* Modal Header */}
+            <div className="flex items-center justify-between border-b border-border/30 pb-2 mb-2 gap-2">
+              <div className="overflow-hidden min-w-0 flex-1">
+                <h3 className="font-heading text-xs sm:text-sm font-bold uppercase text-foreground truncate pr-2">
+                  {activeLesson.title}
+                </h3>
+                <p className="font-mono text-[8px] uppercase tracking-widest text-muted-foreground truncate">
+                  {activeWeek?.weekTitle}
+                </p>
+              </div>
+              <button
+                onClick={() => setIsMobileModalOpen(false)}
+                className="text-muted-foreground hover:text-foreground p-1 rounded-sm hover:bg-muted/30 transition-colors shrink-0"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Modal Video Frame */}
+            <div className="relative w-full flex-1 min-h-[300px] xs:min-h-[380px] sm:min-h-[480px] rounded-sm bg-black border border-primary/20 overflow-hidden shadow-lg my-1.5">
+              {activeLesson.videoUrl ? (
+                <iframe 
+                  src={(() => {
+                    let url = activeLesson.videoUrl || "";
+                    if (url.includes("drive.google.com")) {
+                      const driveIdMatch = url.match(/\/d\/([a-zA-Z0-9_-]+)/) || url.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+                      if (driveIdMatch && driveIdMatch[1]) {
+                        return `https://drive.google.com/file/d/${driveIdMatch[1]}/preview`;
+                      }
+                      return url.replace(/\/view.*$/, "/preview");
+                    } else if (url.includes("youtube.com/watch?v=")) {
+                      const vId = url.split("watch?v=")[1]?.split("&")[0];
+                      return `https://www.youtube.com/embed/${vId}?rel=0`;
+                    } else if (url.includes("youtu.be/")) {
+                      const vId = url.split("youtu.be/")[1]?.split("?")[0];
+                      return `https://www.youtube.com/embed/${vId}?rel=0`;
+                    }
+                    return url;
+                  })()} 
+                  className="w-full h-full absolute inset-0 border-0 block" 
+                  style={{ width: "100%", height: "100%", border: "none" }}
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen"
+                  allowFullScreen
+                ></iframe>
+              ) : (
+                <div className="w-full h-full flex flex-col items-center justify-center text-center p-4">
+                  <button onClick={() => setIsPlaying(!isPlaying)} className="p-3 bg-primary/10 border border-primary/30 rounded-full glow-primary">
+                    {isPlaying ? <PauseCircle className="w-8 h-8 text-primary" /> : <PlayCircle className="w-8 h-8 text-primary" />}
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* Modal Footer Controls */}
+            <div className="pt-3 border-t border-border/30 flex items-center justify-between gap-2 mt-2">
+              {activeLesson.completed ? (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="w-full text-[9px] font-mono tracking-widest uppercase text-primary border-primary/40 bg-primary/10 glow-primary"
+                  onClick={() => {
+                    markComplete(activeLesson.id, activeProgramId, false);
+                    toast.info("Lesson marked as incomplete.");
+                  }}
+                >
+                  <CheckCircle2 className="w-3.5 h-3.5 mr-1" />
+                  MODULE_COMPLETED
+                </Button>
+              ) : (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="w-full text-[9px] font-mono tracking-widest uppercase hover:border-primary/50 hover:text-primary"
+                  onClick={() => {
+                    markComplete(activeLesson.id, activeProgramId, true);
+                    playChime();
+                    toast.success("Lesson marked as complete!");
+                  }}
+                >
+                  MARK_COMPLETE
+                </Button>
+              )}
+            </div>
+          </div>
+        </div>,
+        document.body
+      )}
 
       <SwitchProgramModal
         isOpen={!!switchTargetId}
