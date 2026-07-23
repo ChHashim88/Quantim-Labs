@@ -140,34 +140,34 @@ export default function CalendarPage() {
   }
 
   return (
-    <div className="space-y-8 max-w-6xl mx-auto">
-      <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div>
-          <h1 className="text-4xl lg:text-5xl font-heading font-extrabold tracking-tighter uppercase">MENTORING CALENDAR</h1>
-          <p className="font-mono text-[10px] tracking-[0.2em] uppercase text-muted-foreground mt-2 flex items-center gap-2">
-            <span className="w-1 h-1 bg-primary"></span> SCHEDULE 1-ON-1 CODE REVIEWS AND TRACK DEADLINES
+    <div className="space-y-6 sm:space-y-8 max-w-6xl mx-auto w-full overflow-x-hidden animate-in fade-in slide-in-from-bottom-4 duration-500">
+      <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 max-w-full overflow-hidden">
+        <div className="max-w-full overflow-hidden">
+          <h1 className="text-2xl sm:text-4xl lg:text-5xl font-heading font-extrabold tracking-tighter uppercase break-words">MENTORING CALENDAR</h1>
+          <p className="font-mono text-[9px] sm:text-[10px] tracking-[0.15em] sm:tracking-[0.2em] uppercase text-muted-foreground mt-2 flex items-center gap-2 max-w-full overflow-hidden break-words">
+            <span className="w-1 h-1 bg-primary shrink-0"></span> SCHEDULE 1-ON-1 CODE REVIEWS AND TRACK DEADLINES
           </p>
         </div>
-        <Button onClick={() => setShowBookingForm(true)} className="rounded-sm px-8 py-6 h-auto bg-primary text-primary-foreground hover:bg-primary/90 font-mono text-[10px] font-bold uppercase tracking-widest flex items-center gap-2 glow-primary transition-all duration-300">
+        <Button onClick={() => setShowBookingForm(true)} className="w-full sm:w-auto rounded-sm px-6 sm:px-8 py-4 sm:py-6 h-auto bg-primary text-primary-foreground hover:bg-primary/90 font-mono text-[10px] font-bold uppercase tracking-widest flex items-center justify-center gap-2 glow-primary transition-all duration-300 shrink-0">
           <Plus className="w-4 h-4" />
           BOOK_SESSION
         </Button>
       </header>
 
-      <div className="grid lg:grid-cols-12 gap-8 items-stretch">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-stretch w-full max-w-full overflow-hidden">
         
         {/* Left Column: Calendar Grid */}
-        <div className="lg:col-span-8 flex flex-col justify-between glass-panel corner-accent p-8 min-h-[500px]">
+        <div className="lg:col-span-8 flex flex-col justify-between glass-panel corner-accent p-3.5 sm:p-8 min-h-0 sm:min-h-[500px] max-w-full overflow-hidden">
           <div>
-            <div className="flex items-center justify-between border-b border-border/40 pb-6 mb-8">
-              <span className="font-heading font-bold text-2xl uppercase tracking-tight text-foreground">OCTOBER 2026</span>
-              <div className="text-[9px] font-mono tracking-widest uppercase bg-primary/10 text-primary border border-primary/30 px-3 py-1.5 rounded-sm glow-primary">
+            <div className="flex flex-wrap items-center justify-between border-b border-border/40 pb-4 sm:pb-6 mb-4 sm:mb-8 gap-2 max-w-full overflow-hidden">
+              <span className="font-heading font-bold text-lg sm:text-2xl uppercase tracking-tight text-foreground truncate">OCTOBER 2026</span>
+              <div className="text-[8px] sm:text-[9px] font-mono tracking-widest uppercase bg-primary/10 text-primary border border-primary/30 px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-sm glow-primary shrink-0">
                 SCHOOL_TERM_CALENDAR
               </div>
             </div>
 
             {/* Weekdays Header */}
-            <div className="grid grid-cols-7 gap-2 text-center text-[10px] font-mono tracking-[0.2em] text-muted-foreground mb-4 uppercase">
+            <div className="grid grid-cols-7 gap-1 sm:gap-2 text-center text-[8px] sm:text-[10px] font-mono tracking-tight sm:tracking-[0.2em] text-muted-foreground mb-3 sm:mb-4 uppercase">
               <span>SUN</span>
               <span>MON</span>
               <span>TUE</span>
@@ -178,7 +178,7 @@ export default function CalendarPage() {
             </div>
 
             {/* Monthly Grid */}
-            <div className="grid grid-cols-7 gap-3 flex-1">
+            <div className="grid grid-cols-7 gap-1 sm:gap-3 flex-1">
               {gridCells.map((_, index) => {
                 const isDayCell = index >= startOffset;
                 const dayNumber = index - startOffset + 1;
@@ -192,7 +192,7 @@ export default function CalendarPage() {
                     onClick={() => {
                       if (isDayCell) setSelectedDay(dayNumber);
                     }}
-                    className={`aspect-square rounded-sm flex flex-col items-center justify-between p-2 font-mono text-xs border relative transition-all ${
+                    className={`aspect-square rounded-sm flex flex-col items-center justify-between p-1 sm:p-2 font-mono text-[9px] sm:text-xs border relative transition-all ${
                       !isDayCell
                         ? "border-transparent select-none pointer-events-none opacity-0"
                         : isSelected
@@ -202,13 +202,13 @@ export default function CalendarPage() {
                   >
                     {isDayCell && (
                       <>
-                        <span className={isSelected ? "text-primary" : "text-foreground"}>{dayNumber}</span>
+                        <span className={isSelected ? "text-primary font-bold" : "text-foreground"}>{dayNumber}</span>
                         {hasEvent && (
-                          <div className="flex gap-1.5 justify-center mt-1">
+                          <div className="flex gap-1 justify-center mt-0.5 sm:mt-1">
                             {dayEvents.map((e) => (
                               <div
                                 key={e.id}
-                                className={`w-1.5 h-1.5 rounded-sm ${
+                                className={`w-1 h-1 sm:w-1.5 sm:h-1.5 rounded-sm ${
                                   e.type === "Deadline" ? "bg-red-500 glow-red" : e.type === "Mentor_Session" ? "bg-blue-500 glow-blue animate-pulse" : "bg-primary glow-primary"
                                 }`}
                               />

@@ -178,56 +178,56 @@ export default function CertificatesPage() {
   }
 
   return (
-    <div className="space-y-8 max-w-5xl mx-auto relative">
-      <header>
-        <h1 className="text-4xl lg:text-5xl font-heading font-extrabold tracking-tighter uppercase">CREDENTIALS_AND_CERTIFICATES</h1>
-        <p className="font-mono text-[10px] tracking-[0.2em] uppercase text-muted-foreground mt-2 flex items-center gap-2">
-          <span className="w-1 h-1 bg-primary"></span> VERIFY, DOWNLOAD, AND SHARE CRYPTOGRAPHICALLY SECURE GRADUATION CERTIFICATES
+    <div className="space-y-6 sm:space-y-8 max-w-5xl mx-auto relative w-full overflow-x-hidden animate-in fade-in slide-in-from-bottom-4 duration-500">
+      <header className="max-w-full overflow-hidden">
+        <h1 className="text-2xl sm:text-4xl lg:text-5xl font-heading font-extrabold tracking-tighter uppercase break-words">CREDENTIALS_AND_CERTIFICATES</h1>
+        <p className="font-mono text-[9px] sm:text-[10px] tracking-[0.15em] sm:tracking-[0.2em] uppercase text-muted-foreground mt-2 flex items-center gap-2 max-w-full overflow-hidden break-words">
+          <span className="w-1 h-1 bg-primary shrink-0"></span> VERIFY, DOWNLOAD, AND SHARE CRYPTOGRAPHICALLY SECURE GRADUATION CERTIFICATES
         </p>
       </header>
 
       {/* Certificates list */}
-      <div className="grid md:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-8 max-w-full overflow-hidden">
         {certs.map((c) => (
-          <div key={c.id} className="glass-panel p-6 corner-accent flex flex-col justify-between group hover:border-primary/50 transition-all">
+          <div key={c.id} className="glass-panel p-4 sm:p-6 corner-accent flex flex-col justify-between group hover:border-primary/50 transition-all max-w-full overflow-hidden">
             <div>
-              <div className="flex justify-between items-start mb-6 pb-6 border-b border-border/20">
-                <div className="flex items-center gap-4">
-                  <div className={`w-12 h-12 rounded-sm flex items-center justify-center border ${
+              <div className="flex justify-between items-start mb-4 sm:mb-6 pb-4 sm:pb-6 border-b border-border/20 gap-2 max-w-full overflow-hidden">
+                <div className="flex items-center gap-3 sm:gap-4 overflow-hidden min-w-0 flex-1">
+                  <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-sm flex items-center justify-center border shrink-0 ${
                     c.status === "Issued" ? "bg-primary/10 text-primary border-primary/30 glow-primary active-glow" : "grid-bg text-muted-foreground/50 border-border/40"
                   }`}>
-                    <Award className="w-6 h-6" />
+                    <Award className="w-5 h-5 sm:w-6 sm:h-6" />
                   </div>
-                  <div>
-                    <h3 className="font-heading font-bold text-xl uppercase tracking-tight text-foreground group-hover:text-primary transition-colors">{c.title}</h3>
-                    <p className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground mt-1">{c.course}</p>
+                  <div className="overflow-hidden min-w-0 flex-1">
+                    <h3 className="font-heading font-bold text-base sm:text-xl uppercase tracking-tight text-foreground group-hover:text-primary transition-colors truncate max-w-[160px] xs:max-w-[220px] sm:max-w-none">{c.title}</h3>
+                    <p className="font-mono text-[8px] sm:text-[9px] uppercase tracking-widest text-muted-foreground mt-0.5 sm:mt-1 truncate">{c.course}</p>
                   </div>
                 </div>
-                <div className={`text-[9px] font-mono tracking-widest uppercase border px-2 py-1 rounded-sm ${c.status === "Issued" ? "bg-primary/10 text-primary border-primary/30 glow-primary" : "text-muted-foreground border-border/50"}`}>
+                <div className={`text-[8px] sm:text-[9px] font-mono tracking-widest uppercase border px-2 py-1 rounded-sm shrink-0 truncate max-w-[120px] sm:max-w-none ${c.status === "Issued" ? "bg-primary/10 text-primary border-primary/30 glow-primary" : "text-muted-foreground border-border/50"}`}>
                   {c.status.replace(/_/g, " ")}
                 </div>
               </div>
-              <div className="text-[10px] text-muted-foreground space-y-3 font-mono uppercase tracking-widest bg-muted/5 p-4 rounded-sm border border-border/20 mb-6">
-                <div className="flex justify-between items-center border-b border-border/20 pb-2">
-                  <span>VERIFICATION_ID:</span>
-                  <span className="text-foreground font-bold">{c.verificationId}</span>
+              <div className="text-[9px] sm:text-[10px] text-muted-foreground space-y-2.5 sm:space-y-3 font-mono uppercase tracking-widest bg-muted/5 p-3 sm:p-4 rounded-sm border border-border/20 mb-4 sm:mb-6 max-w-full overflow-hidden">
+                <div className="flex justify-between items-center border-b border-border/20 pb-2 gap-2">
+                  <span className="shrink-0">VERIFICATION_ID:</span>
+                  <span className="text-foreground font-bold truncate max-w-[120px] xs:max-w-[160px] sm:max-w-none">{c.verificationId}</span>
                 </div>
-                <div className="flex justify-between items-center border-b border-border/20 pb-2">
-                  <span>ISSUE_DATE:</span>
-                  <span className="text-foreground font-bold">{c.date}</span>
+                <div className="flex justify-between items-center border-b border-border/20 pb-2 gap-2">
+                  <span className="shrink-0">ISSUE_DATE:</span>
+                  <span className="text-foreground font-bold truncate">{c.date}</span>
                 </div>
-                <div className="flex justify-between items-center">
-                  <span>HONORS_SCORE:</span>
+                <div className="flex justify-between items-center gap-2">
+                  <span className="shrink-0">HONORS_SCORE:</span>
                   <span className={`font-bold ${c.status === "Issued" ? "text-primary glow-primary" : "text-foreground"}`}>{c.score}</span>
                 </div>
               </div>
             </div>
-            <div className="border-t border-border/30 pt-4 mt-auto flex gap-4">
+            <div className="border-t border-border/30 pt-4 mt-auto flex flex-wrap sm:flex-nowrap gap-2 sm:gap-4 max-w-full overflow-hidden">
               {c.status === "Issued" ? (
                 <>
                   <Button
                     onClick={() => setSelectedCert(c)}
-                    className="flex-1 rounded-sm bg-primary text-primary-foreground hover:bg-primary/90 flex items-center justify-center gap-2 font-mono text-[10px] font-bold uppercase tracking-widest glow-primary transition-all duration-300"
+                    className="flex-1 rounded-sm bg-primary text-primary-foreground hover:bg-primary/90 flex items-center justify-center gap-2 font-mono text-[9px] sm:text-[10px] font-bold uppercase tracking-widest glow-primary transition-all duration-300 py-3 sm:py-2 h-auto"
                   >
                     <Eye className="w-4 h-4" />
                     VIEW_DIGITAL_DIPLOMA
@@ -235,15 +235,15 @@ export default function CertificatesPage() {
                   <Button
                     variant="outline"
                     onClick={() => copyVerificationLink(c.verificationId)}
-                    className="rounded-sm flex items-center justify-center px-4 border-primary/30 text-primary hover:bg-primary/10 glow-primary"
+                    className="rounded-sm flex items-center justify-center px-4 border-primary/30 text-primary hover:bg-primary/10 glow-primary h-auto py-3 sm:py-2"
                   >
                     <Copy className="w-4 h-4" />
                   </Button>
                 </>
               ) : (
-                  <Button disabled className="w-full rounded-sm flex items-center justify-center gap-2 font-mono text-[10px] uppercase tracking-widest border-border/40 bg-transparent text-muted-foreground/50">
-                    <Award className="w-4 h-4" />
-                    {c.status === "Locked_-_Awaiting_Term_End" ? "LOCK_STATE: MINIMUM_DURATION_NOT_REACHED" : "LOCK_STATE: COMPLETE_TRACK_TASKS"}
+                  <Button disabled className="w-full rounded-sm flex items-center justify-center gap-2 font-mono text-[8px] sm:text-[10px] uppercase tracking-widest border-border/40 bg-transparent text-muted-foreground/50 py-3 sm:py-2 h-auto text-wrap text-center">
+                    <Award className="w-4 h-4 shrink-0" />
+                    <span>{c.status === "Locked_-_Awaiting_Term_End" ? "LOCK_STATE: MINIMUM_DURATION_NOT_REACHED" : "LOCK_STATE: COMPLETE_TRACK_TASKS"}</span>
                   </Button>
               )}
             </div>
