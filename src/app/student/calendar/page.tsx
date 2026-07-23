@@ -20,12 +20,7 @@ interface CalendarEvent {
   link?: string;
 }
 
-const INITIAL_EVENTS: CalendarEvent[] = [
-  { id: "e1", title: "Task 1.1 Submission", date: 8, time: "11:59 PM", type: "Deadline" },
-  { id: "e2", title: "Live Sync with Hashim Dawood", date: 10, time: "4:00 PM", type: "Mentor_Session", mentor: "Muhammad Hashim Dawood", link: "https://zoom.us/j/mock" },
-  { id: "e3", title: "Dynamic Metadata Review", date: 15, time: "2:00 PM", type: "Lecture" },
-  { id: "e4", title: "Final Capstone Pitch", date: 28, time: "6:00 PM", type: "Mentor_Session", mentor: "Ali Asghar", link: "https://zoom.us/j/mock2" }
-];
+const INITIAL_EVENTS: CalendarEvent[] = [];
 
 export default function CalendarPage() {
   const [hasEnrollments, setHasEnrollments] = useState(false);
