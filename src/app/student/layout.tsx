@@ -119,7 +119,7 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
             const completedTasks = progressData?.filter(p => p.content_type === 'TASK').map(p => p.content_id) || [];
             const completedAssign = progressData?.filter(p => p.content_type === 'ASSIGNMENT').map(p => p.content_id) || [];
             const completedQuizzes = progressData?.filter(p => p.content_type === 'QUIZ').map(p => p.content_id) || [];
-            const completedLectures = progressData?.filter(p => p.content_type === 'LESSON').map(p => p.content_id) || [];
+            const completedLectures = progressData?.filter(p => p.content_type === 'LESSON' || p.content_type === 'VIDEO').map(p => p.content_id) || [];
             const completedDocuments = progressData?.filter(p => p.content_type === 'DOCUMENT').map(p => p.content_id) || [];
 
             const pendingTaskCount = allTasks.filter(id => !completedTasks.includes(id)).length;

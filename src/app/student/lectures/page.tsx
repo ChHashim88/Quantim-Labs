@@ -82,31 +82,6 @@ export default function LecturesPage() {
     setCurrentTime(0);
   }, [activeId, activeProgramId]);
 
-  useEffect(() => {
-    if (!activeLesson || !isPlaying || activeLesson.videoUrl) return;
-
-    const timer = setInterval(() => {
-      setCurrentTime((prev) => {
-        const nextTime = prev + 1;
-
-        if (nextTime >= totalSeconds / 2 && !activeLesson.completed) {
-          markComplete(activeLesson.id, activeProgramId, true);
-          playChime();
-          toast.success("Lesson complete!");
-        }
-
-        if (nextTime >= totalSeconds) {
-          setIsPlaying(false);
-          clearInterval(timer);
-          return totalSeconds;
-        }
-        return nextTime;
-      });
-    }, 1000);
-
-    return () => clearInterval(timer);
-  }, [isPlaying, activeId, totalSeconds, activeLesson, activeProgramId, markComplete]);
-
   const getDaysRemaining = (unlocksAt: Date | null) => {
     if (!unlocksAt) return 0;
     const now = new Date();
@@ -284,19 +259,27 @@ export default function LecturesPage() {
                     <span className="truncate">STREAM_DURATION: {activeLesson.durationHours ? Math.round(activeLesson.durationHours * 60) : 15} MINS</span>
                   </div>
                   {activeLesson.completed ? (
-                    <div className="flex items-center gap-2 text-primary text-[9px] sm:text-[10px] uppercase tracking-widest font-mono glow-primary shrink-0">
-                      <CheckCircle2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="text-[9px] sm:text-[10px] font-mono tracking-widest uppercase text-primary border-primary/40 bg-primary/10 glow-primary shrink-0 hover:bg-primary/20 transition-all"
+                      onClick={() => {
+                        markComplete(activeLesson.id, activeProgramId, false);
+                        toast.info("Lesson marked as incomplete.");
+                      }}
+                    >
+                      <CheckCircle2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1.5" />
                       <span>MODULE_COMPLETED</span>
-                    </div>
+                    </Button>
                   ) : (
                     <Button 
                       variant="outline" 
                       size="sm" 
-                      className="text-[9px] sm:text-[10px] font-mono tracking-widest uppercase w-full sm:w-auto"
+                      className="text-[9px] sm:text-[10px] font-mono tracking-widest uppercase w-full sm:w-auto hover:border-primary/50 hover:text-primary transition-all"
                       onClick={() => {
                         markComplete(activeLesson.id, activeProgramId, true);
                         playChime();
-                        toast.success("Lesson marked as complete manually!");
+                        toast.success("Lesson marked as complete!");
                       }}
                     >
                       MARK_COMPLETE

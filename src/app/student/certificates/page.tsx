@@ -64,7 +64,7 @@ export default function CertificatesPage() {
           .select('content_type, content_id')
           .eq('student_id', user.id);
 
-        const completedVideos = progressData?.filter(p => p.content_type === 'LESSON').map(p => p.content_id) || [];
+        const completedVideos = progressData?.filter(p => p.content_type === 'LESSON' || p.content_type === 'VIDEO').map(p => p.content_id) || [];
         const completedTasks = progressData?.filter(p => p.content_type === 'TASK').map(p => p.content_id) || [];
         const completedAssignments = progressData?.filter(p => p.content_type === 'ASSIGNMENT').map(p => p.content_id) || [];
         const completedQuizzes = progressData?.filter(p => p.content_type === 'QUIZ').map(p => p.content_id) || [];

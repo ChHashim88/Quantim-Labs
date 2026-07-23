@@ -76,7 +76,7 @@ export default function CoursesPage() {
         .from('student_progress')
         .select('content_id')
         .eq('student_id', user.id)
-        .eq('content_type', 'LESSON');
+        .in('content_type', ['LESSON', 'VIDEO']);
 
       const completed = progressData ? progressData.map(p => p.content_id) : [];
       const { data: dbInternships } = await supabase.from('internships').select('*');
